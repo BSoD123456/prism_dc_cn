@@ -30,23 +30,30 @@ class c_script(c_mark):
                 rb.append(b2)
         self.forval(fnd, st, 4, False)
 
-    def test_dec(self, bs, kofs = 0):
+    def test_dec(self, bs, kofs = 0, dec = True):
         chrj = lambda c: int(c.encode('shift-jis').hex(), 16)
         tst_cs = [
             (0x66, chrj('ゐ') - chrj('ぁ') + 1, chrj('ぁ')),
-            (0, chrj('ヂ') - chrj('ァ') + 1, chrj('ァ')),
-            (0, chrj('ミ') - chrj('ツ') + 1, chrj('ツ')),
-            (0, chrj('ヶ') - chrj('ム') + 1, chrj('ム')),
-        ]
+            (0, chrj('ミ') - chrj('ァ') + 1, chrj('ァ')),
+            (0, chrj('ヱ') - chrj('ム') + 1, chrj('ム')),
+            (0, chrj('蔭') - chrj('亜') + 1, chrj('亜')),
+            *((0, lr[1] - lr[0] + 1, (hi<<8)+lr[0])
+                  for hi in range(0x89, 0x97+1)
+                  for lr in [(0x40, 0x7e), (0x80, 0xfc)]),
+            (0, chrj('腕') - chrj('蓮') + 1, chrj('蓮')),
+        ] if dec else []
         tst_rplc = {
-            'ヱ': 'ー',
+            '[c]': 'ー',
             'ゎ': 'わ',
             'わ': 'を',
             'ゐ': 'ん',
-            '[c]': 'ッ',
+            'ヮ': 'ワ',
+            'ワ': 'ヲ',
+            'ヰ': 'ン',
+            'ヱ': 'ヴ',
         }
         rs = []
-        need_check = False
+        #need_check = False
         for b in bs:
             cbs = 0
             for cs in tst_cs:
@@ -56,18 +63,21 @@ class c_script(c_mark):
                     break
                 cbs += cs[1]
             else:
-                if 0x60 < b < 0x70: #or 0x100 < b < 0x120:
-                    print(hex(b))
-                    breakpoint()
-                r = f'[{b:x}]'
+                #if 0x60 < b < 0x70: #or 0x100 < b < 0x120:
+                #    print(hex(b))
+                #    breakpoint()
+                if b >= cbs:
+                    r = f'[?{b:x}]'
+                else:
+                    r = f'[{b:x}]'
             if r in tst_rplc:
                 r = tst_rplc[r]
-            if r in '?ゑ':
-                need_check = True
+            #if r in '?ゑ':
+            #    need_check = True
             rs.append(r)
-        if need_check:
-            print('check:', ''.join(rs))
-            breakpoint()
+        #if need_check:
+        #    print('check:', ''.join(rs))
+        #    breakpoint()
         return ''.join(rs)
 
 def main(fn):
@@ -76,6 +86,8 @@ def main(fn):
     sc = c_script(raw, 0)
     if True:
         sc.findstr()
+        #sc.findstr(0x10000, 0x20000)
+        #sc.findstr(0, 0x10000)
     else:
         for i in range(-0x10, 0x10):
             print(i, '===')
@@ -85,8 +97,8 @@ def main(fn):
 
 if __name__ == '__main__':
     import pdb
-    #from hexdump import hexdump as hd
+    from hexdump import hexdump as hd
     from pprint import pprint
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
-    main(r'wktab\SCRIPT.BIN')
+    sc = main(r'wktab\SCRIPT.BIN')
