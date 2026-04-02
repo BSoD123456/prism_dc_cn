@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from sect import *
+from report import report
 
 @tabkey('command')
 class c_script_file(c_sect_tab):
@@ -10,6 +11,51 @@ class c_script_file(c_sect_tab):
     def get_command(self, ofs):
         val = self.U32(ofs)
         return val >> 0x1b, val & 0x7ffffff
+
+class c_script_anode:
+    pass
+
+class c_script_anode_inst(c_script_anode):
+
+    def __init__(self, val):
+        self.val = val
+
+    def __repr__(self):
+        return str(self.val)
+
+class c_script_anode_act(c_script_anode):
+
+    def __init__(self, name, anum):
+        self.name = name
+        self.subs = []
+        self.rmlen = anum
+
+    def append(self, anode):
+        assert self.rmlen > 0
+        self.subs.append(anode)
+        self.rmlen -= 1
+
+    def __repr__(self):
+        assert self.rmlen == 0
+        sr = ', '.join(repr(n) for n in self.subs)
+        return f'{self.name}({sr})'
+
+class c_script_anode_act_ret(c_script_anode_act):
+    pass
+
+class c_script_anode_act_none(c_script_anode_act):
+    pass
+
+class c_script_anode_bat:
+
+    def __init__(self):
+        self.subs = []
+
+    def append(self, anode):
+        self.subs.append(anode)
+
+    def __repr__(self):
+        return '|'.join(repr(n) for n in self.subs)
 
 class c_script_program:
 
@@ -50,8 +96,8 @@ class c_script_program:
         # 0x8
         ('jump', {
             0x14: (None, 1, 0),
-            0x15: ('when', 2, 0),
-            0x16: ('when_not', 2, 0),
+            0x15: ('if', 2, 0),
+            0x16: ('if_not', 2, 0),
         }),
         ('call', 0, 1, 0),
         ('syscall', [
@@ -132,6 +178,53 @@ class c_script_program:
     def __init__(self, sect):
         self.sect = sect
 
+    def _error(self, ln, msg):
+        report('err', f'(ln:{ln:x}) {msg}')
+        raise ValueError(msg)
+
+    @staticmethod
+    def _keyget(o, k, d = None):
+        try:
+            return o[k]
+        except (KeyError, IndexError):
+            return d
+
+    def parse_sect(self):
+        cmd_list = self._CMD_INFO
+        mstack = []
+        cur_bat = c_script_anode_bat()
+        for ln, (cmd, parm) in enumerate(self.sect):
+            cinfo = self._keyget(cmd_list, cmd)
+            if not cinfo:
+                self._error(ln, f'invalid cmd: {cmd:x}')
+            if isinstance(cinfo[1], int):
+                cname, pnum, snum, rnum = cinfo
+            else:
+                cname, sub_list = cinfo
+                cinfo = self._keyget(sub_list, parm)
+                if not cinfo:
+                    self._error(ln, f'invalid sub-cmd: {cmd:x} {parm:x}')
+                pnum = 0
+                sname, snum, rnum = cinfo
+                cname = '_'.join((cname, sname))
+            assert rnum < 2 and pnum < 2
+            if len(mstack) < snum:
+                self._error(ln, f'stack underflow: {cname} on {len(mstack)}')
+            if rnum:
+                anode = c_script_anode_act_ret(cname, pnum + snum)
+            else:
+                anode = c_script_anode_act_none(cname, pnum + snum)
+            if pnum:
+                anode.append(c_script_anode_inst(parm))
+            for _ in range(snum):
+                anode.append(mstack.pop())
+            print(f'{ln:x}: {anode}')
+            cur_bat.append(anode)
+            if rnum:
+                mstack.append(cur_bat)
+                cur_bat = c_script_anode_bat()
+        return mstack
+            
 if __name__ == '__main__':
     import pdb
     from hexdump import hexdump as hd
@@ -139,9 +232,11 @@ if __name__ == '__main__':
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
     def tst1():
-        global sc
+        global sc, prog, ast
         with open(r'wktab\SCRIPT.BIN', 'rb') as fd:
             raw = fd.read()
         sc = c_script_file(raw, 0)
         sc.parse_size(len(raw), 4)
+        prog = c_script_program(sc)
+        ast = prog.parse_sect()
     tst1()
