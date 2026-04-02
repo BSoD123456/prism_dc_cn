@@ -102,9 +102,9 @@ class c_script_program:
         ]),
         # 0x8
         ('jump', {
-            0x14: (None, 1, 0),
-            0x15: ('if', 2, 0),
-            0x16: ('if_not', 2, 0),
+            0x14: (None, 1, 'jmp'),
+            0x15: ('if', 2, 'bra'),
+            0x16: ('if_not', 2, 'bra'),
         }),
         ('call', 0, 1, 'call'),
         ('syscall', [
@@ -171,14 +171,17 @@ class c_script_program:
             ('35', 1, 1),
             ('36', 1, 1),
         ]),
-        ('return', 0, 0, 0),
+        ('return', 0, 0, 'ret'),
         ('txtcall', 0, 1, 'call'),
         ('halloc', 1, 0, 0),
         ('hfree', 1, 0, 0),
         ('hpush', 0, 0, 1),
         # 0x10
         ('pass', 0, 0, 0),
-        ('text', 1, 0, 0),
+        ('text', {
+            '__par__': (None, 0, 0),
+            0x3ffffff: ('end', 0, 'ret'),
+        }),
         ('texth', 1, 0, 0),
     ]
 
@@ -193,7 +196,7 @@ class c_script_program:
     def _keyget(o, k, d = None):
         try:
             return o[k]
-        except (KeyError, IndexError):
+        except (KeyError, IndexError, TypeError):
             return d
 
     @staticmethod
@@ -211,12 +214,18 @@ class c_script_program:
         return 'cfunc', args, 1
 
     def _parse_func(self, addr, functab):
-        cmd_list = self._CMD_INFO
         mstack = []
         msneed = 0
+        branches = []
+        return self._parse_func_bra(addr, functab, mstack, msneed, branches)
+
+    def _parse_func_bra(self, addr, functab, omstack, msneed, branches):
+        mstack = omstack.copy()
+        cmd_list = self._CMD_INFO
         cur_bat = []
         while True:
             cmd, parm = self._rdcmd(addr)
+            
             cinfo = self._keyget(cmd_list, cmd)
             if not cinfo:
                 self._error(addr, f'invalid cmd: {cmd:x}')
@@ -226,11 +235,16 @@ class c_script_program:
                 cname, sub_list = cinfo
                 cinfo = self._keyget(sub_list, parm)
                 if not cinfo:
-                    self._error(addr, f'invalid sub-cmd: {cmd:x} {parm:x}')
-                pnum = 0
+                    cinfo = self._keyget(sub_list, '__par__')
+                    if not cinfo:
+                        self._error(addr, f'invalid sub-cmd: {cmd:x} {parm:x}')
+                    pnum = 1
+                else:
+                    pnum = 0
                 sname, snum, rnum = cinfo
                 if sname:
                     cname = '_'.join((cname, sname))
+            
             assert pnum < 2
             if len(mstack) < snum:
                 self._error(addr, f'stack underflow: {cname} on {len(mstack)}')
@@ -239,17 +253,34 @@ class c_script_program:
                 cargs.append(c_script_anode_inst(parm))
             for _ in range(snum):
                 cargs.append(mstack.pop())
+
+            fltype = 'std'
             if rnum == 'call':
                 fname, cargs, rnum = self._getfunc(functab, addr, cargs)
                 cname = '_'.join((cname, fname))
+            elif isinstance(rnum, str):
+                fltype = rnum
+                rnum = 0
+            
             assert rnum < 2
             anode = self.make_anode_act(cname, cargs, rnum)
-            print(f'{addr:x}: {anode}')
+            #print(f'{addr:x}: {anode}')
             cur_bat.append(anode)
             if rnum:
                 mstack.append(c_script_anode_bat(cur_bat))
                 cur_bat = []
-            addr += 1
+
+            if fltype == 'std':
+                addr += 1
+            elif fltype == 'jmp':
+                addr += 1
+            elif fltype == 'bra':
+                addr += 1
+            elif fltype == 'ret':
+                break
+            else:
+                self._error(addr, f'invalid flow type: {fltype}')
+            
         return mstack
 
     def parse_sect(self):
