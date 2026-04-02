@@ -25,9 +25,10 @@ class c_script_anode_inst(c_script_anode):
 
 class c_script_anode_act(c_script_anode):
 
-    def __init__(self, name, args):
+    def __init__(self, name, args, addr):
         self.name = name
         self.subs = args
+        self.addr = addr
 
     def __repr__(self):
         sr = ', '.join(repr(n) for n in self.subs)
@@ -49,11 +50,14 @@ class c_script_anode_bat:
         self.subs = [nsubs.pop()]
         par.extend(nsubs)
 
-    def _repr_with(self, sep):
-        return sep.join(repr(n) for n in self.subs)
+    def _repr_with(self, flat):
+        if flat:
+            return '\n'.join(f'{n.addr:x}: {n}' for n in self.subs)
+        else:
+            return '|'.join(repr(n) for n in self.subs)
 
     def __repr__(self):
-        return self._repr_with('|')
+        return self._repr_with(False)
 
 class c_script_anode_func:
 
@@ -66,7 +70,7 @@ class c_script_anode_func:
     def __repr__(self):
         ar = ', '.join(self.args)
         rr = ', '.join(self.rets)
-        sr = self.sub._repr_with('\n')
+        sr = self.sub._repr_with(True)
         return f'{self.name} ({ar}) -> {rr}:\n{sr}'
 
 class c_script_program:
@@ -192,6 +196,7 @@ class c_script_program:
 
     def __init__(self, sect):
         self.sect = sect
+        self.wkset = set()
 
     def _error(self, addr, msg):
         report('err', f'(addr:{addr:x}) {msg}')
@@ -205,21 +210,25 @@ class c_script_program:
             return d
 
     @staticmethod
-    def make_anode_act(name, args, rnum):
+    def make_anode_act(name, args, rnum, addr):
         if rnum == 'jmp':
-            return c_script_anode_act_none(name, args)
+            return c_script_anode_act_none(name, args, addr)
         elif rnum == 'bra':
-            return c_script_anode_act_none(name, args)
+            return c_script_anode_act_none(name, args, addr)
         elif rnum == 'ret':
-            return c_script_anode_act_none(name, args)
+            return c_script_anode_act_none(name, args, addr)
         elif rnum:
             assert rnum == 1
-            return c_script_anode_act_ret(name, args)
+            return c_script_anode_act_ret(name, args, addr)
         else:
-            return c_script_anode_act_none(name, args)
+            return c_script_anode_act_none(name, args, addr)
 
     def _rdcmd(self, addr):
+        self.wkset.add(addr)
         return self.sect[addr]
+
+    def _walked(self, addr):
+        return addr in self.wkset
 
     def _getfunc(self, functab, addr, args):
         #return fname, args, rnum
@@ -274,7 +283,7 @@ class c_script_program:
                 fname, cargs, rnum = self._getfunc(functab, addr, cargs)
                 cname = '_'.join((cname, fname))
             
-            anode = self.make_anode_act(cname, cargs, rnum)
+            anode = self.make_anode_act(cname, cargs, rnum, addr)
             #print(f'{addr:x}: {anode}')
             cur_bat.append(anode)
             if isinstance(anode, c_script_anode_act_ret):
@@ -289,16 +298,21 @@ class c_script_program:
                 if not isinstance(adst, c_script_anode_inst):
                     self._error(addr, f'jump to non-instant addr: {adst}')
                 adst = adst.val
-                addr += 1
+                if self._walked(adst):
+                    print('here', hex(addr), hex(adst))
+                    break
+                print('here2', hex(addr), hex(adst))
+                addr = adst
             elif rnum == 'bra':
                 addr += 1
             elif rnum == 'ret':
-                addr += 1#break
+                break
             elif isinstance(rnum, int):
                 addr += 1
             else:
                 self._error(addr, f'invalid flow type: {rnum}')
-            
+
+        mstack.append(c_script_anode_bat(cur_bat))
         return mstack
 
     def parse_sect(self):
@@ -318,4 +332,7 @@ if __name__ == '__main__':
         sc.parse_size(len(raw), 4)
         prog = c_script_program(sc)
         ast = prog.parse_sect()
+        for i in ast:
+            print('===')
+            print(i._repr_with(True))
     tst1()
