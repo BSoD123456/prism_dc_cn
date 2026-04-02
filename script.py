@@ -299,9 +299,7 @@ class c_script_program:
                     self._error(addr, f'jump to non-instant addr: {adst}')
                 adst = adst.val
                 if self._walked(adst):
-                    print('here', hex(addr), hex(adst))
                     break
-                print('here2', hex(addr), hex(adst))
                 addr = adst
             elif rnum == 'bra':
                 addr += 1
