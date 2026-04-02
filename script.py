@@ -256,10 +256,11 @@ class c_script_program:
             if len(mstack) < snum:
                 self._error(addr, f'stack underflow: {cname} on {len(mstack)}')
             cargs = []
-            if pnum:
-                cargs.append(c_script_anode_inst(parm))
             for _ in range(snum):
                 cargs.append(mstack.pop())
+            if pnum:
+                cargs.append(c_script_anode_inst(parm))
+            cargs.reverse()
 
             if rnum == 'call':
                 fname, cargs, rnum = self._getfunc(functab, addr, cargs)
