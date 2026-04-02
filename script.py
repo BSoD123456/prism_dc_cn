@@ -25,18 +25,11 @@ class c_script_anode_inst(c_script_anode):
 
 class c_script_anode_act(c_script_anode):
 
-    def __init__(self, name, anum):
+    def __init__(self, name, args):
         self.name = name
-        self.subs = []
-        self.rmlen = anum
-
-    def append(self, anode):
-        assert self.rmlen > 0
-        self.subs.append(anode)
-        self.rmlen -= 1
+        self.subs = args
 
     def __repr__(self):
-        assert self.rmlen == 0
         sr = ', '.join(repr(n) for n in self.subs)
         return f'{self.name}({sr})'
 
@@ -48,14 +41,28 @@ class c_script_anode_act_none(c_script_anode_act):
 
 class c_script_anode_bat:
 
-    def __init__(self):
-        self.subs = []
+    def __init__(self, acts):
+        self.subs = acts
 
-    def append(self, anode):
-        self.subs.append(anode)
+    def _repr_with(self, sep):
+        return sep.join(repr(n) for n in self.subs)
 
     def __repr__(self):
-        return '|'.join(repr(n) for n in self.subs)
+        return self._repr_with('|')
+
+class c_script_anode_func:
+
+    def __init__(self, name, args, rets, bat):
+        self.name = name
+        self.args = args
+        self.rets = rets
+        self.sub = bat
+
+    def __repr__(self):
+        ar = ', '.join(self.args)
+        rr = ', '.join(self.rets)
+        sr = self.sub._repr_with('\n')
+        return f'{self.name} ({ar}) -> {rr}:\n{sr}'
 
 class c_script_program:
 
@@ -99,7 +106,7 @@ class c_script_program:
             0x15: ('if', 2, 0),
             0x16: ('if_not', 2, 0),
         }),
-        ('call', 0, 1, 0),
+        ('call', 0, 1, 'call'),
         ('syscall', [
             # 0x0
             ('0', 1, 1),
@@ -165,21 +172,21 @@ class c_script_program:
             ('36', 1, 1),
         ]),
         ('return', 0, 0, 0),
-        ('txtcall', 0, 1, 0),
+        ('txtcall', 0, 1, 'call'),
         ('halloc', 1, 0, 0),
         ('hfree', 1, 0, 0),
         ('hpush', 0, 0, 1),
         # 0x10
         ('pass', 0, 0, 0),
-        ('text', 2, 0, 0),
-        ('texth', 2, 0, 0),
+        ('text', 1, 0, 0),
+        ('texth', 1, 0, 0),
     ]
 
     def __init__(self, sect):
         self.sect = sect
 
-    def _error(self, ln, msg):
-        report('err', f'(ln:{ln:x}) {msg}')
+    def _error(self, addr, msg):
+        report('err', f'(addr:{addr:x}) {msg}')
         raise ValueError(msg)
 
     @staticmethod
@@ -189,41 +196,64 @@ class c_script_program:
         except (KeyError, IndexError):
             return d
 
-    def parse_sect(self):
+    @staticmethod
+    def make_anode_act(name, args, rnum):
+        if rnum:
+            return c_script_anode_act_ret(name, args)
+        else:
+            return c_script_anode_act_none(name, args)
+
+    def _rdcmd(self, addr):
+        return self.sect[addr]
+
+    def _getfunc(self, functab, addr, args):
+        #return fname, args, rnum
+        return 'cfunc', args, 1
+
+    def _parse_func(self, addr, functab):
         cmd_list = self._CMD_INFO
         mstack = []
-        cur_bat = c_script_anode_bat()
-        for ln, (cmd, parm) in enumerate(self.sect):
+        msneed = 0
+        cur_bat = []
+        while True:
+            cmd, parm = self._rdcmd(addr)
             cinfo = self._keyget(cmd_list, cmd)
             if not cinfo:
-                self._error(ln, f'invalid cmd: {cmd:x}')
+                self._error(addr, f'invalid cmd: {cmd:x}')
             if isinstance(cinfo[1], int):
                 cname, pnum, snum, rnum = cinfo
             else:
                 cname, sub_list = cinfo
                 cinfo = self._keyget(sub_list, parm)
                 if not cinfo:
-                    self._error(ln, f'invalid sub-cmd: {cmd:x} {parm:x}')
+                    self._error(addr, f'invalid sub-cmd: {cmd:x} {parm:x}')
                 pnum = 0
                 sname, snum, rnum = cinfo
-                cname = '_'.join((cname, sname))
-            assert rnum < 2 and pnum < 2
+                if sname:
+                    cname = '_'.join((cname, sname))
+            assert pnum < 2
             if len(mstack) < snum:
-                self._error(ln, f'stack underflow: {cname} on {len(mstack)}')
-            if rnum:
-                anode = c_script_anode_act_ret(cname, pnum + snum)
-            else:
-                anode = c_script_anode_act_none(cname, pnum + snum)
+                self._error(addr, f'stack underflow: {cname} on {len(mstack)}')
+            cargs = []
             if pnum:
-                anode.append(c_script_anode_inst(parm))
+                cargs.append(c_script_anode_inst(parm))
             for _ in range(snum):
-                anode.append(mstack.pop())
-            print(f'{ln:x}: {anode}')
+                cargs.append(mstack.pop())
+            if rnum == 'call':
+                fname, cargs, rnum = self._getfunc(functab, addr, cargs)
+                cname = '_'.join((cname, fname))
+            assert rnum < 2
+            anode = self.make_anode_act(cname, cargs, rnum)
+            print(f'{addr:x}: {anode}')
             cur_bat.append(anode)
             if rnum:
-                mstack.append(cur_bat)
-                cur_bat = c_script_anode_bat()
+                mstack.append(c_script_anode_bat(cur_bat))
+                cur_bat = []
+            addr += 1
         return mstack
+
+    def parse_sect(self):
+        return self._parse_func(0, {})
             
 if __name__ == '__main__':
     import pdb
