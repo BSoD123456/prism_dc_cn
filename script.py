@@ -208,7 +208,7 @@ class c_script_program:
         elif rnum == 'ret':
             return c_script_anode_act_none(name, args)
         elif rnum:
-            assert rnum < 2
+            assert rnum == 1
             return c_script_anode_act_ret(name, args)
         else:
             return c_script_anode_act_none(name, args)
@@ -268,7 +268,7 @@ class c_script_program:
             anode = self.make_anode_act(cname, cargs, rnum)
             #print(f'{addr:x}: {anode}')
             cur_bat.append(anode)
-            if rnum:
+            if isinstance(anode, c_script_anode_act_ret):
                 mstack.append(c_script_anode_bat(cur_bat))
                 cur_bat = []
 
