@@ -44,6 +44,11 @@ class c_script_anode_bat:
     def __init__(self, acts):
         self.subs = acts
 
+    def rebalance(self, par):
+        nsubs = self.subs
+        self.subs = [nsubs.pop()]
+        par.extend(nsubs)
+
     def _repr_with(self, sep):
         return sep.join(repr(n) for n in self.subs)
 
@@ -258,6 +263,9 @@ class c_script_program:
             cargs = []
             for _ in range(snum):
                 cargs.append(mstack.pop())
+            if snum > 0:
+                # move up 1st bat
+                cargs[-1].rebalance(cur_bat)
             if pnum:
                 cargs.append(c_script_anode_inst(parm))
             cargs.reverse()
