@@ -201,7 +201,14 @@ class c_script_program:
 
     @staticmethod
     def make_anode_act(name, args, rnum):
-        if rnum:
+        if rnum == 'jmp':
+            return c_script_anode_act_none(name, args)
+        elif rnum == 'bra':
+            return c_script_anode_act_none(name, args)
+        elif rnum == 'ret':
+            return c_script_anode_act_none(name, args)
+        elif rnum:
+            assert rnum < 2
             return c_script_anode_act_ret(name, args)
         else:
             return c_script_anode_act_none(name, args)
@@ -254,15 +261,10 @@ class c_script_program:
             for _ in range(snum):
                 cargs.append(mstack.pop())
 
-            fltype = 'std'
             if rnum == 'call':
                 fname, cargs, rnum = self._getfunc(functab, addr, cargs)
                 cname = '_'.join((cname, fname))
-            elif isinstance(rnum, str):
-                fltype = rnum
-                rnum = 0
             
-            assert rnum < 2
             anode = self.make_anode_act(cname, cargs, rnum)
             #print(f'{addr:x}: {anode}')
             cur_bat.append(anode)
@@ -270,16 +272,16 @@ class c_script_program:
                 mstack.append(c_script_anode_bat(cur_bat))
                 cur_bat = []
 
-            if fltype == 'std':
+            if rnum == 'jmp':
                 addr += 1
-            elif fltype == 'jmp':
+            elif rnum == 'bra':
                 addr += 1
-            elif fltype == 'bra':
-                addr += 1
-            elif fltype == 'ret':
+            elif rnum == 'ret':
                 break
+            elif isinstance(rnum, int):
+                addr += 1
             else:
-                self._error(addr, f'invalid flow type: {fltype}')
+                self._error(addr, f'invalid flow type: {rnum}')
             
         return mstack
 
