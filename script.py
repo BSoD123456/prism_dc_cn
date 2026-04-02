@@ -282,11 +282,18 @@ class c_script_program:
                 cur_bat = []
 
             if rnum == 'jmp':
+                adst = cargs[0].subs[-1]
+                if not adst.name == 'push':
+                    self._error(addr, f'jump to non-instant addr: {adst}')
+                adst = adst.subs[0]
+                if not isinstance(adst, c_script_anode_inst):
+                    self._error(addr, f'jump to non-instant addr: {adst}')
+                adst = adst.val
                 addr += 1
             elif rnum == 'bra':
                 addr += 1
             elif rnum == 'ret':
-                break
+                addr += 1#break
             elif isinstance(rnum, int):
                 addr += 1
             else:
