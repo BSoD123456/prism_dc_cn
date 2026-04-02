@@ -20,22 +20,51 @@ class c_script_program:
         ('vmask', 0, 2, 1),
         ('vget', 0, 1, 1),
         ('vcheck', 0, 1, 1),
-        ('push', 1, 1, 0),
-        ('pop', 0, 0, 1),
-        ('calc', 1, None, 1),
+        ('push', 1, 0, 1),
+        ('pop', 0, 1, 0),
+        ('calc', [
+            # 0x0
+            (None, 0, 0),
+            ('add', 2, 1),
+            ('sub', 2, 1),
+            ('mul', 2, 1),
+            ('div', 2, 1),
+            ('mod', 2, 1),
+            ('neg', 1, 1),
+            ('eq', 2, 1),
+            # 0x8
+            ('gt', 2, 1),
+            ('ge', 2, 1),
+            ('lt', 2, 1),
+            ('le', 2, 1),
+            ('ne', 2, 1),
+            ('and', 2, 1),
+            ('or', 2, 1),
+            ('band', 2, 1),
+            # 0x10
+            ('bor', 2, 1),
+            ('bxor', 2, 1),
+            ('shl', 2, 1),
+            ('shr', 2, 1),
+        ]),
         # 0x8
-        ('jump', 1, None, None),
-        ('call', 0, None, None),
-        ('syscall', 0, None, None),
-        ('return', 0, None, None),
-        ('txtcall', 0, None, None),
+        ('jump', {
+            0x14: (None, 1, 0),
+            0x15: ('when', 2, 0),
+            0x16: ('when_not', 2, 0),
+        }),
+        ('call', 0, 1, 0),
+        ('syscall', [
+        ]),
+        ('return', 0, 0, 0),
+        ('txtcall', 0, 1, 0),
         ('halloc', 1, 0, 0),
         ('hfree', 1, 0, 0),
-        ('hpush', 0, 1, 0),
+        ('hpush', 0, 0, 1),
         # 0x10
         ('pass', 0, 0, 0),
-        ('text', 2, None, None),
-        ('texth', 2, None, None),
+        ('text', 2, 0, 0),
+        ('texth', 2, 0, 0),
     ]
 
     def __init__(self, sect):
