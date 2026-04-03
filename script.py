@@ -285,14 +285,14 @@ class c_script_program:
         fwkset = set()
         labtab = {}
         braseq = [('entry', staddr, 0)]
-        branches = {}
+        branches = []
         msinfo = None
         while braseq:
             lname, addr, msneed = braseq.pop()
             if addr in labtab:
                 continue
             labtab[addr] = lname
-            print('===', lname, hex(addr))
+            #print('===', lname, hex(addr))
             bra, bmsinfo = self._parse_func_bra(
                 addr, functab, labtab, msneed, braseq, fwkset)
             if not bmsinfo is None:
@@ -301,10 +301,10 @@ class c_script_program:
                 elif msinfo != bmsinfo:
                     self._error(addr,
                         f'different numbers of func stack: {msinfo} -> {bmsinfo}')
-            branches[lname] = bra
-            print(bra._repr_as(True))
-        print('msinfo:', msinfo)
-        return branches
+            if len(bra.subs) > 0:
+                branches.append(bra)
+                #print(bra._repr_as(True))
+        return self._merge_bra(branches), msinfo
 
     def _parse_func_bra(self, staddr, functab, labtab, msneed, braseq, fwkset):
         cmd_list = self._CMD_INFO
@@ -429,6 +429,23 @@ class c_script_program:
         mpushb()
         return mstack.pop(), msinfo
 
+    def _merge_bra(self, branches):
+        minaddrs = [b.subs[0].addr for b in branches]
+        raseq = []
+        while True:
+            mna = INF
+            mni = None
+            for i, m in enumerate(minaddrs):
+                if not m is None and m < mna:
+                    mna = m
+                    mni = i
+            if mni is None:
+                break
+            ds = branches[mni].subs
+            raseq.append(ds.pop(0))
+            minaddrs[mni] = ds[0].addr if ds else None
+        return c_script_anode_bat(raseq)
+
     def parse_sect(self):
         return self._parse_func(0, {})
             
@@ -445,9 +462,9 @@ if __name__ == '__main__':
         sc = c_script_file(raw, 0)
         sc.parse_size(len(raw), 4)
         prog = c_script_program(sc)
-        ast = prog.parse_sect()
+        ast, _ = prog.parse_sect()
         #for k, i in ast.items():
         #    print('===', k)
         #    print(i._repr_as(True))
-        #print(ast._repr_as(True))
+        print(ast._repr_as(True))
     tst1()
