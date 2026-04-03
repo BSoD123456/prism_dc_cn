@@ -32,7 +32,7 @@ class c_script_anode_inst(c_script_anode_leaf):
     def __repr__(self):
         return hex(self.val)[2:] if isinstance(self.val, int) else str(self.val)
 
-class c_script_anode_arg(c_script_anode_leaf):
+class c_script_anode_parm(c_script_anode_leaf):
 
     def __init__(self, aidx):
         self.aidx = aidx
@@ -317,7 +317,7 @@ class c_script_program:
         def mpop(nb):
             if len(mstack) < 1:
                 msneed_cntn[0] += 1
-                return c_script_anode_arg(msneed_cntn[0])
+                return c_script_anode_parm(msneed_cntn[0])
             nd = mstack.pop()
             if not nb:
                 rbed = nd.rebalance(cur_bat_cntn[0])
