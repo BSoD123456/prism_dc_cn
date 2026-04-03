@@ -282,15 +282,20 @@ class c_script_program:
         return inst.val
 
     def _parse_func(self, staddr, functab):
-        branches = [staddr]
-        msneed = 0
         fwkset = set()
-        while branches:
-            addr = branches.pop()
-            bra, msneed = self._parse_func_bra(addr, functab, msneed, branches, fwkset)
-        return bra
+        labtab = {}
+        braseq = [('entry', staddr)]
+        msneed = 0
+        branches = {}
+        while braseq:
+            lname, addr = braseq.pop()
+            bra, msneed = self._parse_func_bra(addr, functab, labtab, msneed, braseq, fwkset)
+            branches[lname] = bra
+            print('===', lname)
+            print(bra._repr_as(True))
+        return branches
 
-    def _parse_func_bra(self, staddr, functab, msneed, branches, fwkset):
+    def _parse_func_bra(self, staddr, functab, labtab, msneed, braseq, fwkset):
         cmd_list = self._CMD_INFO
         mstack = []
         cur_bat_cntn = [[]]
@@ -323,6 +328,9 @@ class c_script_program:
                 return False
         addr = staddr
         while True:
+            if walked(addr):
+                mcheck(addr)
+                break
             cmd, parm = self._rdcmd(addr)
             fwkset.add(addr)
             
@@ -389,12 +397,11 @@ class c_script_program:
                 adst = self._getbtail(cargs[-1], False)
                 if not isinstance(adst, c_script_anode_label_bat):
                     self._error(addr, f'jump to non-instant addr: {cargs[-1]}')
-                adst = adst.addr
                 if ctype == 'jmp':
-                    if walked(adst):
-                        break
-                    addr = adst
+                    addr = adst.addr
                 else:
+                    if not adst in labtab:
+                        braseq.append((adst.name, adst.addr))
                     addr += 1
             elif ctype == 'ret':
                 mcheck(addr)
@@ -422,8 +429,8 @@ if __name__ == '__main__':
         sc.parse_size(len(raw), 4)
         prog = c_script_program(sc)
         ast = prog.parse_sect()
-        #for i in ast:
-        #    print('===')
+        #for k, i in ast.items():
+        #    print('===', k)
         #    print(i._repr_as(True))
-        print(ast._repr_as(True))
+        #print(ast._repr_as(True))
     tst1()
