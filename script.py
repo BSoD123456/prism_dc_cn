@@ -284,12 +284,13 @@ class c_script_program:
     def _parse_func(self, staddr, functab):
         branches = [staddr]
         msneed = 0
+        fwkset = set()
         while branches:
             addr = branches.pop()
-            bra, msneed = self._parse_func_bra(addr, functab, msneed, branches)
+            bra, msneed = self._parse_func_bra(addr, functab, msneed, branches, fwkset)
         return bra
 
-    def _parse_func_bra(self, staddr, functab, msneed, branches):
+    def _parse_func_bra(self, staddr, functab, msneed, branches, fwkset):
         cmd_list = self._CMD_INFO
         mstack = []
         cur_bat_cntn = [[]]
@@ -313,9 +314,17 @@ class c_script_program:
         def mcheck(a):
             if len(mstack) > 0:
                 self._error(a, f'branch main stack unbalance: {len(mstack)}')
+        def walked(a):
+            if self._walked(a):
+                if not a in fwkset:
+                    self._error(a, f'function codes should be isolated')
+                return True
+            else:
+                return False
         addr = staddr
         while True:
             cmd, parm = self._rdcmd(addr)
+            fwkset.add(addr)
             
             cinfo = self._keyget(cmd_list, cmd)
             if not cinfo:
@@ -382,7 +391,7 @@ class c_script_program:
                     self._error(addr, f'jump to non-instant addr: {cargs[-1]}')
                 adst = adst.addr
                 if ctype == 'jmp':
-                    if self._walked(adst):
+                    if walked(adst):
                         break
                     addr = adst
                 else:
