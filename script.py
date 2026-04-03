@@ -61,8 +61,11 @@ class c_script_anode_bat(c_script_anode_branch):
 
     def rebalance(self, par):
         nsubs = self.subs
-        self.subs = [nsubs.pop()]
-        par.extend(nsubs)
+        rbed = (len(nsubs) > 1)
+        if rbed:
+            self.subs = [nsubs.pop()]
+            par.extend(nsubs)
+        return rbed
 
     def _repr_as(self, flat):
         if flat:
@@ -274,13 +277,15 @@ class c_script_program:
         cur_bat_cntn = [[]]
         def bpush(nd):
             cur_bat_cntn[0].append(nd)
-        def mpop(rb):
+        def mpop(nb):
             if len(mstack) < 1:
                 msneed += 1
                 return c_script_anode_arg(msneed)
             nd = mstack.pop()
-            if rb:
-                nd.rebalance(cur_bat_cntn[0])
+            if not nb:
+                rbed = nd.rebalance(cur_bat_cntn[0])
+                if nb is None:
+                    return nd, rbed
             return nd
         def mpush(nd):
             mstack.append(nd)
@@ -317,7 +322,7 @@ class c_script_program:
 
             if ctype == 'call':
                 assert snum > 0
-                cdst_nd = mpop(True)
+                cdst_nd, rbed = mpop(None)
                 cdst = self._getinst(cdst_nd, True)
                 if not cdst:
                     self._error(addr, f'call to non-instant addr: {cdst_nd}')
@@ -329,6 +334,8 @@ class c_script_program:
                 if finfo is None:
                     self._error(addr, f'unreachable call: {cname} {cdst:x}')
                 fname, fanum, frnum = finfo
+                if rbed and fanum > 0:
+                    self._error(addr, f'should not rebalance after args: {cdst_nd}')
                 cname = '_'.join((cname, fname))
                 snum += fanum
                 rnum += frnum
@@ -336,7 +343,7 @@ class c_script_program:
             assert pnum < 2
             cargs = []
             for i in range(snum):
-                cargs.append(mpop(i == snum - 1))
+                cargs.append(mpop(i < snum - 1))
             if pnum:
                 cargs.append(c_script_anode_inst(parm))
             cargs.reverse()
