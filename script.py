@@ -284,25 +284,33 @@ class c_script_program:
     def _parse_func(self, staddr, functab):
         fwkset = set()
         labtab = {}
-        braseq = [('entry', staddr)]
-        msneed = 0
-        msret = 0
+        braseq = [('entry', staddr, 0)]
         branches = {}
+        msinfo = None
         while braseq:
-            lname, addr = braseq.pop()
+            lname, addr, msneed = braseq.pop()
             if addr in labtab:
                 continue
             labtab[addr] = lname
             print('===', lname, hex(addr))
-            bra, msneed, msret = self._parse_func_bra(addr, functab, labtab, msneed, msret, braseq, fwkset)
+            bra, bmsinfo = self._parse_func_bra(
+                addr, functab, labtab, msneed, braseq, fwkset)
+            if not bmsinfo is None:
+                if msinfo is None:
+                    msinfo = bmsinfo
+                elif msinfo != bmsinfo:
+                    self._error(addr,
+                        f'different numbers of func stack: {msinfo} -> {bmsinfo}')
             branches[lname] = bra
             print(bra._repr_as(True))
+        print('msinfo:', msinfo)
         return branches
 
-    def _parse_func_bra(self, staddr, functab, labtab, msneed, msret, braseq, fwkset):
+    def _parse_func_bra(self, staddr, functab, labtab, msneed, braseq, fwkset):
         cmd_list = self._CMD_INFO
         mstack = []
         msneed_cntn = [msneed]
+        msinfo = None
         cur_bat_cntn = [[]]
         def bpush(nd):
             cur_bat_cntn[0].append(nd)
@@ -383,9 +391,8 @@ class c_script_program:
                     lb = c_script_anode_label_bat(f'{cdst:x}', cdst)
                 mpush(c_script_anode_bat([lb]))
             elif ctype == 'ret':
-                retnum = len(mstack)
-                snum += retnum
-                msret += retnum
+                msret = len(mstack)
+                snum += msret
             
             assert pnum < 2
             cargs = []
@@ -410,16 +417,17 @@ class c_script_program:
                     addr = adst.addr
                 else:
                     if not adst in labtab:
-                        braseq.append((adst.name, adst.addr))
+                        braseq.append((adst.name, adst.addr, msneed_cntn[0]))
                     addr += 1
             elif ctype == 'ret':
                 mcheck(addr)
+                msinfo = (msneed_cntn[0], msret)
                 break
             else:
                 addr += 1
 
         mpushb()
-        return mstack.pop(), msneed_cntn[0], msret
+        return mstack.pop(), msinfo
 
     def parse_sect(self):
         return self._parse_func(0, {})
