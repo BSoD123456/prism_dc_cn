@@ -260,7 +260,7 @@ class c_script_program:
         bra, msneed = self._parse_func_bra(addr, functab, msneed, branches)
         return bra
 
-    def _parse_func_bra(self, addr, functab, msneed, branches):
+    def _parse_func_bra(self, staddr, functab, msneed, branches):
         cmd_list = self._CMD_INFO
         mstack = []
         cur_bat_cntn = [[]]
@@ -279,6 +279,7 @@ class c_script_program:
         def mpushb():
             mpush(c_script_anode_bat(cur_bat_cntn[0]))
             cur_bat_cntn[0] = []
+        addr = staddr
         while True:
             cmd, parm = self._rdcmd(addr)
             
@@ -347,7 +348,8 @@ class c_script_program:
             else:
                 addr += 1
 
-        assert len(mstack) == 0
+        if len(mstack) > 0:
+            self._error(staddr, f'branch main stack unbalance: {len(mstack)}')
         mpushb()
         return mstack.pop(), msneed
 
