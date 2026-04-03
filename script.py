@@ -55,9 +55,10 @@ class c_script_anode_label_bat(c_script_anode_label):
 
 class c_script_anode_act(c_script_anode_branch):
 
-    def __init__(self, name, args, addr):
+    def __init__(self, name, args, rnum, addr):
         self.name = name
         self.subs = args
+        self.rnum = rnum
         self.addr = addr
 
     def _repr_args(self):
@@ -66,12 +67,6 @@ class c_script_anode_act(c_script_anode_branch):
     def __repr__(self):
         sr = self._repr_args()
         return f'{self.name}({sr})'
-
-class c_script_anode_act_ret(c_script_anode_act):
-    pass
-
-class c_script_anode_act_none(c_script_anode_act):
-    pass
 
 class c_script_anode_bat(c_script_anode_branch):
 
@@ -249,11 +244,8 @@ class c_script_program:
 
     @staticmethod
     def make_anode_act(name, args, rnum, ctype, addr):
-        if rnum:
-            assert rnum == 1
-            return c_script_anode_act_ret(name, args, addr)
-        else:
-            return c_script_anode_act_none(name, args, addr)
+        assert rnum < 2
+        return c_script_anode_act(name, args, rnum, addr)
 
     def _rdcmd(self, addr):
         self.wkset.add(addr)
@@ -377,7 +369,7 @@ class c_script_program:
             anode = self.make_anode_act(cname, cargs, rnum, ctype, addr)
             #print(f'{addr:x}: {anode}')
             bpush(anode)
-            if isinstance(anode, c_script_anode_act_ret):
+            if rnum > 0:
                 mpushb()
 
             if ctype == 'jmp':
