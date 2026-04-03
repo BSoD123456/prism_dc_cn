@@ -114,8 +114,8 @@ class c_script_anode_func(c_script_anode_branch):
         self.sub = bat
 
     def __repr__(self):
-        ar = ', '.join(f'arg{i}' for i in range(self.anum))
-        rr = ', '.join(f'ret{i}' for i in range(self.rnum))
+        ar = ', '.join(f'arg{i+1}' for i in range(self.anum))
+        rr = ', '.join(f'ret{i+1}' for i in range(self.rnum))
         sr = self.sub._repr_as('func')
         return f'func {self.name}({ar}) -> {rr} {{\n{sr}\n}}'
 
