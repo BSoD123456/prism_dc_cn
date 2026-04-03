@@ -105,17 +105,17 @@ class c_script_anode_bat(c_script_anode_branch):
 
 class c_script_anode_func(c_script_anode_branch):
 
-    def __init__(self, name, args, rets, bat):
+    def __init__(self, name, anum, rnum, bat):
         self.name = name
-        self.args = args
-        self.rets = rets
+        self.anum = anum
+        self.rnum = rnum
         self.sub = bat
 
     def __repr__(self):
-        ar = ', '.join(self.args)
-        rr = ', '.join(self.rets)
+        ar = ', '.join(f'arg{i}' for i in range(self.anum))
+        rr = ', '.join(f'ret{i}' for i in range(self.rnum))
         sr = self.sub._repr_as(True)
-        return f'{self.name} ({ar}) -> {rr}:\n{sr}'
+        return f'func {self.name}({ar}) -> {rr} {{\n{sr}\n}}'
 
 class c_script_program:
 
@@ -291,7 +291,7 @@ class c_script_program:
             return None
         return inst.val
 
-    def _parse_func(self, staddr, functab):
+    def _parse_func(self, fname, staddr, functab):
         fwkset = set()
         labtab = {}
         braseq = [(None, staddr, 0)]
@@ -318,7 +318,10 @@ class c_script_program:
             n for a, n in sorted(labtab.items(), key = lambda v: v[0])
             if n])
         branches.insert(0, lbbat)
-        return self._merge_bra(branches), msinfo
+        return c_script_anode_func(
+            fname,
+            *msinfo,
+            self._merge_bra(branches))
 
     def _parse_func_bra(self, staddr, functab, msneed, braseq, fwkset):
         cmd_list = self._CMD_INFO
@@ -460,7 +463,7 @@ class c_script_program:
         return c_script_anode_bat(raseq)
 
     def parse_sect(self):
-        return self._parse_func(0, {})
+        return self._parse_func('main', 0, {})
             
 if __name__ == '__main__':
     import pdb
@@ -475,9 +478,10 @@ if __name__ == '__main__':
         sc = c_script_file(raw, 0)
         sc.parse_size(len(raw), 4)
         prog = c_script_program(sc)
-        ast, _ = prog.parse_sect()
+        ast = prog.parse_sect()
         #for k, i in ast.items():
         #    print('===', k)
         #    print(i._repr_as(True))
-        print(ast._repr_as(True))
+        #print(ast._repr_as(True))
+        print(ast)
     tst1()
