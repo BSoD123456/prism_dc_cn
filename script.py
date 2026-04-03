@@ -37,6 +37,22 @@ class c_script_anode_arg(c_script_anode_leaf):
     def __repr__(self):
         return f'arg{self.aidx}'
 
+class c_script_anode_label(c_script_anode_leaf):
+
+    def __init__(self, name, addr):
+        self.name = name
+        self.addr = addr
+
+class c_script_anode_label_func(c_script_anode_label):
+
+    def __repr__(self):
+        return f'@fun_{self.name}'
+
+class c_script_anode_label_bat(c_script_anode_label):
+
+    def __repr__(self):
+        return f'@lab_{self.name}'
+
 class c_script_anode_act(c_script_anode_branch):
 
     def __init__(self, name, args, addr):
@@ -55,24 +71,6 @@ class c_script_anode_act_ret(c_script_anode_act):
     pass
 
 class c_script_anode_act_none(c_script_anode_act):
-    pass
-
-class c_script_anode_act_call(c_script_anode_act):
-
-    def __init__(self, name, args, addr, fname):
-        super().__init__(name, args, addr)
-        self.fname = fname
-
-    def __repr__(self):
-        sr = self._repr_args()
-        return f'{self.name}@{self.fname}({sr})'
-
-class c_script_anode_act_call_ret(
-        c_script_anode_act_call, c_script_anode_act_ret):
-    pass
-
-class c_script_anode_act_call_none(
-        c_script_anode_act_call, c_script_anode_act_none):
     pass
 
 class c_script_anode_bat(c_script_anode_branch):
@@ -250,19 +248,12 @@ class c_script_program:
             return d
 
     @staticmethod
-    def make_anode_act(name, args, rnum, ctype, addr, na):
-        if ctype == 'call':
-            if rnum:
-                assert rnum == 1
-                return c_script_anode_act_call_ret(name, args, addr, *na)
-            else:
-                return c_script_anode_act_call_none(name, args, addr, *na)
+    def make_anode_act(name, args, rnum, ctype, addr):
+        if rnum:
+            assert rnum == 1
+            return c_script_anode_act_ret(name, args, addr)
         else:
-            if rnum:
-                assert rnum == 1
-                return c_script_anode_act_ret(name, args, addr, *na)
-            else:
-                return c_script_anode_act_none(name, args, addr, *na)
+            return c_script_anode_act_none(name, args, addr)
 
     def _rdcmd(self, addr):
         self.wkset.add(addr)
@@ -272,7 +263,8 @@ class c_script_program:
         return addr in self.wkset
 
     def _getsysfunc(self, addr):
-        return self._keyget(self._SYS_FUNC, addr)
+        n, s, r = self._keyget(self._SYS_FUNC, addr)
+        return f's_{n}', s, r
 
     def _getfunc(self, functab, addr):
         #return fname, anum, rnum
@@ -347,7 +339,6 @@ class c_script_program:
                 ctype = self._keyget(cinfo, 3, 'std')
                 if sname:
                     cname = '_'.join((cname, sname))
-            cna = []
 
             if ctype == 'call':
                 assert snum > 0
@@ -355,7 +346,6 @@ class c_script_program:
                 cdst = self._getinst(cdst_nd, True)
                 if not cdst:
                     self._error(addr, f'call to non-instant addr: {cdst_nd}')
-                snum -= 1
                 if cname == 'syscall':
                     finfo = self._getsysfunc(cdst)
                 else:
@@ -365,7 +355,8 @@ class c_script_program:
                 fname, fanum, frnum = finfo
                 if rbed and fanum > 0:
                     self._error(addr, f'should not rebalance after args: {cdst_nd}')
-                cna.append(fname)
+                mpush(c_script_anode_bat([
+                    c_script_anode_label_func(fname, cdst)]))
                 snum += fanum
                 rnum += frnum
             
@@ -377,7 +368,7 @@ class c_script_program:
                 cargs.append(c_script_anode_inst(parm))
             cargs.reverse()
             
-            anode = self.make_anode_act(cname, cargs, rnum, ctype, addr, cna)
+            anode = self.make_anode_act(cname, cargs, rnum, ctype, addr)
             #print(f'{addr:x}: {anode}')
             bpush(anode)
             if isinstance(anode, c_script_anode_act_ret):
