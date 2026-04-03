@@ -21,7 +21,7 @@ class c_script_anode_inst(c_script_anode):
         self.val = val
 
     def __repr__(self):
-        return str(self.val)
+        return hex(self.val)[2:] if isinstance(self.val, int) else str(self.val)
 
 class c_script_anode_act(c_script_anode):
 
@@ -50,14 +50,14 @@ class c_script_anode_bat:
         self.subs = [nsubs.pop()]
         par.extend(nsubs)
 
-    def _repr_with(self, flat):
+    def _repr_as(self, flat):
         if flat:
             return '\n'.join(f'{n.addr:x}: {n}' for n in self.subs)
         else:
             return '|'.join(repr(n) for n in self.subs)
 
     def __repr__(self):
-        return self._repr_with(False)
+        return self._repr_as(False)
 
 class c_script_anode_func:
 
@@ -70,7 +70,7 @@ class c_script_anode_func:
     def __repr__(self):
         ar = ', '.join(self.args)
         rr = ', '.join(self.rets)
-        sr = self.sub._repr_with(True)
+        sr = self.sub._repr_as(True)
         return f'{self.name} ({ar}) -> {rr}:\n{sr}'
 
 class c_script_program:
@@ -116,70 +116,7 @@ class c_script_program:
             0x16: ('if_not', 2, 0, 'bra'),
         }),
         ('call', 0, 1, 0, 'call'),
-        ('syscall', [
-            # 0x0
-            ('0', 1, 1),
-            ('1', 1, 1),
-            ('2', 1, 1),
-            ('3', 0, 1),
-            ('4_i1', 0, 1),
-            ('5_e', 0, 1),
-            ('6_c', 0, 0),
-            ('7_c', 0, 0),
-            # 0x8
-            ('8_c', 0, 0),
-            ('9', 0, 1),
-            ('a', 0, 1),
-            ('b', 1, 1),
-            ('c_n1i2ni34n5i', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n4|i3|n3 / 3:push1;->r / 4:call d27;->n5:pop1->i2
-            ('d_n1i2ni34n5i', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n3|i3|i4 / 3:push1->r / 4:call d27;->n5:pop1->i2
-            ('e_i2', 0, 1),
-            ('f_c', 0, 0),
-            # 0x10
-            ('10', 1, 1),
-            ('11_c', 0, 0),
-            ('12_c', 0, 0),
-            ('13_c', 0, 0),
-            ('14_c', 0, 0),
-            ('15_c', 0, 0),
-            ('16', 1, 1),
-            ('17', 1, 1),
-            # 0x18
-            ('18', 2, 1),
-            ('19', 1, 1),
-            ('1a', 0, 1),
-            ('1b', 1, 1),
-            ('1c_c', 0, 0),
-            ('1d', 4, 1),
-            ('1e', 1, 1),
-            ('1f', 1, 1),
-            # 0x20
-            ('20', 0, 1),
-            ('21_n1', 1, 1), # pop1;push1;call 1f9b; -> 1:pop1;push1;
-            ('22', 2, 1),
-            ('23', 0, 1),
-            ('24', 1, 1),
-            ('25', 1, 1),
-            ('26', 3, 1),
-            ('27', 1, 1),
-            # 0x28
-            ('28', 1, 1),
-            ('29', 0, 1),
-            ('2a', 1, 1),
-            ('2b', 0, 1),
-            ('2c', 0, 1),
-            ('2d', 0, 1),
-            ('2e', 0, 1),
-            ('2f', 0, 1),
-            # 0x30
-            ('30', 0, 1),
-            ('31', 1, 1),
-            ('32', 2, 1),
-            ('33_i3e', 1, 1),
-            ('34_i3e', 1, 1),
-            ('35', 1, 1),
-            ('36', 1, 1),
-        ]),
+        ('syscall', 0, 1, 0, 'call'),
         ('return', 0, 0, 0, 'ret'),
         ('txtcall', 0, 1, 0, 'call'),
         ('halloc', 1, 0, 0),
@@ -192,6 +129,71 @@ class c_script_program:
             0x3ffffff: ('end', 0, 0, 'ret'),
         }),
         ('texth', 1, 0, 0),
+    ]
+
+    _SYS_FUNC = [
+        # 0x0
+        ('0', 1, 1),
+        ('1', 1, 1),
+        ('2', 1, 1),
+        ('3', 0, 1),
+        ('4_i1', 0, 1),
+        ('5_e', 0, 1),
+        ('6_c', 0, 0),
+        ('7_c', 0, 0),
+        # 0x8
+        ('8_c', 0, 0),
+        ('9', 0, 1),
+        ('a', 0, 1),
+        ('b', 1, 1),
+        ('c_n1i2ni34n5i', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n4|i3|n3 / 3:push1;->r / 4:call d27;->n5:pop1->i2
+        ('d_n1i2ni34n5i', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n3|i3|i4 / 3:push1->r / 4:call d27;->n5:pop1->i2
+        ('e_i2', 0, 1),
+        ('f_c', 0, 0),
+        # 0x10
+        ('10', 1, 1),
+        ('11_c', 0, 0),
+        ('12_c', 0, 0),
+        ('13_c', 0, 0),
+        ('14_c', 0, 0),
+        ('15_c', 0, 0),
+        ('16', 1, 1),
+        ('17', 1, 1),
+        # 0x18
+        ('18', 2, 1),
+        ('19', 1, 1),
+        ('1a', 0, 1),
+        ('1b', 1, 1),
+        ('1c_c', 0, 0),
+        ('1d', 4, 1),
+        ('1e', 1, 1),
+        ('1f', 1, 1),
+        # 0x20
+        ('20', 0, 1),
+        ('21_n1', 1, 1), # pop1;push1;call 1f9b; -> 1:pop1;push1;
+        ('22', 2, 1),
+        ('23', 0, 1),
+        ('24', 1, 1),
+        ('25', 1, 1),
+        ('26', 3, 1),
+        ('27', 1, 1),
+        # 0x28
+        ('28', 1, 1),
+        ('29', 0, 1),
+        ('2a', 1, 1),
+        ('2b', 0, 1),
+        ('2c', 0, 1),
+        ('2d', 0, 1),
+        ('2e', 0, 1),
+        ('2f', 0, 1),
+        # 0x30
+        ('30', 0, 1),
+        ('31', 1, 1),
+        ('32', 2, 1),
+        ('33_i3e', 1, 1),
+        ('34_i3e', 1, 1),
+        ('35', 1, 1),
+        ('36', 1, 1),
     ]
 
     def __init__(self, sect):
@@ -224,20 +226,49 @@ class c_script_program:
     def _walked(self, addr):
         return addr in self.wkset
 
-    def _getfunc(self, functab, addr, args):
-        #return fname, args, rnum
-        return 'cfunc', args, 1
+    def _getsysfunc(self, addr):
+        return self._keyget(self._SYS_FUNC, addr)
+
+    def _getfunc(self, functab, addr):
+        #return fname, anum, rnum
+        return f'f_{addr:x}', 0, 1
+
+    def _getinst(self, bat, removable):
+        assert isinstance(bat, c_script_anode_bat)
+        if not (removable and len(bat.subs) == 1
+                or not removable and len(bat.subs) > 0):
+            return None
+        act = bat.subs[-1]
+        if not (act and act.name == 'push'):
+            return None
+        inst = act.subs[0]
+        if not isinstance(inst, c_script_anode_inst):
+            return None
+        return inst.val
 
     def _parse_func(self, addr, functab):
+        branches = []
+        return self._parse_func_bra(addr, functab, branches)
+
+    def _parse_func_bra(self, addr, functab, branches):
+        cmd_list = self._CMD_INFO
         mstack = []
         msneed = 0
-        branches = []
-        return self._parse_func_bra(addr, functab, mstack, msneed, branches)
-
-    def _parse_func_bra(self, addr, functab, omstack, msneed, branches):
-        mstack = omstack.copy()
-        cmd_list = self._CMD_INFO
-        cur_bat = []
+        cur_bat_cntn = [[]]
+        def bpush(nd):
+            cur_bat_cntn[0].append(nd)
+        def mpop(rb):
+            if len(mstack) < 1:
+                self._error(addr, f'stack underflow: {cname}')
+            nd = mstack.pop()
+            if rb:
+                nd.rebalance(cur_bat_cntn[0])
+            return nd
+        def mpush(nd):
+            mstack.append(nd)
+        def mpushb():
+            mpush(c_script_anode_bat(cur_bat_cntn[0]))
+            cur_bat_cntn[0] = []
         while True:
             cmd, parm = self._rdcmd(addr)
             
@@ -261,39 +292,43 @@ class c_script_program:
                 ctype = self._keyget(cinfo, 3, 'std')
                 if sname:
                     cname = '_'.join((cname, sname))
+
+            if ctype == 'call':
+                assert snum > 0
+                cdst_nd = mpop(True)
+                cdst = self._getinst(cdst_nd, True)
+                if not cdst:
+                    self._error(addr, f'call to non-instant addr: {cdst_nd}')
+                snum -= 1
+                if cname == 'syscall':
+                    finfo = self._getsysfunc(cdst)
+                else:
+                    finfo = self._getfunc(functab, cdst)
+                if finfo is None:
+                    self._error(addr, f'unreachable call: {cname} {cdst:x}')
+                fname, fanum, frnum = finfo
+                cname = '_'.join((cname, fname))
+                snum += fanum
+                rnum += frnum
             
             assert pnum < 2
-            if len(mstack) < snum:
-                self._error(addr, f'stack underflow: {cname} on {len(mstack)}')
             cargs = []
-            for _ in range(snum):
-                cargs.append(mstack.pop())
-            if snum > 0:
-                # move up 1st bat
-                cargs[-1].rebalance(cur_bat)
+            for i in range(snum):
+                cargs.append(mpop(i == snum - 1))
             if pnum:
                 cargs.append(c_script_anode_inst(parm))
             cargs.reverse()
-
-            if ctype == 'call':
-                fname, cargs, rnum = self._getfunc(functab, addr, cargs)
-                cname = '_'.join((cname, fname))
             
             anode = self.make_anode_act(cname, cargs, rnum, ctype, addr)
             #print(f'{addr:x}: {anode}')
-            cur_bat.append(anode)
+            bpush(anode)
             if isinstance(anode, c_script_anode_act_ret):
-                mstack.append(c_script_anode_bat(cur_bat))
-                cur_bat = []
+                mpushb()
 
             if ctype == 'jmp':
-                adst = cargs[0].subs[-1]
-                if not adst.name == 'push':
-                    self._error(addr, f'jump to non-instant addr: {adst}')
-                adst = adst.subs[0]
-                if not isinstance(adst, c_script_anode_inst):
-                    self._error(addr, f'jump to non-instant addr: {adst}')
-                adst = adst.val
+                adst = self._getinst(cargs[0], False)
+                if not adst:
+                    self._error(addr, f'jump to non-instant addr: {cargs[0]}')
                 if self._walked(adst):
                     break
                 addr = adst
@@ -302,8 +337,9 @@ class c_script_program:
             else:
                 addr += 1
 
-        mstack.append(c_script_anode_bat(cur_bat))
-        return mstack
+        assert len(mstack) == 0
+        mpushb()
+        return mstack.pop()
 
     def parse_sect(self):
         return self._parse_func(0, {})
@@ -322,7 +358,8 @@ if __name__ == '__main__':
         sc.parse_size(len(raw), 4)
         prog = c_script_program(sc)
         ast = prog.parse_sect()
-        for i in ast:
-            print('===')
-            print(i._repr_with(True))
+        #for i in ast:
+        #    print('===')
+        #    print(i._repr_as(True))
+        print(ast._repr_as(True))
     tst1()
