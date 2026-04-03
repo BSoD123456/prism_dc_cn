@@ -226,7 +226,7 @@ class c_script_program:
             return d
 
     @staticmethod
-    def make_anode_act(name, args, rnum, ctype, addr):
+    def make_anode_act(addr, name, args, rnum, ctype, *na):
         if rnum:
             assert rnum == 1
             return c_script_anode_act_ret(name, args, addr)
@@ -260,10 +260,12 @@ class c_script_program:
             return None
         return inst.val
 
-    def _parse_func(self, addr, functab):
-        branches = []
+    def _parse_func(self, staddr, functab):
+        branches = [staddr]
         msneed = 0
-        bra, msneed = self._parse_func_bra(addr, functab, msneed, branches)
+        while branches:
+            addr = branches.pop()
+            bra, msneed = self._parse_func_bra(addr, functab, msneed, branches)
         return bra
 
     def _parse_func_bra(self, staddr, functab, msneed, branches):
@@ -285,6 +287,9 @@ class c_script_program:
         def mpushb():
             mpush(c_script_anode_bat(cur_bat_cntn[0]))
             cur_bat_cntn[0] = []
+        def mcheck(a):
+            if len(mstack) > 0:
+                self._error(a, f'branch main stack unbalance: {len(mstack)}')
         addr = staddr
         while True:
             cmd, parm = self._rdcmd(addr)
@@ -336,26 +341,29 @@ class c_script_program:
                 cargs.append(c_script_anode_inst(parm))
             cargs.reverse()
             
-            anode = self.make_anode_act(cname, cargs, rnum, ctype, addr)
+            anode = self.make_anode_act(addr, cname, cargs, rnum, ctype)
             #print(f'{addr:x}: {anode}')
             bpush(anode)
             if isinstance(anode, c_script_anode_act_ret):
                 mpushb()
 
             if ctype == 'jmp':
+                mcheck(addr)
                 adst = self._getinst(cargs[0], False)
                 if not adst:
                     self._error(addr, f'jump to non-instant addr: {cargs[0]}')
                 if self._walked(adst):
                     break
                 addr = adst
+            elif ctype == 'bra':
+                mcheck(addr)
+                addr += 1
             elif ctype == 'ret':
+                mcheck(addr)
                 break
             else:
                 addr += 1
 
-        if len(mstack) > 0:
-            self._error(staddr, f'branch main stack unbalance: {len(mstack)}')
         mpushb()
         return mstack.pop(), msneed
 
