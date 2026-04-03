@@ -40,21 +40,30 @@ class c_script_anode_parm(c_script_anode_leaf):
     def __repr__(self):
         return f'arg{self.aidx}'
 
+class c_script_anode_ref(c_script_anode_leaf):
+
+    def __init__(self, name, addr):
+        self.name = name
+        self.addr = addr
+
+class c_script_anode_ref_func(c_script_anode_ref):
+
+    def __repr__(self):
+        return f'@fun_{self.name}'
+
+class c_script_anode_ref_label(c_script_anode_ref):
+
+    def __repr__(self):
+        return f'@lab_{self.name}'
+
 class c_script_anode_label(c_script_anode_leaf):
 
     def __init__(self, name, addr):
         self.name = name
         self.addr = addr
 
-class c_script_anode_label_func(c_script_anode_label):
-
     def __repr__(self):
-        return f'@fun_{self.name}'
-
-class c_script_anode_label_bat(c_script_anode_label):
-
-    def __repr__(self):
-        return f'@lab_{self.name}'
+        return f'@lab_{self.name}:'
 
 class c_script_anode_act(c_script_anode_branch):
 
@@ -71,6 +80,7 @@ class c_script_anode_act(c_script_anode_branch):
         sr = self._repr_args()
         return f'{self.name}({sr})'
 
+# bat := [act | label]
 class c_script_anode_bat(c_script_anode_branch):
 
     def __init__(self, acts):
@@ -284,17 +294,17 @@ class c_script_program:
     def _parse_func(self, staddr, functab):
         fwkset = set()
         labtab = {}
-        braseq = [('entry', staddr, 0)]
+        braseq = [(None, staddr, 0)]
         branches = []
         msinfo = None
         while braseq:
             lname, addr, msneed = braseq.pop()
             if addr in labtab:
                 continue
-            labtab[addr] = lname
+            labtab[addr] = c_script_anode_label(lname, addr) if lname else None
             #print('===', lname, hex(addr))
             bra, bmsinfo = self._parse_func_bra(
-                addr, functab, labtab, msneed, braseq, fwkset)
+                addr, functab, msneed, braseq, fwkset)
             if not bmsinfo is None:
                 if msinfo is None:
                     msinfo = bmsinfo
@@ -304,9 +314,13 @@ class c_script_program:
             if len(bra.subs) > 0:
                 branches.append(bra)
                 #print(bra._repr_as(True))
+        lbbat = c_script_anode_bat([
+            n for a, n in sorted(labtab.items(), key = lambda v: v[0])
+            if n])
+        branches.insert(0, lbbat)
         return self._merge_bra(branches), msinfo
 
-    def _parse_func_bra(self, staddr, functab, labtab, msneed, braseq, fwkset):
+    def _parse_func_bra(self, staddr, functab, msneed, braseq, fwkset):
         cmd_list = self._CMD_INFO
         mstack = []
         msneed_cntn = [msneed]
@@ -384,11 +398,11 @@ class c_script_program:
                     dname, dsnum, drnum = finfo
                     if rbed and dsnum > 0:
                         self._error(addr, f'should not rebalance after args: {cdst_nd}')
-                    lb = c_script_anode_label_func(dname, cdst)
+                    lb = c_script_anode_ref_func(dname, cdst)
                     snum += dsnum
                     rnum += drnum
                 else:
-                    lb = c_script_anode_label_bat(f'{cdst:x}', cdst)
+                    lb = c_script_anode_ref_label(f'{cdst:x}', cdst)
                 mpush(c_script_anode_bat([lb]))
             elif ctype == 'ret':
                 msret = len(mstack)
@@ -411,13 +425,12 @@ class c_script_program:
             if ctype in ['jmp', 'bra']:
                 mcheck(addr)
                 adst = self._getbtail(cargs[-1], False)
-                if not isinstance(adst, c_script_anode_label_bat):
+                if not isinstance(adst, c_script_anode_ref_label):
                     self._error(addr, f'jump to non-instant addr: {cargs[-1]}')
                 if ctype == 'jmp':
                     addr = adst.addr
                 else:
-                    if not adst in labtab:
-                        braseq.append((adst.name, adst.addr, msneed_cntn[0]))
+                    braseq.append((adst.name, adst.addr, msneed_cntn[0]))
                     addr += 1
             elif ctype == 'ret':
                 mcheck(addr)
