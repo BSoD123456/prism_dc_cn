@@ -94,9 +94,11 @@ class c_script_anode_bat(c_script_anode_branch):
             par.extend(nsubs)
         return rbed
 
-    def _repr_as(self, flat):
-        if flat:
+    def _repr_as(self, form):
+        if form == 'tab':
             return '\n'.join(f'{n.addr:x}: {n}' for n in self.subs)
+        elif form == 'func':
+            return '\n'.join(repr(n) for n in self.subs)
         else:
             return '|'.join(repr(n) for n in self.subs)
 
@@ -114,7 +116,7 @@ class c_script_anode_func(c_script_anode_branch):
     def __repr__(self):
         ar = ', '.join(f'arg{i}' for i in range(self.anum))
         rr = ', '.join(f'ret{i}' for i in range(self.rnum))
-        sr = self.sub._repr_as(True)
+        sr = self.sub._repr_as('func')
         return f'func {self.name}({ar}) -> {rr} {{\n{sr}\n}}'
 
 class c_script_program:
