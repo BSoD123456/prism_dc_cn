@@ -270,12 +270,15 @@ class c_script_program:
         #return fname, anum, rnum
         return f'f_{addr:x}', 0, 1
 
-    def _getinst(self, bat, removable):
+    def _getbtail(self, bat, removable):
         assert isinstance(bat, c_script_anode_bat)
         if not (removable and len(bat.subs) == 1
                 or not removable and len(bat.subs) > 0):
             return None
-        act = bat.subs[-1]
+        return bat.subs[-1]
+
+    def _getinst(self, bat, removable):
+        act = self._getbtail(bat, removable)
         if not (act and act.name == 'push'):
             return None
         inst = act.subs[0]
@@ -340,25 +343,28 @@ class c_script_program:
                 if sname:
                     cname = '_'.join((cname, sname))
 
-            if ctype == 'call':
+            if ctype in ('call', 'jmp', 'bra'):
                 assert snum > 0
                 cdst_nd, rbed = mpop(None)
                 cdst = self._getinst(cdst_nd, True)
                 if not cdst:
                     self._error(addr, f'call to non-instant addr: {cdst_nd}')
-                if cname == 'syscall':
-                    finfo = self._getsysfunc(cdst)
+                if ctype == 'call':
+                    if cname == 'syscall':
+                        finfo = self._getsysfunc(cdst)
+                    else:
+                        finfo = self._getfunc(functab, cdst)
+                    if finfo is None:
+                        self._error(addr, f'unreachable call: {cname} {cdst:x}')
+                    dname, dsnum, drnum = finfo
+                    if rbed and dsnum > 0:
+                        self._error(addr, f'should not rebalance after args: {cdst_nd}')
+                    lb = c_script_anode_label_func(dname, cdst)
+                    snum += dsnum
+                    rnum += drnum
                 else:
-                    finfo = self._getfunc(functab, cdst)
-                if finfo is None:
-                    self._error(addr, f'unreachable call: {cname} {cdst:x}')
-                fname, fanum, frnum = finfo
-                if rbed and fanum > 0:
-                    self._error(addr, f'should not rebalance after args: {cdst_nd}')
-                mpush(c_script_anode_bat([
-                    c_script_anode_label_func(fname, cdst)]))
-                snum += fanum
-                rnum += frnum
+                    lb = c_script_anode_label_bat(f'{cdst:x}', cdst)
+                mpush(c_script_anode_bat([lb]))
             
             assert pnum < 2
             cargs = []
@@ -376,9 +382,10 @@ class c_script_program:
 
             if ctype == 'jmp':
                 mcheck(addr)
-                adst = self._getinst(cargs[0], False)
-                if not adst:
-                    self._error(addr, f'jump to non-instant addr: {cargs[0]}')
+                adst = self._getbtail(cargs[-1], False)
+                if not isinstance(adst, c_script_anode_label_bat):
+                    self._error(addr, f'jump to non-instant addr: {cargs[-1]}')
+                adst = adst.addr
                 if self._walked(adst):
                     break
                 addr = adst
