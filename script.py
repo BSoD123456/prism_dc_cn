@@ -15,7 +15,13 @@ class c_script_file(c_sect_tab):
 class c_script_anode:
     pass
 
-class c_script_anode_inst(c_script_anode):
+class c_script_anode_leaf(c_script_anode):
+    pass
+
+class c_script_anode_branch(c_script_anode):
+    pass
+
+class c_script_anode_inst(c_script_anode_leaf):
 
     def __init__(self, val):
         self.val = val
@@ -23,7 +29,7 @@ class c_script_anode_inst(c_script_anode):
     def __repr__(self):
         return hex(self.val)[2:] if isinstance(self.val, int) else str(self.val)
 
-class c_script_anode_arg(c_script_anode):
+class c_script_anode_arg(c_script_anode_leaf):
 
     def __init__(self, aidx):
         self.aidx = aidx
@@ -31,7 +37,7 @@ class c_script_anode_arg(c_script_anode):
     def __repr__(self):
         return f'arg{self.aidx}'
 
-class c_script_anode_act(c_script_anode):
+class c_script_anode_act(c_script_anode_branch):
 
     def __init__(self, name, args, addr):
         self.name = name
@@ -48,7 +54,7 @@ class c_script_anode_act_ret(c_script_anode_act):
 class c_script_anode_act_none(c_script_anode_act):
     pass
 
-class c_script_anode_bat:
+class c_script_anode_bat(c_script_anode_branch):
 
     def __init__(self, acts):
         self.subs = acts
@@ -67,7 +73,7 @@ class c_script_anode_bat:
     def __repr__(self):
         return self._repr_as(False)
 
-class c_script_anode_func:
+class c_script_anode_func(c_script_anode_branch):
 
     def __init__(self, name, args, rets, bat):
         self.name = name
