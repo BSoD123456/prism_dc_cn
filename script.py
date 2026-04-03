@@ -12,6 +12,9 @@ class c_script_file(c_sect_tab):
         val = self.U32(ofs)
         return val >> 0x1b, val & 0x7ffffff
 
+class err_script_syntax(ValueError):
+    pass
+
 class c_script_anode:
     pass
 
@@ -233,7 +236,7 @@ class c_script_program:
 
     def _error(self, addr, msg):
         report('err', f'(addr:{addr:x}) {msg}')
-        raise ValueError(msg)
+        raise err_script_syntax(msg)
 
     @staticmethod
     def _keyget(o, k, d = None):
