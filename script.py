@@ -23,6 +23,14 @@ class c_script_anode_inst(c_script_anode):
     def __repr__(self):
         return hex(self.val)[2:] if isinstance(self.val, int) else str(self.val)
 
+class c_script_anode_arg(c_script_anode):
+
+    def __init__(self, aidx):
+        self.aidx = aidx
+
+    def __repr__(self):
+        return f'arg{self.aidx}'
+
 class c_script_anode_act(c_script_anode):
 
     def __init__(self, name, args, addr):
@@ -248,18 +256,20 @@ class c_script_program:
 
     def _parse_func(self, addr, functab):
         branches = []
-        return self._parse_func_bra(addr, functab, branches)
+        msneed = 0
+        bra, msneed = self._parse_func_bra(addr, functab, msneed, branches)
+        return bra
 
-    def _parse_func_bra(self, addr, functab, branches):
+    def _parse_func_bra(self, addr, functab, msneed, branches):
         cmd_list = self._CMD_INFO
         mstack = []
-        msneed = 0
         cur_bat_cntn = [[]]
         def bpush(nd):
             cur_bat_cntn[0].append(nd)
         def mpop(rb):
             if len(mstack) < 1:
-                self._error(addr, f'stack underflow: {cname}')
+                msneed += 1
+                return c_script_anode_arg(msneed)
             nd = mstack.pop()
             if rb:
                 nd.rebalance(cur_bat_cntn[0])
@@ -339,7 +349,7 @@ class c_script_program:
 
         assert len(mstack) == 0
         mpushb()
-        return mstack.pop()
+        return mstack.pop(), msneed
 
     def parse_sect(self):
         return self._parse_func(0, {})
