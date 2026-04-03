@@ -84,6 +84,10 @@ class c_script_anode_bat(c_script_anode_branch):
             par.extend(nsubs)
         return rbed
 
+    def flush(self, par):
+        par.extend(self.subs)
+        self.subs = []
+
     def _repr_as(self, flat):
         if flat:
             return '\n'.join(f'{n.addr:x}: {n}' for n in self.subs)
@@ -286,31 +290,44 @@ class c_script_program:
         labtab = {}
         braseq = [('entry', staddr)]
         msneed = 0
+        msret = 0
         branches = {}
         while braseq:
             lname, addr = braseq.pop()
-            bra, msneed = self._parse_func_bra(addr, functab, labtab, msneed, braseq, fwkset)
+            if addr in labtab:
+                continue
+            labtab[addr] = lname
+            print('===', lname, hex(addr))
+            bra, msneed, msret = self._parse_func_bra(addr, functab, labtab, msneed, msret, braseq, fwkset)
             branches[lname] = bra
-            print('===', lname)
             print(bra._repr_as(True))
         return branches
 
-    def _parse_func_bra(self, staddr, functab, labtab, msneed, braseq, fwkset):
+    def _parse_func_bra(self, staddr, functab, labtab, msneed, msret, braseq, fwkset):
         cmd_list = self._CMD_INFO
         mstack = []
+        msneed_cntn = [msneed]
+        msret_cntn = [msret]
         cur_bat_cntn = [[]]
         def bpush(nd):
             cur_bat_cntn[0].append(nd)
         def mpop(nb):
             if len(mstack) < 1:
-                msneed += 1
-                return c_script_anode_arg(msneed)
+                msneed_cntn[0] += 1
+                return c_script_anode_arg(msneed_cntn[0])
             nd = mstack.pop()
             if not nb:
                 rbed = nd.rebalance(cur_bat_cntn[0])
                 if nb is None:
                     return nd, rbed
             return nd
+        def mflush():
+            mn = len(mstack)
+            for nd in mstack:
+                nd.flush(cur_bat_cntn[0])
+            if mn > 0:
+                mstack.clear()
+                msret_cntn[0] += mn
         def mpush(nd):
             mstack.append(nd)
         def mpushb():
@@ -404,13 +421,13 @@ class c_script_program:
                         braseq.append((adst.name, adst.addr))
                     addr += 1
             elif ctype == 'ret':
-                mcheck(addr)
+                mflush()
                 break
             else:
                 addr += 1
 
         mpushb()
-        return mstack.pop(), msneed
+        return mstack.pop(), msneed_cntn[0], msret_cntn[0]
 
     def parse_sect(self):
         return self._parse_func(0, {})
