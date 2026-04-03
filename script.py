@@ -84,10 +84,6 @@ class c_script_anode_bat(c_script_anode_branch):
             par.extend(nsubs)
         return rbed
 
-    def flush(self, par):
-        par.extend(self.subs)
-        self.subs = []
-
     def _repr_as(self, flat):
         if flat:
             return '\n'.join(f'{n.addr:x}: {n}' for n in self.subs)
@@ -307,7 +303,6 @@ class c_script_program:
         cmd_list = self._CMD_INFO
         mstack = []
         msneed_cntn = [msneed]
-        msret_cntn = [msret]
         cur_bat_cntn = [[]]
         def bpush(nd):
             cur_bat_cntn[0].append(nd)
@@ -321,13 +316,6 @@ class c_script_program:
                 if nb is None:
                     return nd, rbed
             return nd
-        def mflush():
-            mn = len(mstack)
-            for nd in mstack:
-                nd.flush(cur_bat_cntn[0])
-            if mn > 0:
-                mstack.clear()
-                msret_cntn[0] += mn
         def mpush(nd):
             mstack.append(nd)
         def mpushb():
@@ -394,6 +382,10 @@ class c_script_program:
                 else:
                     lb = c_script_anode_label_bat(f'{cdst:x}', cdst)
                 mpush(c_script_anode_bat([lb]))
+            elif ctype == 'ret':
+                retnum = len(mstack)
+                snum += retnum
+                msret += retnum
             
             assert pnum < 2
             cargs = []
@@ -421,13 +413,13 @@ class c_script_program:
                         braseq.append((adst.name, adst.addr))
                     addr += 1
             elif ctype == 'ret':
-                mflush()
+                mcheck(addr)
                 break
             else:
                 addr += 1
 
         mpushb()
-        return mstack.pop(), msneed_cntn[0], msret_cntn[0]
+        return mstack.pop(), msneed_cntn[0], msret
 
     def parse_sect(self):
         return self._parse_func(0, {})
