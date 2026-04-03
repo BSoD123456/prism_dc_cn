@@ -286,9 +286,7 @@ class c_script_program:
                 mstack.append(c_script_anode_bat(cur_bat))
                 cur_bat = []
 
-            if ctype == 'std':
-                addr += 1
-            elif ctype == 'jmp':
+            if ctype == 'jmp':
                 adst = cargs[0].subs[-1]
                 if not adst.name == 'push':
                     self._error(addr, f'jump to non-instant addr: {adst}')
@@ -299,14 +297,10 @@ class c_script_program:
                 if self._walked(adst):
                     break
                 addr = adst
-            elif ctype == 'bra':
-                addr += 1
-            elif ctype == 'call':
-                addr += 1
             elif ctype == 'ret':
                 break
             else:
-                self._error(addr, f'invalid flow type: {ctype}')
+                addr += 1
 
         mstack.append(c_script_anode_bat(cur_bat))
         return mstack
