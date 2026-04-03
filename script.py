@@ -111,11 +111,11 @@ class c_script_program:
         ]),
         # 0x8
         ('jump', {
-            0x14: (None, 1, 'jmp'),
-            0x15: ('if', 2, 'bra'),
-            0x16: ('if_not', 2, 'bra'),
+            0x14: (None, 1, 0, 'jmp'),
+            0x15: ('if', 2, 0, 'bra'),
+            0x16: ('if_not', 2, 0, 'bra'),
         }),
-        ('call', 0, 1, 'call'),
+        ('call', 0, 1, 0, 'call'),
         ('syscall', [
             # 0x0
             ('0', 1, 1),
@@ -180,8 +180,8 @@ class c_script_program:
             ('35', 1, 1),
             ('36', 1, 1),
         ]),
-        ('return', 0, 0, 'ret'),
-        ('txtcall', 0, 1, 'call'),
+        ('return', 0, 0, 0, 'ret'),
+        ('txtcall', 0, 1, 0, 'call'),
         ('halloc', 1, 0, 0),
         ('hfree', 1, 0, 0),
         ('hpush', 0, 0, 1),
@@ -189,7 +189,7 @@ class c_script_program:
         ('pass', 0, 0, 0),
         ('text', {
             '__par__': (None, 0, 0),
-            0x3ffffff: ('end', 0, 'ret'),
+            0x3ffffff: ('end', 0, 0, 'ret'),
         }),
         ('texth', 1, 0, 0),
     ]
@@ -210,14 +210,8 @@ class c_script_program:
             return d
 
     @staticmethod
-    def make_anode_act(name, args, rnum, addr):
-        if rnum == 'jmp':
-            return c_script_anode_act_none(name, args, addr)
-        elif rnum == 'bra':
-            return c_script_anode_act_none(name, args, addr)
-        elif rnum == 'ret':
-            return c_script_anode_act_none(name, args, addr)
-        elif rnum:
+    def make_anode_act(name, args, rnum, ctype, addr):
+        if rnum:
             assert rnum == 1
             return c_script_anode_act_ret(name, args, addr)
         else:
@@ -251,7 +245,8 @@ class c_script_program:
             if not cinfo:
                 self._error(addr, f'invalid cmd: {cmd:x}')
             if isinstance(cinfo[1], int):
-                cname, pnum, snum, rnum = cinfo
+                cname, pnum, snum, rnum = cinfo[:4]
+                ctype = self._keyget(cinfo, 4, 'std')
             else:
                 cname, sub_list = cinfo
                 cinfo = self._keyget(sub_list, parm)
@@ -262,7 +257,8 @@ class c_script_program:
                     pnum = 1
                 else:
                     pnum = 0
-                sname, snum, rnum = cinfo
+                sname, snum, rnum = cinfo[:3]
+                ctype = self._keyget(cinfo, 3, 'std')
                 if sname:
                     cname = '_'.join((cname, sname))
             
@@ -279,18 +275,20 @@ class c_script_program:
                 cargs.append(c_script_anode_inst(parm))
             cargs.reverse()
 
-            if rnum == 'call':
+            if ctype == 'call':
                 fname, cargs, rnum = self._getfunc(functab, addr, cargs)
                 cname = '_'.join((cname, fname))
             
-            anode = self.make_anode_act(cname, cargs, rnum, addr)
+            anode = self.make_anode_act(cname, cargs, rnum, ctype, addr)
             #print(f'{addr:x}: {anode}')
             cur_bat.append(anode)
             if isinstance(anode, c_script_anode_act_ret):
                 mstack.append(c_script_anode_bat(cur_bat))
                 cur_bat = []
 
-            if rnum == 'jmp':
+            if ctype == 'std':
+                addr += 1
+            elif ctype == 'jmp':
                 adst = cargs[0].subs[-1]
                 if not adst.name == 'push':
                     self._error(addr, f'jump to non-instant addr: {adst}')
@@ -301,14 +299,14 @@ class c_script_program:
                 if self._walked(adst):
                     break
                 addr = adst
-            elif rnum == 'bra':
+            elif ctype == 'bra':
                 addr += 1
-            elif rnum == 'ret':
+            elif ctype == 'call':
+                addr += 1
+            elif ctype == 'ret':
                 break
-            elif isinstance(rnum, int):
-                addr += 1
             else:
-                self._error(addr, f'invalid flow type: {rnum}')
+                self._error(addr, f'invalid flow type: {ctype}')
 
         mstack.append(c_script_anode_bat(cur_bat))
         return mstack
