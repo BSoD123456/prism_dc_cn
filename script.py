@@ -259,11 +259,11 @@ class c_script_program:
 
     def _getsysfunc(self, addr):
         n, s, r = self._keyget(self._SYS_FUNC, addr)
-        return f's_{n}', s, r
+        return f's{n}', s, r
 
     def _getfunc(self, functab, addr):
         #return fname, anum, rnum
-        return f'f_{addr:x}', 0, 1
+        return f'{addr:x}', 0, 1
 
     def _getbtail(self, bat, removable):
         assert isinstance(bat, c_script_anode_bat)
@@ -375,18 +375,18 @@ class c_script_program:
             if rnum > 0:
                 mpushb()
 
-            if ctype == 'jmp':
+            if ctype in ['jmp', 'bra']:
                 mcheck(addr)
                 adst = self._getbtail(cargs[-1], False)
                 if not isinstance(adst, c_script_anode_label_bat):
                     self._error(addr, f'jump to non-instant addr: {cargs[-1]}')
                 adst = adst.addr
-                if self._walked(adst):
-                    break
-                addr = adst
-            elif ctype == 'bra':
-                mcheck(addr)
-                addr += 1
+                if ctype == 'jmp':
+                    if self._walked(adst):
+                        break
+                    addr = adst
+                else:
+                    addr += 1
             elif ctype == 'ret':
                 mcheck(addr)
                 break
