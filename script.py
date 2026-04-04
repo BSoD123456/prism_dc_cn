@@ -116,13 +116,13 @@ class c_script_anode_func(c_script_anode_branch):
 
     def _repr_as(self, form):
         ar = ', '.join(f'arg{i+1}' for i in range(self.anum))
-        rr = ', '.join(f'ret{i+1}' for i in range(self.rnum))
         if form == 'tab':
+            rr = ', '.join(f'ret{i+1}' for i in range(self.rnum))
             sr = self.sub._repr_as('tab')
             return f'{self.addr:x}: func {self.name}({ar}) -> {rr} {{\n{sr}\n}}'
         else:
             sr = self.sub._repr_as('func')
-            return f'func {self.name}({ar}) -> {rr} {{\n{sr}\n}}'
+            return f'func {self.name}({ar}){{\n{sr}\n}}'
 
     def __repr__(self):
         return self._repr_as(None)
