@@ -264,13 +264,6 @@ class c_script_program:
     def _rdcmd(self, addr):
         return self.sect[addr]
 
-    def _getsysfunc(self, addr):
-        finfo = self._keyget(self._SYS_FUNC, addr)
-        if not finfo:
-            return None
-        n, s, r = finfo
-        return f's{n}', s, r
-
     def _getbtail(self, bat, removable):
         assert isinstance(bat, c_script_anode_bat)
         if not (removable and len(bat.subs) == 1
@@ -406,16 +399,7 @@ class c_script_program:
                     self._error(addr, f'call to non-instant addr: {cdst_nd}')
                 if ctype == 'call':
                     if cname == 'syscall':
-                        finfo = self._getsysfunc(cdst)
-                        warn = False
-                        if len(mstack) != finfo[1]:
-                            print('here1', len(mstack), finfo)
-                            warn = True
-                        if finfo[2] == 0 and self._rdcmd(addr+1)[0] == 0x6:
-                            print('here2', len(mstack), finfo)
-                            warn = True
-                        if warn and finfo[0].endswith('_c'):
-                            breakpoint()
+                        finfo = self._keyget(self._SYS_FUNC, cdst)
                     else:
                         if not cdst in functab:
                             fname =  f'{cdst:x}'
@@ -429,6 +413,8 @@ class c_script_program:
                     dname, dsnum, drnum = finfo
                     if rbed and dsnum > 0:
                         self._error(addr, f'should not rebalance after args: {cdst_nd}')
+                    if cname == 'syscall':
+                        dname = f's{dname}'
                     lb = c_script_anode_ref_func(dname, cdst)
                     snum += dsnum
                     rnum += drnum
