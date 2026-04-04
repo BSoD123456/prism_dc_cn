@@ -296,8 +296,17 @@ class c_script_program:
         print('bf', fname, staddr)
         sta = self._parse_func_inner(fname, staddr, functab, gwkset, cpath)
         print('h3', sta, staddr, functab['need'])
-        if sta == 'unfinished' and staddr in functab['need']:
-            sta = self._parse_func_inner(fname, staddr, functab, gwkset, cpath)
+        if staddr in functab['need']:
+            nnlst = []
+            for rfname, rstaddr, rcpath in functab['need'][staddr]:
+                sta = self._parse_func_inner(
+                    fname, rstaddr, functab, gwkset, rcpath.copy())
+                if sta == 'unfinished':
+                    nnlst.append((rfname, rstaddr, rcpath))
+            if nnlst:
+                functab['need'][staddr] = nnlst
+            else:
+                del functab['need'][staddr]
 
     def _parse_func_inner(self, fname, staddr, functab, gwkset, cpath):
         fwkset = set()
@@ -335,13 +344,11 @@ class c_script_program:
         if not unfinished_info[1] is None:
             if not msinfo is None:
                 functab['proto'][staddr] = (fname, *msinfo)
-            refcidx, refaddr = unfinished_info
-            if refaddr in functab['need']:
-                ostaddr = functab['need'][refaddr]
-                if not ostaddr in cpath:
-                    pass
-            functab['need'].add()
-            print('need', unfinished_info[1])
+            refaddr = unfinished_info[1]
+            if not refaddr in functab['need']:
+                functab['need'][refaddr] = []
+            functab['need'][refaddr].append(
+                (fname, staddr, cpath.copy()))
             return 'unfinished'
         if msinfo is None:
             self._error(staddr, f'function no return: {fname} @ {staddr:x}')
@@ -430,8 +437,7 @@ class c_script_program:
                     if cname == 'syscall':
                         finfo = self._keyget(self._SYS_FUNC, cdst)
                     else:
-                        print('h2', cdst)
-                        if not cdst in functab['declr']:
+                        if not cdst in functab['need']:
                             fname =  f'{cdst:x}'
                             if cdst in cpath:
                                 return None, (cdst, cpath.index(cdst))
@@ -515,7 +521,7 @@ class c_script_program:
         functab = {
             'proto': {},
             'declr': {},
-            'need': set(),
+            'need': {},
         }
         self._parse_func('0', 0, functab, gwkset, cpath)
         print(functab)
