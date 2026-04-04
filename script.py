@@ -49,12 +49,12 @@ class c_script_anode_ref(c_script_anode_leaf):
 class c_script_anode_ref_func(c_script_anode_ref):
 
     def __repr__(self):
-        return f'@fun_{self.name}'
+        return f'&fun.{self.name}'
 
 class c_script_anode_ref_label(c_script_anode_ref):
 
     def __repr__(self):
-        return f'@lab_{self.name}'
+        return f'&lab.{self.name}'
 
 class c_script_anode_label(c_script_anode_leaf):
 
@@ -63,7 +63,7 @@ class c_script_anode_label(c_script_anode_leaf):
         self.addr = addr
 
     def __repr__(self):
-        return f'@lab_{self.name}:'
+        return f'@lab.{self.name}:'
 
 class c_script_anode_act(c_script_anode_branch):
 
@@ -244,7 +244,6 @@ class c_script_program:
 
     def __init__(self, sect):
         self.sect = sect
-        self.wkset = set()
 
     def _error(self, addr, msg):
         report('err', f'(addr:{addr:x}) {msg}')
@@ -263,19 +262,20 @@ class c_script_program:
         return c_script_anode_act(name, args, rnum, addr)
 
     def _rdcmd(self, addr):
-        self.wkset.add(addr)
         return self.sect[addr]
-
-    def _walked(self, addr):
-        return addr in self.wkset
 
     def _getsysfunc(self, addr):
         n, s, r = self._keyget(self._SYS_FUNC, addr)
         return f's{n}', s, r
 
     def _getfunc(self, functab, addr):
-        #return fname, anum, rnum
         return f'{addr:x}', 0, 1
+        if addr in functab:
+            func = functab[addr]
+        else:
+            fname =  f'{addr:x}'
+            self._parse_func(fname, addr, functab)
+        return func.name, func.anum, func.rnum
 
     def _getbtail(self, bat, removable):
         assert isinstance(bat, c_script_anode_bat)
@@ -293,7 +293,7 @@ class c_script_program:
             return None
         return inst.val
 
-    def _parse_func(self, fname, staddr, functab):
+    def _parse_func(self, fname, staddr, functab, gwkset):
         fwkset = set()
         labtab = {}
         braseq = [(None, staddr, 0)]
@@ -306,7 +306,10 @@ class c_script_program:
             labtab[addr] = c_script_anode_label(lname, addr) if lname else None
             #print('===', lname, hex(addr))
             bra, bmsinfo = self._parse_func_bra(
-                addr, functab, msneed, braseq, fwkset)
+                addr, functab, msneed, braseq, fwkset, gwkset)
+            if bra is None:
+                pass
+            gwkset.update(fwkset)
             if not bmsinfo is None:
                 if msinfo is None:
                     msinfo = bmsinfo
@@ -325,7 +328,7 @@ class c_script_program:
             *msinfo,
             self._merge_bra(branches))
 
-    def _parse_func_bra(self, staddr, functab, msneed, braseq, fwkset):
+    def _parse_func_bra(self, staddr, functab, msneed, braseq, fwkset, gwkset):
         cmd_list = self._CMD_INFO
         mstack = []
         msneed_cntn = [msneed]
@@ -351,18 +354,15 @@ class c_script_program:
         def mcheck(a):
             if len(mstack) > 0:
                 self._error(a, f'branch main stack unbalance: {len(mstack)}')
-        def walked(a):
-            if self._walked(a):
-                if not a in fwkset:
-                    self._error(a, f'function codes should be isolated')
-                return True
-            else:
-                return False
+
         addr = staddr
         while True:
-            if walked(addr):
+            
+            if addr in fwkset:
                 mcheck(addr)
                 break
+            elif addr in gwkset:
+                self._error(addr, f'function codes should be isolated')
             cmd, parm = self._rdcmd(addr)
             fwkset.add(addr)
             
@@ -465,7 +465,8 @@ class c_script_program:
         return c_script_anode_bat(raseq)
 
     def parse_sect(self):
-        return self._parse_func('main', 0, {})
+        gwkset = set()
+        return self._parse_func('main', 0, {}, gwkset)
             
 if __name__ == '__main__':
     import pdb
