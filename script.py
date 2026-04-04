@@ -407,11 +407,14 @@ class c_script_program:
                 if ctype == 'call':
                     if cname == 'syscall':
                         finfo = self._getsysfunc(cdst)
+                        warn = False
                         if len(mstack) != finfo[1]:
                             print('here1', len(mstack), finfo)
-                            breakpoint()
+                            warn = True
                         if finfo[2] == 0 and self._rdcmd(addr+1)[0] == 0x6:
                             print('here2', len(mstack), finfo)
+                            warn = True
+                        if warn:
                             breakpoint()
                     else:
                         if not cdst in functab:
