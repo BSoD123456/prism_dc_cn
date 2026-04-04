@@ -414,7 +414,7 @@ class c_script_program:
                         if finfo[2] == 0 and self._rdcmd(addr+1)[0] == 0x6:
                             print('here2', len(mstack), finfo)
                             warn = True
-                        if warn:
+                        if warn and finfo[0].endswith('_c'):
                             breakpoint()
                     else:
                         if not cdst in functab:
