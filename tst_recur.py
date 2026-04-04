@@ -9,6 +9,8 @@ func r2(a1):
     return(call(push(2), r2))
     jump_if(push(1), push(lb))
     return(call(r1))
+    jump_if(push(1), push(lc))
+    return(a1)
     return(call(a1, r2))
 
 0 push 1
@@ -34,9 +36,13 @@ f return
 13 push 0
 14 call
 15 return
-16 push 9
-17 call
-18 return
+16 push 1
+17 push 1a
+18 jump if
+19 return
+1a push 9
+1b call
+1c return
 '''
 
 with open('wktab/tst_recur.bin', 'wb') as fd:
@@ -50,6 +56,8 @@ with open('wktab/tst_recur.bin', 'wb') as fd:
         00000058
         01000028 16000028 15000040
         00000028 00000048
+        00000058
+        01000028 1a000028 15000040
         00000058
         09000028 00000048
         00000058
