@@ -300,6 +300,7 @@ class c_script_program:
         branches = []
         unfinshed = False
         msinfo = None
+        #print('prs_f', fname)
         while braseq:
             lname, addr, msneed = braseq.pop()
             if addr in labtab:
@@ -320,7 +321,7 @@ class c_script_program:
                         f'different numbers of func stack: {msinfo} -> {bmsinfo}')
             if len(bra.subs) > 0:
                 branches.append(bra)
-                #print(bra._repr_as(True))
+                #print(bra._repr_as('tab'))
 
         if msinfo is None:
             self._error(staddr, f'function no return: {fname} @ {staddr:x}')
@@ -489,7 +490,7 @@ class c_script_program:
         gwkset = set()
         cpath = []
         funcs = {}
-        self._parse_func('main', 0, {}, funcs, gwkset, cpath)
+        self._parse_func('0', 0, {}, funcs, gwkset, cpath)
         return funcs
             
 if __name__ == '__main__':
@@ -500,7 +501,9 @@ if __name__ == '__main__':
 
     def tst1():
         global sc, prog, ast
-        with open(r'wktab\SCRIPT.BIN', 'rb') as fd:
+        #fn = r'wktab\SCRIPT.BIN'
+        fn = r'wktab\tst_recur.bin'
+        with open(fn, 'rb') as fd:
             raw = fd.read()
         sc = c_script_file(raw, 0)
         sc.parse_size(len(raw), 4)
