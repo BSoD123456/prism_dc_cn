@@ -185,24 +185,24 @@ class c_script_program:
         ('3', 0, 1),
         ('4_i1', 0, 1),
         ('5_e', 0, 1),
-        ('6_c', 0, 0),
-        ('7_c', 0, 0),
+        ('6_c', 4, 1),
+        ('7_c', 0, 1),
         # 0x8
-        ('8_c', 0, 0),
+        ('8_c', 1, 1),
         ('9', 0, 1),
         ('a', 0, 1),
         ('b', 1, 1),
         ('c_n1i2ni34n5i', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n4|i3|n3 / 3:push1;->r / 4:call d27;->n5:pop1->i2
         ('d_n1i2ni34n5i', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n3|i3|i4 / 3:push1->r / 4:call d27;->n5:pop1->i2
         ('e_i2', 0, 1),
-        ('f_c', 0, 0),
+        ('f_c', 1, 1),
         # 0x10
         ('10', 1, 1),
-        ('11_c', 0, 0),
-        ('12_c', 0, 0),
-        ('13_c', 0, 0),
-        ('14_c', 0, 0),
-        ('15_c', 0, 0),
+        ('11_c', 1, 1),
+        ('12_c', 1, 1),
+        ('13_c', 1, 1),
+        ('14_c', 1, 1),
+        ('15_c', 1, 1),
         ('16', 1, 1),
         ('17', 1, 1),
         # 0x18
@@ -210,7 +210,7 @@ class c_script_program:
         ('19', 1, 1),
         ('1a', 0, 1),
         ('1b', 1, 1),
-        ('1c_c', 0, 0),
+        ('1c_c', 1, 1),
         ('1d', 4, 1),
         ('1e', 1, 1),
         ('1f', 1, 1),
@@ -451,16 +451,16 @@ class c_script_program:
             bpush(anode)
             if rnum > 0:
                 mpushb()
-            if len(mstack) == 0: print(f'{addr:x}: {anode}')
+            #if len(mstack) == 0: print(f'{addr:x}: {anode}')
 
             if ctype in ['jmp', 'bra']:
-                mcheck(addr)
                 adst = self._getbtail(cargs[-1], False)
                 if not isinstance(adst, c_script_anode_ref_label):
                     self._error(addr, f'jump to non-instant addr: {cargs[-1]}')
                 if ctype == 'jmp':
                     addr = adst.addr
                 else:
+                    mcheck(addr)
                     braseq.append((adst.name, adst.addr, msneed_cntn[0]))
                     addr += 1
             elif ctype == 'ret':
