@@ -103,21 +103,29 @@ class c_script_anode_bat(c_script_anode_branch):
             return '|'.join(repr(n) for n in self.subs)
 
     def __repr__(self):
-        return self._repr_as(False)
+        return self._repr_as(None)
 
 class c_script_anode_func(c_script_anode_branch):
 
-    def __init__(self, name, anum, rnum, bat):
+    def __init__(self, name, anum, rnum, bat, addr):
         self.name = name
         self.anum = anum
         self.rnum = rnum
         self.sub = bat
+        self.addr = addr
 
-    def __repr__(self):
+    def _repr_as(self, form):
         ar = ', '.join(f'arg{i+1}' for i in range(self.anum))
         rr = ', '.join(f'ret{i+1}' for i in range(self.rnum))
-        sr = self.sub._repr_as('func')
-        return f'func {self.name}({ar}) -> {rr} {{\n{sr}\n}}'
+        if form == 'tab':
+            sr = self.sub._repr_as('tab')
+            return f'{self.addr:x}: func {self.name}({ar}) -> {rr} {{\n{sr}\n}}'
+        else:
+            sr = self.sub._repr_as('func')
+            return f'func {self.name}({ar}) -> {rr} {{\n{sr}\n}}'
+
+    def __repr__(self):
+        return self._repr_as(None)
 
 class c_script_program:
 
@@ -327,7 +335,8 @@ class c_script_program:
         func = c_script_anode_func(
             fname,
             *msinfo,
-            self._merge_bra(branches))
+            self._merge_bra(branches),
+            staddr)
         funcdecs[staddr] = func
         return 'done'
 
