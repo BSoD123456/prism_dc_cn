@@ -407,6 +407,12 @@ class c_script_program:
                 if ctype == 'call':
                     if cname == 'syscall':
                         finfo = self._getsysfunc(cdst)
+                        if len(mstack) != finfo[1]:
+                            print('here1', len(mstack), finfo)
+                            breakpoint()
+                        if finfo[2] == 0 and self._rdcmd(addr+1)[0] == 0x6:
+                            print('here2', len(mstack), finfo)
+                            breakpoint()
                     else:
                         if not cdst in functab:
                             fname =  f'{cdst:x}'
@@ -439,10 +445,10 @@ class c_script_program:
             cargs.reverse()
             
             anode = self.make_anode_act(cname, cargs, rnum, ctype, addr)
-            print(f'{addr:x}: {anode}')
             bpush(anode)
             if rnum > 0:
                 mpushb()
+            if len(mstack) == 0: print(f'{addr:x}: {anode}')
 
             if ctype in ['jmp', 'bra']:
                 mcheck(addr)
