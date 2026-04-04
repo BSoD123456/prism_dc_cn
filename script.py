@@ -288,17 +288,23 @@ class c_script_program:
             return None
         return inst.val
 
-    def _parse_func(self, fname, staddr, functab, funcdecs, gwkset, cpath):
-        assert not staddr in functab
+    def _parse_func(self, fname, staddr, functab, gwkset, cpath):
+        assert not staddr in functab['proto']
         if fname in cpath:
             return 'recursed'
-        cpath.append(fname)
-        
+        cpath.append(staddr)
+        print('bf', fname, staddr)
+        sta = self._parse_func_inner(fname, staddr, functab, gwkset, cpath)
+        print('h3', sta, staddr, functab['need'])
+        if sta == 'unfinished' and staddr in functab['need']:
+            sta = self._parse_func_inner(fname, staddr, functab, gwkset, cpath)
+
+    def _parse_func_inner(self, fname, staddr, functab, gwkset, cpath):
         fwkset = set()
         labtab = {}
         braseq = [(None, staddr, 0)]
         branches = []
-        unfinshed = False
+        unfinished_info = (INF, None)
         msinfo = None
         #print('prs_f', fname)
         while braseq:
@@ -308,11 +314,14 @@ class c_script_program:
             labtab[addr] = c_script_anode_label(lname, addr) if lname else None
             #print('===', lname, hex(addr))
             bra, bmsinfo = self._parse_func_bra(
-                addr, functab, funcdecs, msneed, braseq, fwkset, gwkset, cpath.copy())
-            if bra == 'recursed':
-                unfinshed = True
+                addr, functab, msneed, braseq, fwkset, gwkset, cpath.copy())
+            if bra is None:
+                print('here', addr, bmsinfo)
+                if not bmsinfo is None:
+                    naddr, ncidx = bmsinfo
+                    if ncidx < unfinished_info[0]:
+                        unfinished_info = (ncidx, naddr)
                 continue
-            gwkset.update(fwkset)
             if not bmsinfo is None:
                 if msinfo is None:
                     msinfo = bmsinfo
@@ -323,12 +332,21 @@ class c_script_program:
                 branches.append(bra)
                 #print(bra._repr_as('tab'))
 
+        if not unfinished_info[1] is None:
+            if not msinfo is None:
+                functab['proto'][staddr] = (fname, *msinfo)
+            refcidx, refaddr = unfinished_info
+            if refaddr in functab['need']:
+                ostaddr = functab['need'][refaddr]
+                if not ostaddr in cpath:
+                    pass
+            functab['need'].add()
+            print('need', unfinished_info[1])
+            return 'unfinished'
         if msinfo is None:
             self._error(staddr, f'function no return: {fname} @ {staddr:x}')
-        functab[staddr] = (fname, *msinfo)
-        if unfinshed:
-            return 'unfinished'
-        
+        functab['proto'][staddr] = (fname, *msinfo)
+
         lbbat = c_script_anode_bat([
             n for a, n in sorted(labtab.items(), key = lambda v: v[0])
             if n])
@@ -338,11 +356,12 @@ class c_script_program:
             *msinfo,
             self._merge_bra(branches),
             staddr)
-        funcdecs[staddr] = func
+        functab['declr'][staddr] = func
+        gwkset.update(fwkset)
         return 'done'
 
     def _parse_func_bra(self,
-            staddr, functab, funcdecs, msneed, braseq, fwkset, gwkset, cpath):
+            staddr, functab, msneed, braseq, fwkset, gwkset, cpath):
         cmd_list = self._CMD_INFO
         mstack = []
         msneed_cntn = [msneed]
@@ -411,13 +430,16 @@ class c_script_program:
                     if cname == 'syscall':
                         finfo = self._keyget(self._SYS_FUNC, cdst)
                     else:
-                        if not cdst in functab:
+                        print('h2', cdst)
+                        if not cdst in functab['declr']:
                             fname =  f'{cdst:x}'
+                            if cdst in cpath:
+                                return None, (cdst, cpath.index(cdst))
                             fsta = self._parse_func(
-                                fname, cdst, functab, funcdecs, gwkset, cpath)
-                            if fsta == 'recursed':
-                                return fsta, None
-                        finfo = functab[cdst]
+                                fname, cdst, functab, gwkset, cpath.copy())
+                            if not cdst in functab['proto']:
+                                return None, None
+                        finfo = functab['proto'][cdst]
                     if finfo is None:
                         self._error(addr, f'unreachable call: {cname} {cdst:x}')
                     dname, dsnum, drnum = finfo
@@ -425,6 +447,7 @@ class c_script_program:
                         self._error(addr, f'should not rebalance after args: {cdst_nd}')
                     if cname == 'syscall':
                         dname = f's{dname}'
+                    cpath.append(dname)
                     lb = c_script_anode_ref_func(dname, cdst)
                     snum += dsnum
                     rnum += drnum
@@ -489,9 +512,14 @@ class c_script_program:
     def parse_sect(self):
         gwkset = set()
         cpath = []
-        funcs = {}
-        self._parse_func('0', 0, {}, funcs, gwkset, cpath)
-        return funcs
+        functab = {
+            'proto': {},
+            'declr': {},
+            'need': set(),
+        }
+        self._parse_func('0', 0, functab, gwkset, cpath)
+        print(functab)
+        return functab['declr']
             
 if __name__ == '__main__':
     import pdb
@@ -502,7 +530,7 @@ if __name__ == '__main__':
     def tst1():
         global sc, prog, ast
         #fn = r'wktab\SCRIPT.BIN'
-        fn = r'wktab\tst_recur.bin'
+        fn = r'wktab\tst_recur1.bin'
         with open(fn, 'rb') as fd:
             raw = fd.read()
         sc = c_script_file(raw, 0)
