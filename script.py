@@ -288,6 +288,12 @@ class c_script_program:
             return None
         return inst.val
 
+    def _getlabname(self, addr):
+        return f'{addr:x}'
+
+    def _getfuncname(self, addr):
+        return f'{addr:x}'
+
     def _parse_func(self, fname, staddr, functab, gwkset, cpath):
         assert not staddr in functab['proto']
         if fname in cpath:
@@ -308,51 +314,67 @@ class c_script_program:
             else:
                 del functab['need'][staddr]
 
-    def _parse_func_inner(self, fname, staddr, functab, gwkset, cpath):
-        fwkset = set()
-        labtab = {}
-        braseq = [(None, staddr, 0)]
-        branches = []
-        unfinished_info = (INF, None)
-        msinfo = None
-        #print('prs_f', fname)
-        while braseq:
-            lname, addr, msneed = braseq.pop()
-            if addr in labtab:
-                continue
-            labtab[addr] = c_script_anode_label(lname, addr) if lname else None
-            #print('===', lname, hex(addr))
-            bra, bmsinfo = self._parse_func_bra(
-                addr, functab, msneed, braseq, fwkset, gwkset, cpath.copy())
-            if bra is None:
-                print('here', addr, bmsinfo)
-                if not bmsinfo is None:
-                    naddr, ncidx = bmsinfo
-                    if ncidx < unfinished_info[0]:
-                        unfinished_info = (ncidx, naddr)
-                continue
-            if not bmsinfo is None:
-                if msinfo is None:
-                    msinfo = bmsinfo
-                elif msinfo != bmsinfo:
-                    self._error(addr,
-                        f'different numbers of func stack: {msinfo} -> {bmsinfo}')
-            if len(bra.subs) > 0:
-                branches.append(bra)
-                #print(bra._repr_as('tab'))
+    def _parse_func(self, staddr, functab, gwkset):
+        progctx = {}
+        sustab = {}
+        braseq = [(staddr, staddr, 0)]
+        faddr = None
 
-        if not unfinished_info[1] is None:
-            if not msinfo is None:
-                functab['proto'][staddr] = (fname, *msinfo)
-            refaddr = unfinished_info[1]
-            if not refaddr in functab['need']:
-                functab['need'][refaddr] = []
-            functab['need'][refaddr].append(
-                (fname, staddr, cpath.copy()))
-            return 'unfinished'
-        if msinfo is None:
-            self._error(staddr, f'function no return: {fname} @ {staddr:x}')
-        functab['proto'][staddr] = (fname, *msinfo)
+        while True:
+            while braseq:
+
+                nfaddr, addr, msneed = braseq.pop()
+                if nfaddr != faddr:
+                    faddr = nfaddr
+                    if not faddr in progctx:
+                        progctx[faddr] = {
+                            'fwkset': set(),
+                            'labtab': {},
+                            'bralst': [],
+                        }
+                    fwkset = progctx[faddr]['fwkset']
+                    labtab = progctx[faddr]['labtab']
+                    bralst = progctx[faddr]['bralst']
+
+                bwkset = fwkset.copy()
+                bra, blabs, bsta, binfo = self._parse_func_bra(
+                    addr, functab, msneed, bwkset, gwkset)
+                print('lab', blabs)
+                for n, a, m in blabs:
+                    if a in labtab:
+                        continue
+                    labtab[a] = n
+                    braseq.append((faddr, a, m))
+                if bra:
+                    if len(bra.subs) > 0:
+                        bralst.append(bra)
+                    fwkset.update(bwkset)
+                    if bsta == 'return':
+                        print('ret', faddr, addr, binfo)
+                        if not faddr in functab:
+                            functab[faddr] = binfo
+                            if faddr in sustab:
+                                print('append', faddr, sustab[faddr])
+                                braseq.extend(sustab[faddr])
+                                del sustab[faddr]
+                        elif functab[faddr] != binfo:
+                            self._error(addr,
+                                f'different numbers of func stack: {functab[faddr]} -> {binfo}')
+                else:
+                    if bsta == 'call':
+                        print('sus', binfo, faddr, addr)
+                        if not binfo in sustab:
+                            sustab[binfo] = []
+                        sustab[binfo].append((faddr, addr, msneed))
+
+            if not sustab:
+                break
+            for a in sustab:
+                braseq.append((a, a, 0))
+                break
+
+        breakpoint()
+
 
         lbbat = c_script_anode_bat([
             n for a, n in sorted(labtab.items(), key = lambda v: v[0])
@@ -368,8 +390,9 @@ class c_script_program:
         return 'done'
 
     def _parse_func_bra(self,
-            staddr, functab, msneed, braseq, fwkset, gwkset, cpath):
+            staddr, functab, msneed, fwkset, gwkset):
         cmd_list = self._CMD_INFO
+        labseq = []
         mstack = []
         msneed_cntn = [msneed]
         msinfo = None
@@ -388,9 +411,12 @@ class c_script_program:
             return nd
         def mpush(nd):
             mstack.append(nd)
-        def mpushb():
-            mpush(c_script_anode_bat(cur_bat_cntn[0]))
+        def bpack():
+            nd = c_script_anode_bat(cur_bat_cntn[0])
             cur_bat_cntn[0] = []
+            return nd
+        def mpushb():
+            mpush(bpack())
         def mcheck(a):
             if len(mstack) > 0:
                 self._error(a, f'branch main stack unbalance: {len(mstack)}')
@@ -400,7 +426,7 @@ class c_script_program:
             
             if addr in fwkset:
                 mcheck(addr)
-                break
+                return bpack(), labseq, 'part', None
             elif addr in gwkset:
                 self._error(addr, f'function codes should be isolated')
             cmd, parm = self._rdcmd(addr)
@@ -437,28 +463,24 @@ class c_script_program:
                     if cname == 'syscall':
                         finfo = self._keyget(self._SYS_FUNC, cdst)
                     else:
-                        if not cdst in functab['need']:
-                            fname =  f'{cdst:x}'
-                            if cdst in cpath:
-                                return None, (cdst, cpath.index(cdst))
-                            fsta = self._parse_func(
-                                fname, cdst, functab, gwkset, cpath.copy())
-                            if not cdst in functab['proto']:
-                                return None, None
-                        finfo = functab['proto'][cdst]
+                        if not cdst in functab:
+                            return None, labseq, 'call', cdst
+                        finfo = (
+                            self._getfuncname(cdst), *functab[cdst])
                     if finfo is None:
                         self._error(addr, f'unreachable call: {cname} {cdst:x}')
                     dname, dsnum, drnum = finfo
                     if rbed and dsnum > 0:
-                        self._error(addr, f'should not rebalance after args: {cdst_nd}')
+                        self._error(addr,
+                            f'should not rebalance after args: {cdst_nd}')
                     if cname == 'syscall':
                         dname = f's{dname}'
-                    cpath.append(dname)
                     lb = c_script_anode_ref_func(dname, cdst)
                     snum += dsnum
                     rnum += drnum
                 else:
-                    lb = c_script_anode_ref_label(f'{cdst:x}', cdst)
+                    lb = c_script_anode_ref_label(
+                        self._getlabname(cdst), cdst)
                 mpush(c_script_anode_bat([lb]))
             elif ctype == 'ret':
                 msret = len(mstack)
@@ -486,17 +508,15 @@ class c_script_program:
                     addr = adst.addr
                 else:
                     mcheck(addr)
-                    braseq.append((adst.name, adst.addr, msneed_cntn[0]))
+                    labseq.append((adst.name, adst.addr, msneed_cntn[0]))
                     addr += 1
             elif ctype == 'ret':
                 mcheck(addr)
-                msinfo = (msneed_cntn[0], msret)
-                break
+                return bpack(), labseq, 'return', (msneed_cntn[0], msret)
             else:
                 addr += 1
 
-        mpushb()
-        return mstack.pop(), msinfo
+        assert False
 
     def _merge_bra(self, branches):
         minaddrs = [b.subs[0].addr if b.subs else None for b in branches]
@@ -517,13 +537,8 @@ class c_script_program:
 
     def parse_sect(self):
         gwkset = set()
-        cpath = []
-        functab = {
-            'proto': {},
-            'declr': {},
-            'need': {},
-        }
-        self._parse_func('0', 0, functab, gwkset, cpath)
+        functab = {}
+        self._parse_func(0, functab, gwkset)
         print(functab)
         return functab['declr']
             
