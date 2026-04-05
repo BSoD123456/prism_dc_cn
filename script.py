@@ -470,7 +470,7 @@ class c_script_program:
                     if finfo is None:
                         self._error(addr, f'unreachable call: {cname} {cdst:x}')
                     dname, dsnum, drnum = finfo
-                    if rbed and dsnum > 0:
+                    if rbed and (dsnum > 0 and len(mstack) > 0):
                         self._error(addr,
                             f'should not rebalance after args: {cdst_nd}')
                     if cname == 'syscall':
