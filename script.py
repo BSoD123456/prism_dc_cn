@@ -105,6 +105,11 @@ class c_script_anode_bat(c_script_anode_branch):
     def __repr__(self):
         return self._repr_as(None)
 
+class c_script_anode_prog(c_script_anode_bat):
+
+    def __repr__(self):
+        return self._repr_as('func')
+
 class c_script_anode_func(c_script_anode_branch):
 
     def __init__(self, name, anum, rnum, bat, addr):
@@ -257,6 +262,9 @@ class c_script_program:
         report('err', f'(addr:{addr:x}) {msg}')
         raise err_script_syntax(msg)
 
+    def _warn(self, addr, msg):
+        report('war', f'(addr:{addr:x}) {msg}')
+
     @staticmethod
     def _keyget(o, k, d = None):
         try:
@@ -294,26 +302,6 @@ class c_script_program:
     def _getfuncname(self, addr):
         return f'{addr:x}'
 
-    def _parse_func(self, fname, staddr, functab, gwkset, cpath):
-        assert not staddr in functab['proto']
-        if fname in cpath:
-            return 'recursed'
-        cpath.append(staddr)
-        print('bf', fname, staddr)
-        sta = self._parse_func_inner(fname, staddr, functab, gwkset, cpath)
-        print('h3', sta, staddr, functab['need'])
-        if staddr in functab['need']:
-            nnlst = []
-            for rfname, rstaddr, rcpath in functab['need'][staddr]:
-                sta = self._parse_func_inner(
-                    fname, rstaddr, functab, gwkset, rcpath.copy())
-                if sta == 'unfinished':
-                    nnlst.append((rfname, rstaddr, rcpath))
-            if nnlst:
-                functab['need'][staddr] = nnlst
-            else:
-                del functab['need'][staddr]
-
     def _parse_func(self, staddr, functab, gwkset):
         progctx = {}
         sustab = {}
@@ -339,7 +327,7 @@ class c_script_program:
                 bwkset = fwkset.copy()
                 bra, blabs, bsta, binfo = self._parse_func_bra(
                     addr, functab, msneed, bwkset, gwkset)
-                print('lab', blabs)
+                #print('lab', blabs)
                 for a, m in blabs:
                     if a in labset:
                         continue
@@ -348,13 +336,14 @@ class c_script_program:
                 if bra:
                     if len(bra.subs) > 0:
                         bralst.append(bra)
-                    fwkset.update(bwkset)
+                    progctx[faddr]['fwkset'] = fwkset = bwkset
+                    gwkset.update(fwkset)
                     if bsta == 'return':
-                        print('ret', faddr, addr, binfo)
+                        #print('ret', faddr, addr, binfo)
                         if not faddr in functab:
                             functab[faddr] = binfo
                             if faddr in sustab:
-                                print('append', faddr, sustab[faddr])
+                                #print('append', faddr, sustab[faddr])
                                 braseq.extend(sustab[faddr])
                                 del sustab[faddr]
                         elif functab[faddr] != binfo:
@@ -362,7 +351,7 @@ class c_script_program:
                                 f'different numbers of func stack: {functab[faddr]} -> {binfo}')
                 else:
                     if bsta == 'call':
-                        print('sus', binfo, faddr, addr)
+                        #print('sus', binfo, faddr, addr)
                         if not binfo in sustab:
                             sustab[binfo] = []
                         sustab[binfo].append((faddr, addr, msneed))
@@ -373,21 +362,7 @@ class c_script_program:
                 braseq.append((a, a, 0))
                 break
 
-        breakpoint()
-
-
-        lbbat = c_script_anode_bat([
-            n for a, n in sorted(labtab.items(), key = lambda v: v[0])
-            if n])
-        branches.insert(0, lbbat)
-        func = c_script_anode_func(
-            fname,
-            *msinfo,
-            self._merge_bra(branches),
-            staddr)
-        functab['declr'][staddr] = func
-        gwkset.update(fwkset)
-        return 'done'
+        return progctx
 
     def _parse_func_bra(self,
             staddr, functab, msneed, fwkset, gwkset):
@@ -535,12 +510,39 @@ class c_script_program:
             minaddrs[mni] = ds[0].addr if ds else None
         return c_script_anode_bat(raseq)
 
+    def _post_parse_prog(self, functab, progctxs):
+        progbat = []
+        fawkset = set()
+        for progctx in progctxs:
+            for faddr, ctx in progctx.items():
+                if faddr in fawkset:
+                    self._warn(faddr,
+                        f'ignore duplicated function: {self._getfuncname(faddr)}')
+                    continue
+                fawkset.add(faddr)
+                lbbat = c_script_anode_bat([
+                    c_script_anode_label(
+                        self._getlabname(a), a)
+                    for a in sorted(ctx['labset'])
+                    if a != faddr])
+                bralst = [lbbat]
+                bralst.extend(ctx['bralst'])
+                func = c_script_anode_func(
+                    self._getfuncname(faddr),
+                    *functab[faddr],
+                    self._merge_bra(bralst),
+                    faddr)
+                progbat.append(func)
+        progbat.sort(key = lambda nd: nd.addr)
+        prog = c_script_anode_prog(progbat)
+        return prog
+
     def parse_sect(self):
         gwkset = set()
         functab = {}
-        self._parse_func(0, functab, gwkset)
-        print(functab)
-        return functab['declr']
+        progctx = self._parse_func(0, functab, gwkset)
+        prog = self._post_parse_prog(functab, [progctx])
+        return prog
             
 if __name__ == '__main__':
     import pdb
