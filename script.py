@@ -343,9 +343,10 @@ class c_script_program:
                         if not faddr in functab:
                             functab[faddr] = binfo
                             if faddr in sustab:
-                                #print('append', faddr, sustab[faddr])
-                                braseq.extend(sustab[faddr])
-                                del sustab[faddr]
+                                susseq = sustab.pop(faddr)
+                                #print('append', faddr, susseq)
+                                for v in susseq.values():
+                                    braseq.append(v)
                         elif functab[faddr] != binfo:
                             self._error(addr,
                                 f'different numbers of func stack: {functab[faddr]} -> {binfo}')
@@ -353,13 +354,18 @@ class c_script_program:
                     if bsta == 'call':
                         #print('sus', binfo, faddr, addr)
                         if not binfo in sustab:
-                            sustab[binfo] = []
-                        sustab[binfo].append((faddr, addr, msneed))
+                            sustab[binfo] = {}
+                        if not addr in sustab[binfo]:
+                            sustab[binfo][addr] = (faddr, addr, msneed)
+                        elif sustab[binfo][addr] != (faddr, addr, msneed):
+                            self._error(addr,
+                                f'conflicting suspend info: {(faddr, addr, msneed)} / {sustab[binfo][addr]}')
 
             if not sustab:
                 break
             for a in sustab:
                 braseq.append((a, a, 0))
+                sustab[a] = sustab.pop(a)
                 break
 
         return progctx
@@ -552,8 +558,8 @@ if __name__ == '__main__':
 
     def tst1():
         global sc, prog, ast
-        #fn = r'wktab\SCRIPT.BIN'
-        fn = r'wktab\tst_recur1.bin'
+        fn = r'wktab\SCRIPT.BIN'
+        #fn = r'wktab\tst_recur1.bin'
         with open(fn, 'rb') as fd:
             raw = fd.read()
         sc = c_script_file(raw, 0)
