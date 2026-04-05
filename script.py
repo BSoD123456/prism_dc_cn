@@ -329,21 +329,21 @@ class c_script_program:
                     if not faddr in progctx:
                         progctx[faddr] = {
                             'fwkset': set(),
-                            'labtab': {},
+                            'labset': set(),
                             'bralst': [],
                         }
                     fwkset = progctx[faddr]['fwkset']
-                    labtab = progctx[faddr]['labtab']
+                    labset = progctx[faddr]['labset']
                     bralst = progctx[faddr]['bralst']
 
                 bwkset = fwkset.copy()
                 bra, blabs, bsta, binfo = self._parse_func_bra(
                     addr, functab, msneed, bwkset, gwkset)
                 print('lab', blabs)
-                for n, a, m in blabs:
-                    if a in labtab:
+                for a, m in blabs:
+                    if a in labset:
                         continue
-                    labtab[a] = n
+                    labset.add(a)
                     braseq.append((faddr, a, m))
                 if bra:
                     if len(bra.subs) > 0:
@@ -508,7 +508,7 @@ class c_script_program:
                     addr = adst.addr
                 else:
                     mcheck(addr)
-                    labseq.append((adst.name, adst.addr, msneed_cntn[0]))
+                    labseq.append((adst.addr, msneed_cntn[0]))
                     addr += 1
             elif ctype == 'ret':
                 mcheck(addr)
