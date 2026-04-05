@@ -526,6 +526,9 @@ class c_script_program:
                         f'ignore duplicated function: {self._getfuncname(faddr)}')
                     continue
                 fawkset.add(faddr)
+                if not faddr in functab:
+                    self._error(faddr,
+                        f'function without return: {self._getfuncname(faddr)}')
                 lbbat = c_script_anode_bat([
                     c_script_anode_label(
                         self._getlabname(a), a)
@@ -558,8 +561,9 @@ if __name__ == '__main__':
 
     def tst1():
         global sc, prog, ast
-        fn = r'wktab\SCRIPT.BIN'
+        #fn = r'wktab\SCRIPT.BIN'
         #fn = r'wktab\tst_recur1.bin'
+        fn = r'wktab\tst_noret.bin'
         with open(fn, 'rb') as fd:
             raw = fd.read()
         sc = c_script_file(raw, 0)
