@@ -59,6 +59,29 @@ with open('wktab/tst_recur1.bin', 'wb') as fd:
     '''))
 
 '''
+func r1():
+    call(r2)
+    return()
+
+func r2():
+    call(r1)
+    return()
+
+0 push 3
+1 call
+2 return
+3 push 0
+4 call
+5 return
+'''
+
+with open('wktab/tst_recur2.bin', 'wb') as fd:
+    fd.write(bytes.fromhex('''
+        03000028 00000048 00000058
+        00000028 00000048 00000058
+    '''))
+
+'''
 pop(push(1))
 jump force 0
 '''
