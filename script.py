@@ -318,9 +318,9 @@ class c_script_program:
                     labset = progctx[faddr]['labset']
                     bralst = progctx[faddr]['bralst']
 
-                bwkset = fwkset.copy()
                 bra, blabs, bsta, binfo = self._parse_func_bra(
-                    addr, functab, mstack, msneed, bwkset, gwkset)
+                    addr, functab, mstack, msneed, fwkset, gwkset)
+                gwkset.update(fwkset)
                 #print('lab', blabs)
                 for a, m in blabs:
                     if a in labset:
@@ -330,8 +330,6 @@ class c_script_program:
                 if bra:
                     if len(bra.subs) > 0:
                         bralst.append(bra)
-                    progctx[faddr]['fwkset'] = fwkset = bwkset
-                    gwkset.update(fwkset)
                     if bsta == 'return':
                         #print('ret', faddr, addr, binfo)
                         if not faddr in functab:
@@ -441,6 +439,7 @@ class c_script_program:
                         if not cdst in functab:
                             mpush()
                             bextend(cdst_nd)
+                            fwkset.remove(addr)
                             return None, labseq, 'call', (
                                 cdst, addr, mstack, msneed_cntn[0])
                         finfo = (
