@@ -299,13 +299,13 @@ class c_script_program:
     def _parse_func(self, staddr, functab, gwkset):
         progctx = {}
         sustab = {}
-        braseq = [(staddr, staddr, 0)]
+        braseq = [(staddr, staddr, [[]], 0)]
         faddr = None
 
         while True:
             while braseq:
 
-                nfaddr, addr, msneed = braseq.pop()
+                nfaddr, addr, mstack, msneed = braseq.pop()
                 if nfaddr != faddr:
                     faddr = nfaddr
                     if not faddr in progctx:
@@ -320,13 +320,13 @@ class c_script_program:
 
                 bwkset = fwkset.copy()
                 bra, blabs, bsta, binfo = self._parse_func_bra(
-                    addr, functab, msneed, bwkset, gwkset)
+                    addr, functab, mstack, msneed, bwkset, gwkset)
                 #print('lab', blabs)
                 for a, m in blabs:
                     if a in labset:
                         continue
                     labset.add(a)
-                    braseq.append((faddr, a, m))
+                    braseq.append((faddr, a, [[]], m))
                 if bra:
                     if len(bra.subs) > 0:
                         bralst.append(bra)
@@ -347,28 +347,33 @@ class c_script_program:
                 else:
                     if bsta == 'call':
                         #print('sus', binfo, faddr, addr)
-                        if not binfo in sustab:
-                            sustab[binfo] = {}
-                        if not addr in sustab[binfo]:
-                            sustab[binfo][addr] = (faddr, addr, msneed)
-                        elif sustab[binfo][addr] != (faddr, addr, msneed):
-                            self._error(addr,
-                                f'conflicting suspend info: {(faddr, addr, msneed)} / {sustab[binfo][addr]}')
+                        caddr, csaddr, cmstack, cmsneed = binfo
+                        if not caddr in sustab:
+                            sustab[caddr] = {}
+                        if not csaddr in sustab[caddr]:
+                            sustab[caddr][csaddr] = (faddr, csaddr, cmstack, cmsneed)
+                        else:
+                            sfaddr, scsaddr, scmstack, scmsneed = sustab[caddr][csaddr]
+                            if (
+                                    sfaddr, scsaddr, len(scmstack), scmsneed
+                                ) != (
+                                    faddr, csaddr, len(cmstack), cmsneed):
+                                self._error(csaddr,
+                                    f'conflicting suspend info: {faddr, csaddr, len(cmstack), cmsneed} / {(sfaddr, scsaddr, len(scmstack), scmsneed)}')
 
             if not sustab:
                 break
             for a in sustab:
-                braseq.append((a, a, 0))
+                braseq.append((a, a, [[]], 0))
                 sustab[a] = sustab.pop(a)
                 break
 
         return progctx
 
     def _parse_func_bra(self,
-            staddr, functab, msneed, fwkset, gwkset):
+            staddr, functab, mstack, msneed, fwkset, gwkset):
         cmd_list = self._CMD_INFO
         labseq = []
-        mstack = [[]]
         msneed_cntn = [msneed]
         def bpush(nd):
             mstack[-1].append(nd)
@@ -434,7 +439,10 @@ class c_script_program:
                         finfo = self._keyget(self._SYS_FUNC, cdst)
                     else:
                         if not cdst in functab:
-                            return None, labseq, 'call', cdst
+                            mpush()
+                            bextend(cdst_nd)
+                            return None, labseq, 'call', (
+                                cdst, addr, mstack, msneed_cntn[0])
                         finfo = (
                             self._getfuncname(cdst), *functab[cdst])
                     if finfo is None:
@@ -547,8 +555,8 @@ if __name__ == '__main__':
 
     def tst1():
         global sc, prog, ast
-        #fn = r'wktab\SCRIPT.BIN'
-        fn = r'wktab\tst_recur1.bin'
+        fn = r'wktab\SCRIPT.BIN'
+        #fn = r'wktab\tst_recur1.bin'
         #fn = r'wktab\tst_noret.bin'
         with open(fn, 'rb') as fd:
             raw = fd.read()
