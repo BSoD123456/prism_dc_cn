@@ -299,6 +299,7 @@ class c_script_program:
     def _parse_func(self, staddr, functab, gwkset):
         progctx = {}
         sustab = {}
+        suswkset = set()
         braseq = [(staddr, staddr, [[]], 0)]
         faddr = None
 
@@ -361,6 +362,10 @@ class c_script_program:
 
             if not sustab:
                 break
+            susstep = tuple(k for s in sustab.values() for k in s)
+            if susstep in suswkset:
+                self._error(susstep[0], f'recursed invoke')
+            suswkset.add(susstep)
             for a in sustab:
                 braseq.append((a, a, [[]], 0))
                 sustab[a] = sustab.pop(a)
@@ -567,5 +572,5 @@ if __name__ == '__main__':
         #    print('===', k)
         #    print(i._repr_as(True))
         #print(ast._repr_as(True))
-        print(ast)
+        #print(ast)
     tst1()
