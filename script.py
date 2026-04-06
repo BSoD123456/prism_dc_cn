@@ -86,14 +86,6 @@ class c_script_anode_bat(c_script_anode_branch):
     def __init__(self, acts):
         self.subs = acts
 
-    def rebalance(self, par):
-        nsubs = self.subs
-        rbed = (len(nsubs) > 1)
-        if rbed:
-            self.subs = [nsubs.pop()]
-            par.extend(nsubs)
-        return rbed
-
     def _repr_as(self, form):
         if form == 'tab':
             return '\n'.join(f'{n.addr:x}: {n}' for n in self.subs)
@@ -280,15 +272,17 @@ class c_script_program:
     def _rdcmd(self, addr):
         return self.sect[addr]
 
-    def _getbtail(self, bat, removable):
-        assert isinstance(bat, c_script_anode_bat)
-        if not (removable and len(bat.subs) == 1
-                or not removable and len(bat.subs) > 0):
+    def _getbhead(self, bat):
+        if len(bat.subs) < 1:
             return None
-        return bat.subs[-1]
+        return bat.subs[0]
 
-    def _getinst(self, bat, removable):
-        act = self._getbtail(bat, removable)
+    def _rplcbhead(self, bat, nd):
+        bat.subs[0] = nd
+        return bat
+
+    def _getinst(self, bat):
+        act = self._getbhead(bat)
         if not (act and act.name == 'push'):
             return None
         inst = act.subs[0]
@@ -374,40 +368,35 @@ class c_script_program:
             staddr, functab, msneed, fwkset, gwkset):
         cmd_list = self._CMD_INFO
         labseq = []
-        mstack = []
+        mstack = [[]]
         msneed_cntn = [msneed]
-        msinfo = None
-        cur_bat_cntn = [[]]
         def bpush(nd):
-            cur_bat_cntn[0].append(nd)
-        def mpop(nb):
-            if len(mstack) < 1:
+            mstack[-1].append(nd)
+        def bextend(bat):
+            mstack[-1].extend(bat.subs)
+        def mpush():
+            mstack.append([])
+        def mpop():
+            if len(mstack) < 2:
+                assert len(mstack) == 1
                 msneed_cntn[0] += 1
                 return c_script_anode_parm(msneed_cntn[0])
-            nd = mstack.pop()
-            if not nb:
-                rbed = nd.rebalance(cur_bat_cntn[0])
-                if nb is None:
-                    return nd, rbed
+            b = mstack.pop()
+            nd = c_script_anode_bat(b)
             return nd
-        def mpush(nd):
-            mstack.append(nd)
-        def bpack():
-            nd = c_script_anode_bat(cur_bat_cntn[0])
-            cur_bat_cntn[0] = []
-            return nd
-        def mpushb():
-            mpush(bpack())
-        def mcheck(a):
-            if len(mstack) > 0:
-                self._error(a, f'branch main stack unbalance: {len(mstack)}')
+        def mdeep():
+            return len(mstack) - 1
+        def mcheck(a, ret):
+            if mdeep() != 0:
+                self._error(a, f'branch main stack unbalance: {mdeep()}')
+            if ret:
+                return c_script_anode_bat(mstack.pop())
 
         addr = staddr
         while True:
             
             if addr in fwkset:
-                mcheck(addr)
-                return bpack(), labseq, 'part', None
+                return mcheck(addr, True), labseq, 'part', None
             elif addr in gwkset:
                 self._error(addr, f'function codes should be isolated')
             cmd, parm = self._rdcmd(addr)
@@ -436,8 +425,8 @@ class c_script_program:
 
             if ctype in ('call', 'jmp', 'bra'):
                 assert snum > 0
-                cdst_nd, rbed = mpop(None)
-                cdst = self._getinst(cdst_nd, True)
+                cdst_nd = mpop()
+                cdst = self._getinst(cdst_nd)
                 if cdst is None:
                     self._error(addr, f'call to non-instant addr: {cdst_nd}')
                 if ctype == 'call':
@@ -451,9 +440,6 @@ class c_script_program:
                     if finfo is None:
                         self._error(addr, f'unreachable call: {cname} {cdst:x}')
                     dname, dsnum, drnum = finfo
-                    if rbed and (dsnum > 0 and len(mstack) > 0):
-                        self._error(addr,
-                            f'should not rebalance after args: {cdst_nd}')
                     if cname == 'syscall':
                         dname = f's{dname}'
                     lb = c_script_anode_ref_func(dname, cdst)
@@ -462,38 +448,38 @@ class c_script_program:
                 else:
                     lb = c_script_anode_ref_label(
                         self._getlabname(cdst), cdst)
-                mpush(c_script_anode_bat([lb]))
+                mpush()
+                bextend(self._rplcbhead(cdst_nd, lb))
             elif ctype == 'ret':
-                msret = len(mstack)
+                msret = mdeep()
                 snum += msret
             
             assert pnum < 2
             cargs = []
-            for i in range(snum):
-                cargs.append(mpop(i < snum - 1))
+            for _ in range(snum):
+                cargs.append(mpop())
             if pnum:
                 cargs.append(c_script_anode_inst(parm))
             cargs.reverse()
             
             anode = self.make_anode_act(cname, cargs, rnum, ctype, addr)
-            bpush(anode)
             if rnum > 0:
-                mpushb()
+                mpush()
+            bpush(anode)
             #if len(mstack) == 0: print(f'{addr:x}: {anode}')
 
             if ctype in ['jmp', 'bra']:
-                adst = self._getbtail(cargs[-1], False)
+                adst = self._getbhead(cargs[-1])
                 if not isinstance(adst, c_script_anode_ref_label):
                     self._error(addr, f'jump to non-instant addr: {cargs[-1]}')
                 if ctype == 'jmp':
                     addr = adst.addr
                 else:
-                    mcheck(addr)
+                    mcheck(addr, False)
                     labseq.append((adst.addr, msneed_cntn[0]))
                     addr += 1
             elif ctype == 'ret':
-                mcheck(addr)
-                return bpack(), labseq, 'return', (msneed_cntn[0], msret)
+                return mcheck(addr, True), labseq, 'return', (msneed_cntn[0], msret)
             else:
                 addr += 1
 
@@ -562,8 +548,8 @@ if __name__ == '__main__':
     def tst1():
         global sc, prog, ast
         #fn = r'wktab\SCRIPT.BIN'
-        #fn = r'wktab\tst_recur1.bin'
-        fn = r'wktab\tst_noret.bin'
+        fn = r'wktab\tst_recur1.bin'
+        #fn = r'wktab\tst_noret.bin'
         with open(fn, 'rb') as fd:
             raw = fd.read()
         sc = c_script_file(raw, 0)
