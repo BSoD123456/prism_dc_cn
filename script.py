@@ -614,6 +614,11 @@ if __name__ == '__main__':
     from pprint import pprint
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
+    import pickle
+    def saveobj(o, n):
+        with open(n, 'wb') as fd:
+            pickle.dump(o, fd)
+
     def tst1():
         global sc, prog, ast
         fn = r'wktab\SCRIPT.BIN'
@@ -630,4 +635,5 @@ if __name__ == '__main__':
         #    print(i._repr_as(True))
         #print(ast._repr_as(True))
         #print(ast)
+        saveobj(ast, r'wktab\ast.pck')
     tst1()
