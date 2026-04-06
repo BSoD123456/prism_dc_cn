@@ -13,8 +13,38 @@ class c_scode_program:
         self.ast = ast
         self.chrset = c_charset_jp()
 
-    def parse(self):
+    def _gen_anode(self, nd, assume = None, ctx = None):
+        cn = nd.__class__.__name__
+        assert cn.startswith('c_script_anode_')
+        cn = '_gen_anode_' + cn[len('c_script_anode_'):]
+        if hasattr(nd, 'name'):
+            mn = '_'.join(
+                (cn, nd.name, assume) if assume else (cn, nd.name))
+            if hasattr(self, mn):
+                return getattr(self, mn)(nd, ctx)
+        if assume:
+            mn = '_'.join((cn, assume))
+        else:
+            mn = cn
+        return getattr(self, mn)(nd, ctx)
+
+    def _gen_anode_prog(self, nd, ctx):
+        print('start')
+        for snd in nd.subs:
+            self._gen_anode(snd)
+
+    def _gen_anode_func(self, nd, ctx):
         pass
+
+    def _gen_anode_text(self, nd, ctx):
+        txts = []
+        for c in nd.text:
+            txts.append(self.chrset.dec(c))
+        txt = ''.join(txts)
+        print(f'{nd.name}: {txt}')
+
+    def gen_code(self):
+        self._gen_anode(self.ast)
 
 if __name__ == '__main__':
     import pdb
@@ -29,7 +59,8 @@ if __name__ == '__main__':
 
     from script import *
     def tst1():
-        global ast, code
+        global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        code = c_scode_program(ast)
+        cd = c_scode_program(ast)
+        cd.gen_code()
     tst1()
