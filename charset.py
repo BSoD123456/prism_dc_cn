@@ -25,7 +25,8 @@ class c_charset_jp:
         *(
             ((hi<<8)+lr[0], (hi<<8)+lr[1])
             for hi in range(0x89, 0x97+1)
-            for lr in [(0x40, 0x7e), (0x80, 0xfc)]),
+            for lr in [(0x40, 0x7e), (0x80, 0xfc)]
+        ),
         ('蓮', '腕'),
     ]
 
