@@ -51,10 +51,10 @@ class c_scode_buf_std(c_scode_buf):
 
 class c_scode_program:
 
-    def __init__(self, ast):
+    def __init__(self, ast, buf):
         self.ast = ast
+        self.buf = buf
         self.chrset = c_charset_jp()
-        self.buf = c_scode_buf_std()
 
     def _gen_anode(self, nd, assume = None, ctx = None):
         cn = nd.__class__.__name__
@@ -104,6 +104,6 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        cd = c_scode_program(ast)
+        cd = c_scode_program(ast, c_scode_buf_std())
         cd.gen_code()
     tst1()
