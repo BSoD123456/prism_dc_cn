@@ -125,7 +125,14 @@ class c_script_anode_func(c_script_anode_branch):
         return self._repr_as(None)
 
 class c_script_anode_text(c_script_anode_func):
-    pass
+
+    def __init__(self, name, text, addr):
+        self.name = name
+        self.text = text
+        self.addr = addr
+
+    def __repr__(self):
+        return f'txt.{self.name}:{self.text}'
 
 class c_script_program:
 
@@ -284,14 +291,19 @@ class c_script_program:
         bat.subs[0] = nd
         return bat
 
+    def _getainst(self, bat):
+        if not (isinstance(bat, c_script_anode_bat) and len(bat.subs) == 1):
+            return None
+        inst = bat.subs[0]
+        if not isinstance(inst, c_script_anode_inst):
+            return None
+        return inst.val
+
     def _getinst(self, bat):
         act = self._getbhead(bat)
         if not (act and act.name == 'push'):
             return None
-        inst = act.subs[0]
-        if not isinstance(inst, c_script_anode_inst):
-            return None
-        return inst.val
+        return self._getainst(act.subs[0])
 
     def _getlabname(self, addr):
         return f'{addr:x}'
@@ -301,6 +313,32 @@ class c_script_program:
 
     def _gettxtname(self, addr):
         return f't{addr:x}'
+
+    def _parse_text(self, bat):
+        txt = []
+        for i, nd in enumerate(bat.subs):
+            if not (
+                    isinstance(nd, c_script_anode_act)
+                    and nd.name.startswith('text')):
+                self._error(addr,
+                    f'text func should not have non-text act: {nd}')
+            if nd.name in ('text', 'texth'):
+                assert len(nd.subs) == 1
+                val = self._getainst(nd.subs[0])
+                assert val and (val & 0x3ffffff) != 0x3ffffff
+                v1 = val & 0x1fff
+                if nd.name == 'texth':
+                    v1 |= 0x2000
+                txt.append(v1)
+                v2 = ((val >> 0xd) & 0x1fff)
+                if v2 != 0x1fff:
+                    if nd.name == 'texth':
+                        v2 |= 0x2000
+                    txt.append(v2)
+            elif not (nd.name == 'text_end' and i == len(bat.subs) - 1):
+                self._error(addr,
+                    f'invalid text act: {nd}')
+        return txt
 
     def _parse_func(self, staddr, functab, gwkset):
         progctx = {}
@@ -480,7 +518,7 @@ class c_script_program:
             for _ in range(snum):
                 cargs.append(mpop())
             if pnum:
-                cargs.append(c_script_anode_inst(parm))
+                cargs.append(c_script_anode_bat([c_script_anode_inst(parm)]))
             cargs.reverse()
             
             anode = self.make_anode_act(cname, cargs, rnum, ctype, addr)
@@ -545,17 +583,18 @@ class c_script_program:
                 bralst = [lbbat]
                 bralst.extend(ctx['bralst'])
                 fanum, frnum, fcname = functab[faddr]
+                fbat = self._merge_bra(bralst)
                 if fcname == 'text_end':
+                    txt = self._parse_text(fbat)
                     func = c_script_anode_text(
                         self._gettxtname(faddr),
-                        fanum, frnum,
-                        self._merge_bra(bralst),
+                        txt,
                         faddr)
                 else:
                     func = c_script_anode_func(
                         self._getfuncname(faddr),
                         fanum, frnum,
-                        self._merge_bra(bralst),
+                        fbat,
                         faddr)
                 progbat.append(func)
         progbat.sort(key = lambda nd: nd.addr)
