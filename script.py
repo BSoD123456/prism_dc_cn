@@ -544,13 +544,13 @@ class c_script_program:
         prog = c_script_anode_prog(progbat)
         return prog
 
-    def parse_sect(self):
+    def parse_sect(self, entry):
         gwkset = set()
         functab = {}
-        progctx = self._parse_func(0, functab, gwkset)
+        progctx = self._parse_func(entry, functab, gwkset)
         prog = self._post_parse_prog(functab, [progctx])
         return prog
-            
+
 if __name__ == '__main__':
     import pdb
     from hexdump import hexdump as hd
@@ -567,7 +567,7 @@ if __name__ == '__main__':
         sc = c_script_file(raw, 0)
         sc.parse_size(len(raw), 4)
         prog = c_script_program(sc)
-        ast = prog.parse_sect()
+        ast = prog.parse_sect(0)
         #for k, i in ast.items():
         #    print('===', k)
         #    print(i._repr_as(True))
