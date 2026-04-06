@@ -124,6 +124,9 @@ class c_script_anode_func(c_script_anode_branch):
     def __repr__(self):
         return self._repr_as(None)
 
+class c_script_anode_text(c_script_anode_func):
+    pass
+
 class c_script_program:
 
     _CMD_INFO = [
@@ -296,6 +299,9 @@ class c_script_program:
     def _getfuncname(self, addr):
         return f'{addr:x}'
 
+    def _gettxtname(self, addr):
+        return f't{addr:x}'
+
     def _parse_func(self, staddr, functab, gwkset):
         progctx = {}
         sustab = {}
@@ -440,6 +446,11 @@ class c_script_program:
                 if ctype == 'call':
                     if cname == 'syscall':
                         finfo = self._keyget(self._SYS_FUNC, cdst)
+                        if finfo is None:
+                            self._error(addr,
+                                f'unreachable call: {cname} {cdst:x}')
+                        dname, dsnum, drnum = finfo
+                        dname = f's{dname}'
                     else:
                         if not cdst in functab:
                             mpush()
@@ -447,13 +458,11 @@ class c_script_program:
                             fwkset.remove(addr)
                             return None, labseq, 'call', (
                                 cdst, addr, mstack, msneed_cntn[0])
-                        finfo = (
-                            self._getfuncname(cdst), *functab[cdst])
-                    if finfo is None:
-                        self._error(addr, f'unreachable call: {cname} {cdst:x}')
-                    dname, dsnum, drnum = finfo
-                    if cname == 'syscall':
-                        dname = f's{dname}'
+                        dsnum, drnum, dcname = functab[cdst]
+                        if dcname == 'text_end':
+                            dname = self._gettxtname(cdst)
+                        else:
+                            dname = self._getfuncname(cdst)
                     lb = c_script_anode_ref_func(dname, cdst)
                     snum += dsnum
                     rnum += drnum
@@ -491,7 +500,8 @@ class c_script_program:
                     labseq.append((adst.addr, msneed_cntn[0]))
                     addr += 1
             elif ctype == 'ret':
-                return mcheck(addr, True), labseq, 'return', (msneed_cntn[0], msret)
+                return mcheck(addr, True), labseq, 'return', (
+                    msneed_cntn[0], msret, cname)
             else:
                 addr += 1
 
@@ -534,11 +544,19 @@ class c_script_program:
                     if a != faddr])
                 bralst = [lbbat]
                 bralst.extend(ctx['bralst'])
-                func = c_script_anode_func(
-                    self._getfuncname(faddr),
-                    *functab[faddr],
-                    self._merge_bra(bralst),
-                    faddr)
+                fanum, frnum, fcname = functab[faddr]
+                if fcname == 'text_end':
+                    func = c_script_anode_text(
+                        self._gettxtname(faddr),
+                        fanum, frnum,
+                        self._merge_bra(bralst),
+                        faddr)
+                else:
+                    func = c_script_anode_func(
+                        self._getfuncname(faddr),
+                        fanum, frnum,
+                        self._merge_bra(bralst),
+                        faddr)
                 progbat.append(func)
         progbat.sort(key = lambda nd: nd.addr)
         prog = c_script_anode_prog(progbat)
