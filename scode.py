@@ -11,17 +11,25 @@ class c_scode_buf:
 
     IDTSYM = '    '
 
-    def __init__(self, parent, touched):
+    def __init__(self, parent, touched, indent):
         self.par = parent
         self.tch = touched
-        self.idt = 0
+        self.idt = indent
         self.lbuf = []
         self.buf = []
+
+    def sub(self, idt = 1):
+        return c_scode_buf(self, False, self.idt + idt)
 
     def indent(self, val):
         self.idt += val
         if self.idt < 0:
             raise err_scode_syntax('indent underflow')
+
+    def popindent(self):
+        idt = self.idt
+        self.idt = self.par.idt if self.par else 0
+        return idt - self.idt
 
     def _idtsym(self):
         return (self.IDTSYM for _ in range(self.idt))
@@ -35,24 +43,28 @@ class c_scode_buf:
     def write(self, s):
         self.lbuf.append(s)
 
-    def newline(self):
+    def newline(self, idt = 0):
         if self.lbuf:
             line = ''.join((*self._idtsym(), *self.lbuf))
             self.lbuf = []
         else:
             line = ''
         self._writeline(line)
+        if idt:
+            self.indent(idt)
 
     def touch(self):
         if self.tch:
-            return
+            return self
+        self.tch = True
         for line in self.buf:
-            self._write_par(line)
+            self._writeline(line)
+        return self
 
 class c_scode_buf_null(c_scode_buf):
 
     def __init__(self):
-        super().__init__(None, True)
+        super().__init__(None, True, 0)
 
     def _writeline(self, line):
         pass
@@ -60,7 +72,7 @@ class c_scode_buf_null(c_scode_buf):
 class c_scode_buf_std(c_scode_buf):
 
     def __init__(self):
-        super().__init__(None, True)
+        super().__init__(None, True, 0)
 
     def _writeline(self, line):
         print(line)
@@ -121,14 +133,15 @@ class c_scode_program:
         ctx['buf'].newline()
 
     def _gen_anode_func(self, nd, ctx):
-        buf = ctx['buf']
-        buf.write(f'{nd.repr_as("proto")} {{')
-        buf.newline()
-        buf.indent(1)
+        pbuf = ctx['buf']
+        pbuf.write(f'{nd.repr_as("proto")} {{')
+        pbuf.newline()
+        buf = ctx['buf'] = pbuf.sub()
         self._gen_anode(nd.sub, None, ctx)
-        buf.indent(-1)
-        buf.write('}')
-        buf.newline()
+        buf.touch()
+        ctx['buf'] = pbuf
+        pbuf.write('}')
+        pbuf.newline()
         return 'func'
 
     def _gen_anode_text(self, nd, ctx):
@@ -139,8 +152,10 @@ class c_scode_program:
             self._gen_anode(snd, None, ctx)
 
     def _gen_anode_label(self, nd, ctx):
+        oidt = ctx['buf'].popindent()
         ctx['buf'].write(str(nd))
         ctx['buf'].newline()
+        ctx['buf'].indent(oidt)
 
     def _gen_anode_act(self, nd, ctx):
         ctx['buf'].write(str(nd))
