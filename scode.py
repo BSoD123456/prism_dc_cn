@@ -278,32 +278,35 @@ class c_scode_program:
     def _gen_anode_act_hpush(self, nd, ctx):
         ctx['buf'].write('local')
 
-    def _gen_vnode_var(self, nd, ctx):
-        ctx['buf'].write('[')
-        self._gen_anode(self._getone(nd), None, ctx)
-        ctx['buf'].write(']')
-
     def _gen_anode_act_vget(self, nd, ctx):
         ctx['buf'].write('var')
-        self._gen_vnode_var(self._getone(nd), ctx)
+        ctx['buf'].write('[')
+        self._gen_anode(self._getone(self._getone(nd)), None, ctx)
+        ctx['buf'].write(' >>5]')
 
     def _gen_anode_act_vset(self, nd, ctx):
         ndl, ndr = nd.subs
         ctx['buf'].write('var')
-        self._gen_vnode_var(ndr, ctx)
+        ctx['buf'].write('[')
+        self._gen_anode(self._getone(ndr), None, ctx)
+        ctx['buf'].write(' >>5]')
         ctx['buf'].write(' = ')
         self._gen_anode(self._getone(ndl), None, ctx)
 
     def _gen_anode_act_vmask(self, nd, ctx):
         ndl, ndr = nd.subs
         ctx['buf'].write('flag')
-        self._gen_vnode_var(ndr, ctx)
+        ctx['buf'].write('[')
+        self._gen_anode(self._getone(ndr), None, ctx)
+        ctx['buf'].write(']')
         ctx['buf'].write(' = ')
         self._gen_anode(self._getone(ndl), None, ctx)
 
     def _gen_anode_act_vcheck(self, nd, ctx):
         ctx['buf'].write('flag')
-        self._gen_vnode_var(self._getone(nd), ctx)
+        ctx['buf'].write('[')
+        self._gen_anode(self._getone(self._getone(nd)), None, ctx)
+        ctx['buf'].write(']')
 
     # calc
 
