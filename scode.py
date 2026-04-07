@@ -255,6 +255,14 @@ class c_scode_program:
         txt = ctx['text'][nd.name]
         ctx['buf'].write(f'text = "{txt}"')
 
+    # calc
+
+    def _gen_vnode_act_calc_1(self, op, nd, ctx):
+        pass
+
+    def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx):
+        pass
+
     # ref
 
     def _gen_anode_ref_func(self, nd, ctx):
