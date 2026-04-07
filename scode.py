@@ -75,6 +75,15 @@ class c_scode_buf_std(c_scode_buf):
     def _writeline(self, line):
         print(line)
 
+class c_scode_buf_fd(c_scode_buf):
+
+    def __init__(self, fd):
+        super().__init__(None, True, 0)
+        self.fd = fd
+
+    def _writeline(self, line):
+        self.fd.write(line + '\n')
+
 def with_anode(cls):
     nmset = set()
     for mn in dir(cls):
@@ -423,6 +432,12 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        cd = c_scode_program(ast, c_scode_buf_std())
-        cd.gen_code()
+        if True:
+            #cd = c_scode_program(ast, c_scode_buf_null())
+            cd = c_scode_program(ast, c_scode_buf_std())
+            cd.gen_code()
+        else:
+            with open(r'wktab\output.txt', 'w', encoding = 'utf-8') as fd:
+                cd = c_scode_program(ast, c_scode_buf_fd(fd))
+                cd.gen_code()
     tst1()
