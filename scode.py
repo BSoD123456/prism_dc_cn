@@ -60,6 +60,13 @@ class c_scode_program:
         self.buf = buf
         self.chrset = c_charset_jp()
 
+    def _error(self, nd, msg):
+        report('err', f'(addr:{nd.addr:x}) {msg}')
+        raise err_scode_syntax(msg)
+
+    def _warn(self, nd, msg):
+        report('war', f'(addr:{nd.addr:x}) {msg}')
+
     def _gen_anode(self, nd, assume = None, ctx = None):
         cn = nd.__class__.__name__
         assert cn.startswith('c_script_anode_')
@@ -78,6 +85,7 @@ class c_scode_program:
     def _gen_anode_prog(self, nd, ctx):
         print('start')
         ctx = {}
+        ctx['buf'] = self.buf
         ctx['text'] = {}
         for snd in nd.subs:
             self._gen_anode(snd, 'dectext', ctx)
@@ -86,12 +94,15 @@ class c_scode_program:
         pass
 
     def _gen_anode_text_dectext(self, nd, ctx):
+        if nd.name in ctx['text']:
+            self._error(nd, f'duplicated text name: {nd.name}')
         txts = []
         for c in nd.text:
             txts.append(self.chrset.dec(c))
         txt = ''.join(txts)
-        self.buf.write(f'{nd.name}: {txt}')
-        self.buf.newline()
+        ctx['text'][nd.name] = txt
+        ctx['buf'].write(f'{nd.name}: {txt}')
+        ctx['buf'].newline()
 
     def gen_code(self):
         self._gen_anode(self.ast)
