@@ -125,6 +125,8 @@ class c_scode_program:
             if self._gen_anode(snd, None, ctx) == 'func':
                 buf.newline()
 
+    # struct
+
     def _gen_anode_func_dectext(self, nd, ctx):
         pass
 
@@ -178,6 +180,8 @@ class c_scode_program:
         ctx['buf'].write(f'@lab.{nd.name}:')
         ctx['buf'].newline()
         ctx['buf'].indent(oidt)
+
+    # act
 
     def _gen_anode_act_prim(self, nd, ctx):
         self._gen_anode_act(nd, ctx)
@@ -249,7 +253,9 @@ class c_scode_program:
         if not nd.name in ctx['text']:
             self._error(nd, f'unknown text: {nd.name}')
         txt = ctx['text'][nd.name]
-        ctx['buf'].write(f'settext "{txt}" @{nd.name}')
+        ctx['buf'].write(f'text = "{txt}"')
+
+    # ref
 
     def _gen_anode_ref_func(self, nd, ctx):
         ctx['buf'].write(str(nd))
