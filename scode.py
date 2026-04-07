@@ -75,37 +75,28 @@ class c_scode_buf_std(c_scode_buf):
     def _writeline(self, line):
         print(line)
 
-def block_assume(cls):
-    mseq = []
-    for mn, mval in cls.__dict__.items():
-        if not (mn.startswith('_gen_anode_')
-                and isinstance(mval, tuple)):
+def with_anode(cls):
+    nmset = set()
+    for mn in dir(cls):
+        if not mn.startswith('_gen_anode_'):
             continue
-        mseq.append((mn, mval))
-    for mn, mval in mseq:
-        cn = mn.split('__')[0]
-        for blk in mval[1:]:
-            if blk:
-                bmn = '__'.join((cn, blk))
-            else:
-                bmn = cn
-            def _mk(pblk):
-                def _assume_block(self, nd, ctx):
-                    self._error(nd, f'should not be assumed as: {pblk}')
-                return _assume_block
-            setattr(cls, bmn, _mk(blk))
-        setattr(cls, mn, mval[0])
+        nm = mn.split('__')[0]
+        nmset.add(nm)
+    def _dispatch_anode(self, nd, assume):
+        ctype = nd.__class__.__name__
+        assert ctype.startswith('c_script_anode_')
+        nm = '_gen_anode_' + ctype[len('c_script_anode_'):]
+        if hasattr(nd, 'name'):
+            nm2 = '_'.join((nm, nd.name))
+            if nm2 in nmset:
+                nm = nm2
+        if assume:
+            nm = '__'.join((nm, assume))
+        return getattr(self, nm, None), nm[len('_gen_anode_'):]
+    cls._dispatch_anode = _dispatch_anode
     return cls
 
-def ablk(*blks):
-    def _deco(mth):
-        if blks:
-            return (mth, *blks)
-        else:
-            return (mth, None)
-    return _deco
-
-@block_assume
+@with_anode
 class c_scode_program:
 
     def __init__(self, ast, buf):
@@ -128,22 +119,11 @@ class c_scode_program:
         return nd.subs[0]
 
     def _gen_anode(self, nd, assume = None, ctx = None):
-        cn = nd.__class__.__name__
-        assert cn.startswith('c_script_anode_')
-        cn = '_gen_anode_' + cn[len('c_script_anode_'):]
-        if hasattr(nd, 'name'):
-            mn = '_'.join((cn, nd.name))
-            if assume:
-                mn = '__'.join((mn, assume))
-            if hasattr(self, mn):
-                getattr(self, mn)(nd, ctx)
-                return mn[len('_gen_anode_'):]
-        if assume:
-            mn = '__'.join((cn, assume))
-        else:
-            mn = cn
-        getattr(self, mn)(nd, ctx)
-        return mn[len('_gen_anode_'):]
+        mth, mn = self._dispatch_anode(nd, assume)
+        if not mth:
+            self._error(nd, f'should not be assumed as: {mn}')
+        mth(nd, ctx)
+        return mn
 
     # program
 
@@ -236,19 +216,16 @@ class c_scode_program:
                 buf.write(', ')
         buf.write(')')
 
-    @ablk()
     def _gen_anode_act_pop__prim(self, nd, ctx):
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
         ctx['buf'].write(';')
         ctx['buf'].newline()
 
-    @ablk('prim')
     def _gen_anode_act_push(self, nd, ctx):
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
 
-    @ablk()
     def _gen_anode_act_return__prim(self, nd, ctx):
         ar = []
         for i, bnd in enumerate(nd.subs):
@@ -296,79 +273,60 @@ class c_scode_program:
         ctx['buf'].write(f' {op} ')
         self._gen_anode(self._getone(nd2), None, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_add(self, nd, ctx):
         self._gen_vnode_act_calc_2('+', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_sub(self, nd, ctx):
         self._gen_vnode_act_calc_2('-', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_mul(self, nd, ctx):
         self._gen_vnode_act_calc_2('*', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_div(self, nd, ctx):
         self._gen_vnode_act_calc_2('//', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_mod(self, nd, ctx):
         self._gen_vnode_act_calc_2('%', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_neg(self, nd, ctx):
         self._gen_vnode_act_calc_1('-', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_eq(self, nd, ctx):
         self._gen_vnode_act_calc_2('==', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_gt(self, nd, ctx):
         self._gen_vnode_act_calc_2('>', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_ge(self, nd, ctx):
         self._gen_vnode_act_calc_2('>=', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_lt(self, nd, ctx):
         self._gen_vnode_act_calc_2('<', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_le(self, nd, ctx):
         self._gen_vnode_act_calc_2('<=', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_ne(self, nd, ctx):
         self._gen_vnode_act_calc_2('!=', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_and(self, nd, ctx):
         self._gen_vnode_act_calc_2('&&', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_or(self, nd, ctx):
         self._gen_vnode_act_calc_2('||', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_band(self, nd, ctx):
         self._gen_vnode_act_calc_2('&', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_bor(self, nd, ctx):
         self._gen_vnode_act_calc_2('|', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_bxor(self, nd, ctx):
         self._gen_vnode_act_calc_2('^', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_shl(self, nd, ctx):
         self._gen_vnode_act_calc_2('<<', *nd.subs, ctx)
 
-    @ablk('prim')
     def _gen_anode_act_calc_shr(self, nd, ctx):
         self._gen_vnode_act_calc_2('>>', *nd.subs, ctx)
 
