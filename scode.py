@@ -141,7 +141,14 @@ class c_scode_program:
 
     def _gen_anode_func(self, nd, ctx):
         pbuf = ctx['buf']
-        pbuf.write(f'{nd.repr_as("proto")} {{')
+        if nd.rnum == 1:
+            rr = 'ret '
+        else:
+            rr = ', '.join(f'ret{i+1}' for i in range(nd.rnum))
+            if nd.rnum > 1:
+                rr = rr + ' '
+        ar = ', '.join(f'arg{i+1}' for i in range(nd.anum))
+        pbuf.write(f'{rr}fun.{nd.name}({ar}) {{')
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
         self._gen_anode(nd.sub, 'prim', ctx)
@@ -168,7 +175,7 @@ class c_scode_program:
 
     def _gen_anode_label_prim(self, nd, ctx):
         oidt = ctx['buf'].popindent()
-        ctx['buf'].write(str(nd))
+        ctx['buf'].write(f'@lab.{nd.name}:')
         ctx['buf'].newline()
         ctx['buf'].indent(oidt)
 
@@ -179,17 +186,17 @@ class c_scode_program:
 
     def _gen_anode_act(self, nd, ctx):
         ctx['buf'].write(nd.name)
-        self._gen_vnode_args(nd, ctx)
+        self._gen_vnode_args(nd.subs, ctx)
 
-    def _gen_vnode_args(self, nd, ctx):
+    def _gen_vnode_args(self, subs, ctx):
         buf = ctx['buf']
-        buf.write('( ')
-        for i, bnd in enumerate(nd.subs):
+        buf.write('(')
+        for i, bnd in enumerate(subs):
             snd = self._getone(bnd)
             self._gen_anode(snd, None, ctx)
-            if i < len(nd.subs) - 1:
+            if i < len(subs) - 1:
                 buf.write(', ')
-        buf.write(' )')
+        buf.write(')')
 
     def _gen_anode_act_pop_prim(self, nd, ctx):
         snd = self._getone(self._getone(nd))
@@ -220,6 +227,16 @@ class c_scode_program:
 
     def _gen_anode_act_return(self, nd, ctx):
         self._error(nd, 'should not be here')
+
+    def _gen_anode_act_call_prim(self, nd, ctx):
+        self._gen_anode_act_call(nd, ctx)
+        ctx['buf'].write(';')
+        ctx['buf'].newline()
+
+    def _gen_anode_act_call(self, nd, ctx):
+        dnd = self._getone(nd.subs[-1])
+        ctx['buf'].write(f'fun.{dnd.name}')
+        self._gen_vnode_args(nd.subs[:-1], ctx)
 
     def _gen_anode_ref_func(self, nd, ctx):
         ctx['buf'].write(str(nd))

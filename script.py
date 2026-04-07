@@ -80,6 +80,9 @@ class c_script_anode_act(c_script_anode_branch):
         sr = self._repr_args()
         return f'{self.name}({sr})'
 
+class c_script_anode_act_call(c_script_anode_act):
+    pass
+
 # bat := [act | label]
 class c_script_anode_bat(c_script_anode_branch):
 
@@ -282,7 +285,10 @@ class c_script_program:
     @staticmethod
     def make_anode_act(name, args, rnum, ctype, addr):
         assert rnum < 2
-        return c_script_anode_act(name, args, rnum, addr)
+        if ctype == 'call':
+            return c_script_anode_act_call(name, args, rnum, addr)
+        else:
+            return c_script_anode_act(name, args, rnum, addr)
 
     def _rdcmd(self, addr):
         return self.sect[addr]
