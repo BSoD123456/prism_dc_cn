@@ -289,7 +289,13 @@ class c_scode_program:
         pass
 
     def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx):
-        pass
+        self._gen_anode(self._getone(nd1), None, ctx)
+        ctx['buf'].write(' + ')
+        self._gen_anode(self._getone(nd2), None, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_add(self, nd, ctx):
+        self._gen_vnode_act_calc_2('+', *nd.subs, ctx)
 
     # ref
 
