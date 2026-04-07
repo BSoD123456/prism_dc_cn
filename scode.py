@@ -279,27 +279,30 @@ class c_scode_program:
         ctx['buf'].write('local')
 
     def _gen_vnode_var(self, nd, ctx):
-        ctx['buf'].write('var[')
+        ctx['buf'].write('[')
         self._gen_anode(self._getone(nd), None, ctx)
         ctx['buf'].write(']')
 
     def _gen_anode_act_vget(self, nd, ctx):
+        ctx['buf'].write('var')
         self._gen_vnode_var(self._getone(nd), ctx)
 
     def _gen_anode_act_vset(self, nd, ctx):
         ndl, ndr = nd.subs
+        ctx['buf'].write('var')
         self._gen_vnode_var(ndl, ctx)
         ctx['buf'].write(' = ')
         self._gen_anode(self._getone(ndr), None, ctx)
 
     def _gen_anode_act_vmask(self, nd, ctx):
         ndl, ndr = nd.subs
+        ctx['buf'].write('flag')
         self._gen_vnode_var(ndl, ctx)
-        ctx['buf'].write(' ?= ')
+        ctx['buf'].write(' = ')
         self._gen_anode(self._getone(ndr), None, ctx)
 
     def _gen_anode_act_vcheck(self, nd, ctx):
-        ctx['buf'].write('?')
+        ctx['buf'].write('flag')
         self._gen_vnode_var(self._getone(nd), ctx)
 
     # calc
@@ -309,9 +312,11 @@ class c_scode_program:
         self._gen_anode(self._getone(nd), None, ctx)
 
     def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx):
+        ctx['buf'].write(f'(')
         self._gen_anode(self._getone(nd1), None, ctx)
         ctx['buf'].write(f' {op} ')
         self._gen_anode(self._getone(nd2), None, ctx)
+        ctx['buf'].write(f')')
 
     def _gen_anode_act_calc_add(self, nd, ctx):
         self._gen_vnode_act_calc_2('+', *nd.subs, ctx)
