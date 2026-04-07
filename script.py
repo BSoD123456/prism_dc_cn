@@ -113,9 +113,9 @@ class c_script_anode_func(c_script_anode_branch):
 
     def repr_as(self, form):
         ar = ', '.join(f'arg{i+1}' for i in range(self.anum))
-        rr = ', '.join(f'ret' for i in range(self.rnum))
         prt = f'fun.{self.name}({ar})'
-        if rr:
+        if self.rnum > 0:
+            rr = ', '.join(f'ret' for i in range(self.rnum))
             prt = ' '.join((rr, prt))
         if form == 'proto':
             return prt
