@@ -216,6 +216,14 @@ class c_scode_program:
             if i < len(subs) - 1:
                 buf.write(', ')
 
+    def _gen_anode_nop__prim(self, nd, ctx):
+        ctx['buf'].write('nop;')
+        ctx['buf'].newline()
+
+    def _gen_anode_pass__prim(self, nd, ctx):
+        ctx['buf'].write('pass;')
+        ctx['buf'].newline()
+
     def _gen_anode_act_pop__prim(self, nd, ctx):
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
