@@ -235,8 +235,21 @@ class c_scode_program:
 
     def _gen_anode_act_call(self, nd, ctx):
         dnd = self._getone(nd.subs[-1])
-        ctx['buf'].write(f'fun.{dnd.name}')
+        if nd.name == 'syscall':
+            dname = f'sys.{dnd.name}'
+        elif nd.name == 'txtcall':
+            self._gen_vnode_text(dnd, ctx)
+            return
+        else:
+            dname = f'fun.{dnd.name}'
+        ctx['buf'].write(dname)
         self._gen_vnode_args(nd.subs[:-1], ctx)
+
+    def _gen_vnode_text(self, nd, ctx):
+        if not nd.name in ctx['text']:
+            self._error(nd, f'unknown text: {nd.name}')
+        txt = ctx['text'][nd.name]
+        ctx['buf'].write(f'settext "{txt}" @{nd.name}')
 
     def _gen_anode_ref_func(self, nd, ctx):
         ctx['buf'].write(str(nd))
