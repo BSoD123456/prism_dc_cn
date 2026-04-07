@@ -254,9 +254,6 @@ class c_scode_program:
             dname = f'fun.{dnd.name}'
         ctx['buf'].write(dname)
         ctx['buf'].write('(')
-        if dname in ('sys.s0', 'sys.s1'):
-            snd = self._getone(subs.pop(0))
-            self._gen_anode(snd, 'vidx', ctx)
         self._gen_vnode_args(subs, ctx)
         ctx['buf'].write(')')
 
@@ -266,40 +263,46 @@ class c_scode_program:
         txt = ctx['text'][nd.name]
         ctx['buf'].write(f'text = "{txt}"')
 
-    def _gen_anode_act_vget(self, nd, ctx):
+    def _gen_anode_act_halloc__prim(self, nd, ctx):
+        ctx['buf'].write('local = heap[')
+        self._gen_anode(self._getone(self._getone(nd)), None, ctx)
+        ctx['buf'].write('];')
+        ctx['buf'].newline()
+
+    def _gen_anode_act_hfree__prim(self, nd, ctx):
+        ctx['buf'].write('free heap[')
+        self._gen_anode(self._getone(self._getone(nd)), None, ctx)
+        ctx['buf'].write('];')
+        ctx['buf'].newline()
+
+    def _gen_anode_act_hpush(self, nd, ctx):
+        ctx['buf'].write('local')
+
+    def _gen_vnode_var(self, nd, ctx):
         ctx['buf'].write('var[')
-        self._gen_anode(self._getone(self._getone(nd)), 'vidx', ctx)
+        self._gen_anode(self._getone(nd), None, ctx)
         ctx['buf'].write(']')
 
+    def _gen_anode_act_vget(self, nd, ctx):
+        self._gen_vnode_var(self._getone(nd), ctx)
+
     def _gen_anode_act_vset(self, nd, ctx):
-        pass
+        ndl, ndr = nd.subs
+        self._gen_vnode_var(ndl, ctx)
+        ctx['buf'].write(' = ')
+        self._gen_anode(self._getone(ndr), None, ctx)
 
     def _gen_anode_act_vmask(self, nd, ctx):
-        pass
+        ndl, ndr = nd.subs
+        self._gen_vnode_var(ndl, ctx)
+        ctx['buf'].write(' ?= ')
+        self._gen_anode(self._getone(ndr), None, ctx)
 
     def _gen_anode_act_vcheck(self, nd, ctx):
-        pass
+        ctx['buf'].write('?')
+        self._gen_vnode_var(self._getone(nd), ctx)
 
-    # vidx
-
-    def _gen_anode_act_hpush__vidx(self, nd, ctx):
-        pass
-
-    def _gen_anode_act_push__vidx(self, nd, ctx):
-        self._gen_anode_act_push(nd, ctx)
-
-    def _gen_anode_act_calc_add__vidx(self, nd, ctx):
-        bs, ofs = (self._getone(i) for i in nd.subs)
-        self._gen_anode(bs, 'vidx', ctx)
-        self._gen_anode(ofs, 'vidx', ctx)
-        #if not (bs.name == 'hpush' and ofs.name == 'push'):
-        #    print(f'invalid vidx format: {nd}')
-        pass
-
-    def _gen_anode_act_calc_shl__vidx(self, nd, ctx):
-        pass
-
-    # calc base
+    # calc
 
     def _gen_vnode_act_calc_1(self, op, nd, ctx):
         pass
@@ -381,7 +384,7 @@ class c_scode_program:
         val = nd.val
         if val & 0x4000000:
             val -= 0x8000000
-        ctx['buf'].write(str(val))
+        ctx['buf'].write(hex(val))
 
     def gen_code(self):
         self._gen_anode(self.ast)
@@ -401,6 +404,6 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        cd = c_scode_program(ast, c_scode_buf_null())
+        cd = c_scode_program(ast, c_scode_buf_std())
         cd.gen_code()
     tst1()
