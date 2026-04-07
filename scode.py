@@ -157,6 +157,15 @@ class c_scode_program:
         for snd in nd.subs:
             self._gen_anode(snd, 'prim', ctx)
 
+    def _gen_anode_bat_inret(self, nd, ctx):
+        for i, snd in enumerate(nd.subs):
+            if i == 0:
+                self._gen_anode(snd, None, ctx)
+                ctx['buf'].write(';')
+                ctx['buf'].newline()
+            else:
+                self._gen_anode(snd, 'prim', ctx)
+
     def _gen_anode_label_prim(self, nd, ctx):
         oidt = ctx['buf'].popindent()
         ctx['buf'].write(str(nd))
@@ -199,8 +208,15 @@ class c_scode_program:
         self._gen_anode(snd, None, ctx)
 
     def _gen_anode_act_return_prim(self, nd, ctx):
-        #TODO
-        ctx['buf'].write(str(nd))
+        ar = []
+        for i, bnd in enumerate(nd.subs):
+            an = f'ret{i+1}'
+            ctx['buf'].write(f'{an} = ')
+            ar.append(an)
+            self._gen_anode(bnd, 'inret', ctx)
+        ctx['buf'].write(f'return {", ".join(ar)}')
+        ctx['buf'].write(';')
+        ctx['buf'].newline()
 
     def _gen_anode_act_return(self, nd, ctx):
         self._error(nd, 'should not be here')
@@ -215,7 +231,10 @@ class c_scode_program:
         ctx['buf'].write(str(nd))
 
     def _gen_anode_inst(self, nd, ctx):
-        ctx['buf'].write(str(nd))
+        val = nd.val
+        if val & 0x4000000:
+            val -= 0x8000000
+        ctx['buf'].write(str(val))
 
     def gen_code(self):
         self._gen_anode(self.ast)
