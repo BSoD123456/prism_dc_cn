@@ -86,7 +86,7 @@ class c_script_anode_bat(c_script_anode_branch):
     def __init__(self, acts):
         self.subs = acts
 
-    def _repr_as(self, form):
+    def repr_as(self, form):
         if form == 'tab':
             return '\n'.join(f'{n.addr:x}: {n}' for n in self.subs)
         elif form == 'func':
@@ -95,12 +95,12 @@ class c_script_anode_bat(c_script_anode_branch):
             return '|'.join(repr(n) for n in self.subs)
 
     def __repr__(self):
-        return self._repr_as(None)
+        return self.repr_as(None)
 
 class c_script_anode_prog(c_script_anode_bat):
 
     def __repr__(self):
-        return self._repr_as('func')
+        return self.repr_as('func')
 
 class c_script_anode_func(c_script_anode_branch):
 
@@ -111,18 +111,22 @@ class c_script_anode_func(c_script_anode_branch):
         self.sub = bat
         self.addr = addr
 
-    def _repr_as(self, form):
+    def repr_as(self, form):
         ar = ', '.join(f'arg{i+1}' for i in range(self.anum))
-        if form == 'tab':
-            rr = ', '.join(f'ret{i+1}' for i in range(self.rnum))
-            sr = self.sub._repr_as('tab')
-            return f'{self.addr:x}: func {self.name}({ar}) -> {rr} {{\n{sr}\n}}'
+        rr = ', '.join(f'ret{i+1}' for i in range(self.rnum))
+        rr = rr if rr else 'void'
+        prt = f'{rr} fun.{self.name}({ar})'
+        if form == 'proto':
+            return prt
+        elif form == 'tab':
+            sr = self.sub.repr_as('tab')
+            return f'{self.addr:x}: {prt} {{\n{sr}\n}}'
         else:
-            sr = self.sub._repr_as('func')
-            return f'func {self.name}({ar}){{\n{sr}\n}}'
+            sr = self.sub.repr_as('func')
+            return f'{prt}{{\n{sr}\n}}'
 
     def __repr__(self):
-        return self._repr_as(None)
+        return self.repr_as(None)
 
 class c_script_anode_text(c_script_anode_func):
 
@@ -632,8 +636,8 @@ if __name__ == '__main__':
         ast = prog.parse_sect(0)
         #for k, i in ast.items():
         #    print('===', k)
-        #    print(i._repr_as(True))
-        #print(ast._repr_as(True))
+        #    print(i.repr_as(True))
+        #print(ast.repr_as(True))
         #print(ast)
         saveobj(ast, r'wktab\ast.pck')
     tst1()
