@@ -290,12 +290,86 @@ class c_scode_program:
 
     def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx):
         self._gen_anode(self._getone(nd1), None, ctx)
-        ctx['buf'].write(' + ')
+        ctx['buf'].write(f' {op} ')
         self._gen_anode(self._getone(nd2), None, ctx)
 
     @ablk('prim')
     def _gen_anode_act_calc_add(self, nd, ctx):
         self._gen_vnode_act_calc_2('+', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_sub(self, nd, ctx):
+        self._gen_vnode_act_calc_2('-', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_mul(self, nd, ctx):
+        self._gen_vnode_act_calc_2('*', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_div(self, nd, ctx):
+        self._gen_vnode_act_calc_2('//', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_mod(self, nd, ctx):
+        self._gen_vnode_act_calc_2('%', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_neg(self, nd, ctx):
+        self._gen_vnode_act_calc_1('-', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_eq(self, nd, ctx):
+        self._gen_vnode_act_calc_2('==', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_gt(self, nd, ctx):
+        self._gen_vnode_act_calc_2('>', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_ge(self, nd, ctx):
+        self._gen_vnode_act_calc_2('>=', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_lt(self, nd, ctx):
+        self._gen_vnode_act_calc_2('<', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_le(self, nd, ctx):
+        self._gen_vnode_act_calc_2('<=', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_ne(self, nd, ctx):
+        self._gen_vnode_act_calc_2('!=', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_and(self, nd, ctx):
+        self._gen_vnode_act_calc_2('&&', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_or(self, nd, ctx):
+        self._gen_vnode_act_calc_2('||', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_band(self, nd, ctx):
+        self._gen_vnode_act_calc_2('&', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_bor(self, nd, ctx):
+        self._gen_vnode_act_calc_2('|', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_bxor(self, nd, ctx):
+        self._gen_vnode_act_calc_2('^', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_shl(self, nd, ctx):
+        self._gen_vnode_act_calc_2('<<', *nd.subs, ctx)
+
+    @ablk('prim')
+    def _gen_anode_act_calc_shr(self, nd, ctx):
+        self._gen_vnode_act_calc_2('>>', *nd.subs, ctx)
+
+    
 
     # ref
 
