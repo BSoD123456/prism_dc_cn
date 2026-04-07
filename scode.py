@@ -289,6 +289,10 @@ class c_scode_program:
 
     def _gen_anode_act_vset(self, nd, ctx):
         ndl, ndr = nd.subs
+        if (getattr(self._getone(ndl), 'name', None) == 'push'
+            and self._getone(self._getone(self._getone(ndl))).__class__.__name__ == 'c_script_anode_inst'
+            and (self._getone(self._getone(self._getone(ndl))).val & 0x1f)):
+            print('here2', nd.addr, nd)
         ctx['buf'].write('var')
         self._gen_vnode_var(ndl, ctx)
         ctx['buf'].write(' = ')
@@ -410,6 +414,6 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        cd = c_scode_program(ast, c_scode_buf_std())
+        cd = c_scode_program(ast, c_scode_buf_null())
         cd.gen_code()
     tst1()
