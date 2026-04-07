@@ -43,15 +43,13 @@ class c_scode_buf:
     def write(self, s):
         self.lbuf.append(s)
 
-    def newline(self, idt = 0):
+    def newline(self):
         if self.lbuf:
             line = ''.join((*self._idtsym(), *self.lbuf))
             self.lbuf = []
         else:
             line = ''
         self._writeline(line)
-        if idt:
-            self.indent(idt)
 
     def touch(self):
         if self.tch:
@@ -164,18 +162,20 @@ class c_scode_program:
 
     def _gen_anode_act_prim(self, nd, ctx):
         ctx['buf'].write(str(nd))
+        ctx['buf'].write(';')
         ctx['buf'].newline()
 
     def _gen_anode_act_pop_prim(self, nd, ctx):
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
+        ctx['buf'].write(';')
+        ctx['buf'].newline()
 
     def _gen_anode_act_pop(self, nd, ctx):
         assert False
 
     def _gen_anode_act(self, nd, ctx):
         ctx['buf'].write(str(nd))
-        ctx['buf'].newline()
 
     def gen_code(self):
         self._gen_anode(self.ast)
