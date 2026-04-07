@@ -36,14 +36,26 @@ class c_scode_buf:
         self.lbuf.append(s)
 
     def newline(self):
-        self._writeline(''.join((*self._idtsym(), *self.lbuf)))
-        self.lbuf = []
+        if self.lbuf:
+            line = ''.join((*self._idtsym(), *self.lbuf))
+            self.lbuf = []
+        else:
+            line = ''
+        self._writeline(line)
 
     def touch(self):
         if self.tch:
             return
         for line in self.buf:
             self._write_par(line)
+
+class c_scode_buf_null(c_scode_buf):
+
+    def __init__(self):
+        super().__init__(None, True)
+
+    def _writeline(self, line):
+        pass
 
 class c_scode_buf_std(c_scode_buf):
 
@@ -85,10 +97,14 @@ class c_scode_program:
     def _gen_anode_prog(self, nd, ctx):
         print('start')
         ctx = {}
-        ctx['buf'] = self.buf
+        ctx['buf'] = c_scode_buf_null()
         ctx['text'] = {}
         for snd in nd.subs:
             self._gen_anode(snd, 'dectext', ctx)
+        buf = ctx['buf'] = self.buf
+        for snd in nd.subs:
+            if self._gen_anode(snd, None, ctx) == 'func':
+                buf.newline()
 
     def _gen_anode_func_dectext(self, nd, ctx):
         pass
@@ -101,8 +117,21 @@ class c_scode_program:
             txts.append(self.chrset.dec(c))
         txt = ''.join(txts)
         ctx['text'][nd.name] = txt
-        ctx['buf'].write(f'{nd.name}: {txt}')
+        ctx['buf'].write(f'txt.{nd.name} = "{txt}";')
         ctx['buf'].newline()
+
+    def _gen_anode_func(self, nd, ctx):
+        buf = ctx['buf']
+        buf.write(f'{nd.repr_as("proto")} {{')
+        buf.newline()
+        buf.indent(1)
+        buf.indent(-1)
+        buf.write('}')
+        buf.newline()
+        return 'func'
+
+    def _gen_anode_text(self, nd, ctx):
+        pass
 
     def gen_code(self):
         self._gen_anode(self.ast)
