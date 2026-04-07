@@ -83,11 +83,13 @@ class c_scode_program:
         self.chrset = c_charset_jp()
 
     def _error(self, nd, msg):
-        report('err', f'(addr:{nd.addr:x}) {msg}')
+        addr = getattr(nd, 'addr', -1)
+        report('err', f'(addr:{addr:x}) {msg}')
         raise err_scode_syntax(msg)
 
     def _warn(self, nd, msg):
-        report('war', f'(addr:{nd.addr:x}) {msg}')
+        addr = getattr(nd, 'addr', -1)
+        report('war', f'(addr:{addr:x}) {msg}')
 
     def _getone(self, nd):
         if len(nd.subs) != 1:
@@ -166,6 +168,20 @@ class c_scode_program:
         ctx['buf'].write(';')
         ctx['buf'].newline()
 
+    def _gen_anode_act(self, nd, ctx):
+        ctx['buf'].write(nd.name)
+        self._gen_vnode_args(nd, ctx)
+
+    def _gen_vnode_args(self, nd, ctx):
+        buf = ctx['buf']
+        buf.write('( ')
+        for i, bnd in enumerate(nd.subs):
+            snd = self._getone(bnd)
+            self._gen_anode(snd, None, ctx)
+            if i < len(nd.subs) - 1:
+                buf.write(', ')
+        buf.write(' )')
+
     def _gen_anode_act_pop_prim(self, nd, ctx):
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
@@ -173,9 +189,22 @@ class c_scode_program:
         ctx['buf'].newline()
 
     def _gen_anode_act_pop(self, nd, ctx):
-        assert False
+        self._error(nd, 'should not be here')
 
-    def _gen_anode_act(self, nd, ctx):
+    def _gen_anode_act_push_prim(self, nd, ctx):
+        self._error(nd, 'should not be here')
+
+    def _gen_anode_act_push(self, nd, ctx):
+        snd = self._getone(self._getone(nd))
+        self._gen_anode(snd, None, ctx)
+
+    def _gen_anode_ref_func(self, nd, ctx):
+        ctx['buf'].write(str(nd))
+
+    def _gen_anode_ref_label(self, nd, ctx):
+        ctx['buf'].write(str(nd))
+
+    def _gen_anode_inst(self, nd, ctx):
         ctx['buf'].write(str(nd))
 
     def gen_code(self):
