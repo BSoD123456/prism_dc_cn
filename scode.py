@@ -170,6 +170,9 @@ class c_scode_program:
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
 
+    def _gen_anode_act_pop(self, nd, ctx):
+        assert False
+
     def _gen_anode_act(self, nd, ctx):
         ctx['buf'].write(str(nd))
         ctx['buf'].newline()
