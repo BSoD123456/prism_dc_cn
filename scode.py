@@ -198,10 +198,20 @@ class c_scode_program:
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
 
+    def _gen_anode_act_return_prim(self, nd, ctx):
+        #TODO
+        ctx['buf'].write(str(nd))
+
+    def _gen_anode_act_return(self, nd, ctx):
+        self._error(nd, 'should not be here')
+
     def _gen_anode_ref_func(self, nd, ctx):
         ctx['buf'].write(str(nd))
 
     def _gen_anode_ref_label(self, nd, ctx):
+        ctx['buf'].write(str(nd))
+
+    def _gen_anode_parm(self, nd, ctx):
         ctx['buf'].write(str(nd))
 
     def _gen_anode_inst(self, nd, ctx):
