@@ -15,6 +15,7 @@ class c_scode_buf:
         self.par = parent
         self.tch = touched
         self.idt = 0
+        self.lbuf = []
         self.buf = []
 
     def indent(self, val):
@@ -25,15 +26,18 @@ class c_scode_buf:
     def _idtsym(self):
         return (self.IDTSYM for _ in range(self.idt))
 
-    def _write_par(self, line):
-        self.par.write(line)
-
-    def write(self, s):
-        line = ''.join((*self._idtsym(), s))
+    def _writeline(self, line):
         if self.tch:
-            self._write_par(line)
+            self.par._writeline(line)
         else:
             self.buf.append(line)
+
+    def write(self, s):
+        self.lbuf.append(s)
+
+    def newline(self):
+        self._writeline(''.join((*self._idtsym(), *self.lbuf)))
+        self.lbuf = []
 
     def touch(self):
         if self.tch:
@@ -46,7 +50,7 @@ class c_scode_buf_std(c_scode_buf):
     def __init__(self):
         super().__init__(None, True)
 
-    def _write_par(self, line):
+    def _writeline(self, line):
         print(line)
 
 class c_scode_program:
@@ -73,18 +77,21 @@ class c_scode_program:
 
     def _gen_anode_prog(self, nd, ctx):
         print('start')
+        ctx = {}
+        ctx['text'] = {}
         for snd in nd.subs:
-            self._gen_anode(snd)
+            self._gen_anode(snd, 'dectext', ctx)
 
-    def _gen_anode_func(self, nd, ctx):
+    def _gen_anode_func_dectext(self, nd, ctx):
         pass
 
-    def _gen_anode_text(self, nd, ctx):
+    def _gen_anode_text_dectext(self, nd, ctx):
         txts = []
         for c in nd.text:
             txts.append(self.chrset.dec(c))
         txt = ''.join(txts)
         self.buf.write(f'{nd.name}: {txt}')
+        self.buf.newline()
 
     def gen_code(self):
         self._gen_anode(self.ast)
