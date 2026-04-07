@@ -125,6 +125,7 @@ class c_scode_program:
         buf.write(f'{nd.repr_as("proto")} {{')
         buf.newline()
         buf.indent(1)
+        self._gen_anode(nd.sub, None, ctx)
         buf.indent(-1)
         buf.write('}')
         buf.newline()
@@ -132,6 +133,18 @@ class c_scode_program:
 
     def _gen_anode_text(self, nd, ctx):
         pass
+
+    def _gen_anode_bat(self, nd, ctx):
+        for snd in nd.subs:
+            self._gen_anode(snd, None, ctx)
+
+    def _gen_anode_label(self, nd, ctx):
+        ctx['buf'].write(str(nd))
+        ctx['buf'].newline()
+
+    def _gen_anode_act(self, nd, ctx):
+        ctx['buf'].write(str(nd))
+        ctx['buf'].newline()
 
     def gen_code(self):
         self._gen_anode(self.ast)
