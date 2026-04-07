@@ -372,11 +372,12 @@ class c_script_program:
                     addr, functab, mstack, msneed, fwkset, gwkset)
                 gwkset.update(fwkset)
                 #print('lab', blabs)
-                for a, m in blabs:
+                for a, m, prs in blabs:
                     if a in labset:
                         continue
                     labset.add(a)
-                    braseq.append((faddr, a, [[]], m))
+                    if prs:
+                        braseq.append((faddr, a, [[]], m))
                 if bra:
                     if len(bra.subs) > 0:
                         bralst.append(bra)
@@ -538,10 +539,11 @@ class c_script_program:
                 if not isinstance(adst, c_script_anode_ref_label):
                     self._error(addr, f'jump to non-instant addr: {cargs[-1]}')
                 if ctype == 'jmp':
+                    labseq.append((adst.addr, msneed_cntn[0], False))
                     addr = adst.addr
                 else:
                     mcheck(addr, False)
-                    labseq.append((adst.addr, msneed_cntn[0]))
+                    labseq.append((adst.addr, msneed_cntn[0], True))
                     addr += 1
             elif ctype == 'ret':
                 return mcheck(addr, True), labseq, 'return', (
