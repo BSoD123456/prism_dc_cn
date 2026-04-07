@@ -75,6 +75,37 @@ class c_scode_buf_std(c_scode_buf):
     def _writeline(self, line):
         print(line)
 
+def block_assume(cls):
+    mseq = []
+    for mn, mval in cls.__dict__.items():
+        if not (mn.startswith('_gen_anode_')
+                and isinstance(mval, tuple)):
+            continue
+        mseq.append((mn, mval))
+    for mn, mval in mseq:
+        cn = mn.split('__')[0]
+        for blk in mval[1:]:
+            if blk:
+                bmn = '__'.join((cn, blk))
+            else:
+                bmn = cn
+            def _mk(pblk):
+                def _assume_block(self, nd, ctx):
+                    self._error(nd, f'should not be assumed as: {pblk}')
+                return _assume_block
+            setattr(cls, bmn, _mk(blk))
+        setattr(cls, mn, mval[0])
+    return cls
+
+def ablk(*blks):
+    def _deco(mth):
+        if blks:
+            return (mth, *blks)
+        else:
+            return (mth, None)
+    return _deco
+
+@block_assume
 class c_scode_program:
 
     def __init__(self, ast, buf):
@@ -101,17 +132,20 @@ class c_scode_program:
         assert cn.startswith('c_script_anode_')
         cn = '_gen_anode_' + cn[len('c_script_anode_'):]
         if hasattr(nd, 'name'):
-            mn = '_'.join(
-                (cn, nd.name, assume) if assume else (cn, nd.name))
+            mn = '_'.join((cn, nd.name))
+            if assume:
+                mn = '__'.join((mn, assume))
             if hasattr(self, mn):
                 getattr(self, mn)(nd, ctx)
                 return mn[len('_gen_anode_'):]
         if assume:
-            mn = '_'.join((cn, assume))
+            mn = '__'.join((cn, assume))
         else:
             mn = cn
         getattr(self, mn)(nd, ctx)
         return mn[len('_gen_anode_'):]
+
+    # program
 
     def _gen_anode_prog(self, nd, ctx):
         print('start')
@@ -127,10 +161,10 @@ class c_scode_program:
 
     # struct
 
-    def _gen_anode_func_dectext(self, nd, ctx):
+    def _gen_anode_func__dectext(self, nd, ctx):
         pass
 
-    def _gen_anode_text_dectext(self, nd, ctx):
+    def _gen_anode_text__dectext(self, nd, ctx):
         if nd.name in ctx['text']:
             self._error(nd, f'duplicated text name: {nd.name}')
         txts = []
@@ -162,11 +196,11 @@ class c_scode_program:
     def _gen_anode_text(self, nd, ctx):
         pass
 
-    def _gen_anode_bat_prim(self, nd, ctx):
+    def _gen_anode_bat__prim(self, nd, ctx):
         for snd in nd.subs:
             self._gen_anode(snd, 'prim', ctx)
 
-    def _gen_anode_bat_inret(self, nd, ctx):
+    def _gen_anode_bat__inret(self, nd, ctx):
         for i, snd in enumerate(nd.subs):
             if i == 0:
                 self._gen_anode(snd, None, ctx)
@@ -175,7 +209,7 @@ class c_scode_program:
             else:
                 self._gen_anode(snd, 'prim', ctx)
 
-    def _gen_anode_label_prim(self, nd, ctx):
+    def _gen_anode_label__prim(self, nd, ctx):
         oidt = ctx['buf'].popindent()
         ctx['buf'].write(f'@lab.{nd.name}:')
         ctx['buf'].newline()
@@ -183,7 +217,7 @@ class c_scode_program:
 
     # act
 
-    def _gen_anode_act_prim(self, nd, ctx):
+    def _gen_anode_act__prim(self, nd, ctx):
         self._gen_anode_act(nd, ctx)
         ctx['buf'].write(';')
         ctx['buf'].newline()
@@ -202,23 +236,20 @@ class c_scode_program:
                 buf.write(', ')
         buf.write(')')
 
-    def _gen_anode_act_pop_prim(self, nd, ctx):
+    @ablk()
+    def _gen_anode_act_pop__prim(self, nd, ctx):
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
         ctx['buf'].write(';')
         ctx['buf'].newline()
 
-    def _gen_anode_act_pop(self, nd, ctx):
-        self._error(nd, 'should not be here')
-
-    def _gen_anode_act_push_prim(self, nd, ctx):
-        self._error(nd, 'should not be here')
-
+    @ablk('prim')
     def _gen_anode_act_push(self, nd, ctx):
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
 
-    def _gen_anode_act_return_prim(self, nd, ctx):
+    @ablk()
+    def _gen_anode_act_return__prim(self, nd, ctx):
         ar = []
         for i, bnd in enumerate(nd.subs):
             an = f'ret{i+1}'
@@ -229,10 +260,7 @@ class c_scode_program:
         ctx['buf'].write(';')
         ctx['buf'].newline()
 
-    def _gen_anode_act_return(self, nd, ctx):
-        self._error(nd, 'should not be here')
-
-    def _gen_anode_act_call_prim(self, nd, ctx):
+    def _gen_anode_act_call__prim(self, nd, ctx):
         self._gen_anode_act_call(nd, ctx)
         ctx['buf'].write(';')
         ctx['buf'].newline()
