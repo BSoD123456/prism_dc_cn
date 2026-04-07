@@ -437,8 +437,9 @@ class c_script_program:
             if len(mstack) < 2:
                 assert len(mstack) == 1
                 msneed_cntn[0] += 1
-                return c_script_anode_parm(msneed_cntn[0])
-            b = mstack.pop()
+                b = [c_script_anode_parm(msneed_cntn[0])]
+            else:
+                b = mstack.pop()
             nd = c_script_anode_bat(b)
             return nd
         def mdeep():
