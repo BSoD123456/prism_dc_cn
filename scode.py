@@ -305,7 +305,8 @@ class c_scode_program:
     # calc
 
     def _gen_vnode_act_calc_1(self, op, nd, ctx):
-        pass
+        ctx['buf'].write('-')
+        self._gen_anode(self._getone(nd), None, ctx)
 
     def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx):
         self._gen_anode(self._getone(nd1), None, ctx)
