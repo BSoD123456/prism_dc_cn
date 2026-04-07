@@ -102,12 +102,14 @@ class c_scode_program:
             mn = '_'.join(
                 (cn, nd.name, assume) if assume else (cn, nd.name))
             if hasattr(self, mn):
-                return getattr(self, mn)(nd, ctx)
+                getattr(self, mn)(nd, ctx)
+                return mn[len('_gen_anode_'):]
         if assume:
             mn = '_'.join((cn, assume))
         else:
             mn = cn
-        return getattr(self, mn)(nd, ctx)
+        getattr(self, mn)(nd, ctx)
+        return mn[len('_gen_anode_'):]
 
     def _gen_anode_prog(self, nd, ctx):
         print('start')
@@ -145,7 +147,6 @@ class c_scode_program:
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
-        return 'func'
 
     def _gen_anode_text(self, nd, ctx):
         pass
@@ -161,7 +162,7 @@ class c_scode_program:
         ctx['buf'].indent(oidt)
 
     def _gen_anode_act_prim(self, nd, ctx):
-        ctx['buf'].write(str(nd))
+        self._gen_anode_act(nd, ctx)
         ctx['buf'].write(';')
         ctx['buf'].newline()
 
