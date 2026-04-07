@@ -283,6 +283,9 @@ class c_scode_program:
         txt = ctx['text'][nd.name]
         ctx['buf'].write(f'text = "{txt}"')
 
+    def _gen_vnode_vidx(self, nd, ctx):
+        pass
+
     # calc
 
     def _gen_vnode_act_calc_1(self, op, nd, ctx):
@@ -368,8 +371,6 @@ class c_scode_program:
     @ablk('prim')
     def _gen_anode_act_calc_shr(self, nd, ctx):
         self._gen_vnode_act_calc_2('>>', *nd.subs, ctx)
-
-    
 
     # ref
 
