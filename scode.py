@@ -91,6 +91,11 @@ class c_scode_program:
     def _warn(self, nd, msg):
         report('war', f'(addr:{nd.addr:x}) {msg}')
 
+    def _getone(self, nd):
+        if len(nd.subs) != 1:
+            self._error(nd, f'anode should have only 1 subnode: {nd}')
+        return nd.subs[0]
+
     def _gen_anode(self, nd, assume = None, ctx = None):
         cn = nd.__class__.__name__
         assert cn.startswith('c_script_anode_')
@@ -137,7 +142,7 @@ class c_scode_program:
         pbuf.write(f'{nd.repr_as("proto")} {{')
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
-        self._gen_anode(nd.sub, None, ctx)
+        self._gen_anode(nd.sub, 'prim', ctx)
         buf.touch()
         ctx['buf'] = pbuf
         pbuf.write('}')
@@ -147,15 +152,23 @@ class c_scode_program:
     def _gen_anode_text(self, nd, ctx):
         pass
 
-    def _gen_anode_bat(self, nd, ctx):
+    def _gen_anode_bat_prim(self, nd, ctx):
         for snd in nd.subs:
-            self._gen_anode(snd, None, ctx)
+            self._gen_anode(snd, 'prim', ctx)
 
-    def _gen_anode_label(self, nd, ctx):
+    def _gen_anode_label_prim(self, nd, ctx):
         oidt = ctx['buf'].popindent()
         ctx['buf'].write(str(nd))
         ctx['buf'].newline()
         ctx['buf'].indent(oidt)
+
+    def _gen_anode_act_prim(self, nd, ctx):
+        ctx['buf'].write(str(nd))
+        ctx['buf'].newline()
+
+    def _gen_anode_act_pop_prim(self, nd, ctx):
+        snd = self._getone(self._getone(nd))
+        self._gen_anode(snd, None, ctx)
 
     def _gen_anode_act(self, nd, ctx):
         ctx['buf'].write(str(nd))
