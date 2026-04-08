@@ -181,7 +181,6 @@ class c_scode_program:
         for snd in nd.subs:
             if self._gen_anode(snd, None, ctx) == 'func':
                 buf.newline()
-                breakpoint()
 
     # struct
 
@@ -389,7 +388,6 @@ class c_scode_program:
         else:
             lbunused.add(nd.addr)
         bstack = ctx['bstack']
-        poped = False
         while bstack:
             saddr, daddr, bnt, pbuf = bstack[-1]
             if daddr < nd.addr:
@@ -405,15 +403,9 @@ class c_scode_program:
             buf.write('}')
             buf.newline()
             buf.touch()
-            poped = True
             self._use_label_in_ctx(nd.addr, ctx)
             bstack.pop()
             buf = ctx['buf'] = pbuf
-        if not poped:
-            oidt = ctx['buf'].noindent()
-            ctx['buf'].write(f'@lab.{nd.name}:')
-            ctx['buf'].newline()
-            ctx['buf'].indent(oidt)
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
         lb = self._getone(self._getone(nd))
@@ -432,21 +424,17 @@ class c_scode_program:
                     buf.write('}')
                     buf.newline()
                     unkjmp = ctx['unkjmp']
-                    print(nd.addr, nd, len(bstack), unkjmp)
                     for i in range(len(unkjmp)-1, -1, -1):
                         hsaddr, hdaddr, hid, hbslen = unkjmp[i]
                         if hbslen < len(bstack):
                             break
                         if hdaddr == nd.addr - 1:
                             buf.reput(hid, 'continue')
-                            print('c', hdaddr)
                             self._use_label_in_ctx(hdaddr, ctx)
                         elif hdaddr == nd.addr + 1:
                             buf.reput(hid, 'break')
-                            print('b', hdaddr)
                             self._use_label_in_ctx(hdaddr, ctx)
                         else:
-                            print(hdaddr, nd.addr)
                             self._error(nd, f'unparsable jump at: 0x{hsaddr:x}')
                         unkjmp.pop()
                     buf.touch()
