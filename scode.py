@@ -500,22 +500,16 @@ class c_scode_program:
             if djtyp != 'j':
                 self._error(nd, f'while-block should not be end with condi')
             buf.write('while ')
-            if not nt:
-                buf.write('not ')
-            buf.write('(')
-            self._gen_anode(condi, None, ctx)
-            buf.write(') {')
-            buf.newline()
             btyp = 'lp'
         else:
             buf.write('if ')
-            if nt:
-                buf.write('not ')
-            buf.write('(')
-            self._gen_anode(condi, None, ctx)
-            buf.write(') {')
-            buf.newline()
             btyp = 'if'
+        if not nt:
+            buf.write('not ')
+        buf.write('(')
+        self._gen_anode(condi, None, ctx)
+        buf.write(') {')
+        buf.newline()
         bstack = ctx['bstack']
         if bstack and bstack[-1][3] < lb.addr:
             self._error(nd, f'block out of bounds: {lb}')
