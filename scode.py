@@ -662,9 +662,9 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        if False:
-            #cd = c_scode_program(ast, c_scode_buf_null())
-            cd = c_scode_program(ast, c_scode_buf_std())
+        if True:
+            cd = c_scode_program(ast, c_scode_buf_null())
+            #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
         else:
             with open(r'wktab\output.txt', 'w', encoding = 'utf-8') as fd:
