@@ -17,6 +17,7 @@ class c_scode_buf:
         self.idt = indent
         self.lbuf = []
         self.buf = []
+        self.hdidx = 0
 
     def sub(self, idt = 1):
         return c_scode_buf(self, False, idt)
@@ -52,6 +53,24 @@ class c_scode_buf:
             line = ''
         self._writeline(line)
 
+    def hold(self):
+        if self.tch:
+            raise err_scode_syntax('touched buf unholdable')
+        elif self.lbuf:
+            raise err_scode_syntax('can only hold a newline')
+        self.hdidx += 1
+        self._writeline(self.hdidx)
+
+    def reput(self, hid, line):
+        if self.tch:
+            raise err_scode_syntax('touched buf unchangable')
+        for i, v in enumerate(self.buf):
+            if v == hid:
+                break
+        else:
+            raise err_scode_syntax(f'invalid hid: {hid}')
+        self.buf[i] = ''.join((*self._idtsym(), line))
+
     def touch(self):
         if self.tch:
             return self
@@ -59,13 +78,11 @@ class c_scode_buf:
         if not self.par:
             return self
         for line in self.buf:
+            if isinstance(line, int):
+                raise err_scode_syntax('held buf untouchable')
             self.par.write(line)
             self.par.newline()
-        if self.lbuf:
-            for tok in self._idtsym():
-                self.par.write(tok)
-            for tok in self.lbuf:
-                self.par.write(tok)
+        self.buf = []
         return self
 
 class c_scode_buf_null(c_scode_buf):
