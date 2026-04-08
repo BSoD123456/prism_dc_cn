@@ -118,28 +118,33 @@ class c_scode_buf_fd(c_scode_buf):
     def _writeline(self, line):
         self.fd.write(line + '\n')
 
-def with_anode(cls):
-    nmset = set()
-    for mn in dir(cls):
-        if not mn.startswith('_gen_anode_'):
-            continue
-        nm = mn.split('__')[0]
-        nmset.add(nm)
-    def _dispatch_anode(self, nd, assume):
-        ctype = nd.__class__.__name__
-        assert ctype.startswith('c_script_anode_')
-        nm = '_gen_anode_' + ctype[len('c_script_anode_'):]
-        if hasattr(nd, 'name'):
-            nm2 = '_'.join((nm, nd.name))
-            if nm2 in nmset:
-                nm = nm2
-        if assume:
-            nm = '__'.join((nm, assume))
-        return getattr(self, nm, None), nm[len('_gen_anode_'):]
-    cls._dispatch_anode = _dispatch_anode
-    return cls
+def with_anode(stricts):
+    def _deco(cls):
+        nmset = set()
+        for mn in dir(cls):
+            if not mn.startswith('_gen_anode_'):
+                continue
+            nm = mn.split('__')[0]
+            nmset.add(nm)
+        def _dispatch_anode(self, nd, assume):
+            ctype = nd.__class__.__name__
+            assert ctype.startswith('c_script_anode_')
+            nm1 = '_gen_anode_' + ctype[len('c_script_anode_'):]
+            nm = nm1
+            if hasattr(nd, 'name'):
+                nm2 = '_'.join((nm, nd.name))
+                if nm2 in nmset:
+                    nm = nm2
+            if assume:
+                nm = '__'.join((nm, assume))
+                if not hasattr(self, nm) and not assume in stricts:
+                    nm = '__'.join((nm1, assume))
+            return getattr(self, nm, None), nm[len('_gen_anode_'):]
+        cls._dispatch_anode = _dispatch_anode
+        return cls
+    return _deco
 
-@with_anode
+@with_anode('prim')
 class c_scode_program:
 
     def __init__(self, ast, buf):
@@ -205,6 +210,8 @@ class c_scode_program:
         ctx['buf'].newline()
 
     def _gen_anode_func(self, nd, ctx):
+        ctx['lbrvs'] = {}
+        self._gen_anode(nd.sub, 'lbscan', ctx)
         pbuf = ctx['buf']
         if nd.rnum == 1:
             rr = 'ret '
@@ -233,6 +240,7 @@ class c_scode_program:
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
+        ctx.pop('lbrvs')
 
     def _gen_anode_text(self, nd, ctx):
         pass
@@ -251,6 +259,36 @@ class c_scode_program:
                 ctx['buf'].newline()
             else:
                 self._gen_anode(snd, 'prim', ctx)
+
+    # label scan
+
+    def _gen_anode_bat__lbscan(self, nd, ctx):
+        for snd in nd.subs:
+            self._gen_anode(snd, 'lbscan', ctx)
+
+    def _gen_anode_act__lbscan(self, nd, ctx):
+        pass
+
+    def _gen_anode_label__lbscan(self, nd, ctx):
+        pass
+
+    def _rec_label_reverse(self, saddr, daddr, jtyp, ctx):
+        lbrvs = ctx['lbrvs']
+        if not daddr in lbrvs:
+            lbrvs[daddr] = {}
+        lbrvs[daddr][saddr] = jtyp
+
+    def _gen_anode_act_jump__lbscan(self, nd, ctx):
+        lb = self._getone(self._getone(nd))
+        self._rec_label_reverse(nd.addr, lb.addr, 'j', ctx)
+
+    def _gen_anode_act_jump_if__lbscan(self, nd, ctx):
+        condi, lb = (self._getone(i) for i in nd.subs)
+        self._rec_label_reverse(nd.addr, lb.addr, 'jt', ctx)
+
+    def _gen_anode_act_jump_if_not__lbscan(self, nd, ctx):
+        condi, lb = (self._getone(i) for i in nd.subs)
+        self._rec_label_reverse(nd.addr, lb.addr, 'jf', ctx)
 
     # act
 
