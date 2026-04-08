@@ -17,7 +17,6 @@ class c_scode_buf:
         self.idt = indent
         self.lbuf = []
         self.buf = []
-        self.hdidx = 0
 
     def sub(self, idt = 1):
         return c_scode_buf(self, False, idt)
@@ -32,8 +31,8 @@ class c_scode_buf:
         self.idt = 0
         return idt
 
-    def _idtsym(self):
-        return (self.IDTSYM for _ in range(self.idt))
+    def _idtsym(self, idt):
+        return (self.IDTSYM for _ in range(idt))
 
     def _writeline(self, line):
         if self.tch:
@@ -47,29 +46,30 @@ class c_scode_buf:
 
     def newline(self):
         if self.lbuf:
-            line = ''.join((*self._idtsym(), *self.lbuf))
+            line = ''.join((*self._idtsym(self.idt), *self.lbuf))
             self.lbuf = []
         else:
             line = ''
         self._writeline(line)
 
+    HDIDX = 0
     def hold(self):
         if self.tch:
             raise err_scode_syntax('touched buf unholdable')
         elif self.lbuf:
             raise err_scode_syntax('can only hold a newline')
-        self.hdidx += 1
-        self._writeline(self.hdidx)
+        c_scode_buf.HDIDX += 1
+        self._writeline((c_scode_buf.HDIDX, self.idt))
 
     def reput(self, hid, line):
         if self.tch:
             raise err_scode_syntax('touched buf unchangable')
-        for i, v in enumerate(self.buf):
-            if v == hid:
+        for i, (dhid, didt) in enumerate(self.buf):
+            if dhid == hid:
                 break
         else:
             raise err_scode_syntax(f'invalid hid: {hid}')
-        self.buf[i] = ''.join((*self._idtsym(), line))
+        self.buf[i] = ''.join((*self._idtsym(didt), line))
 
     def touch(self):
         if self.tch:
@@ -78,10 +78,12 @@ class c_scode_buf:
         if not self.par:
             return self
         for line in self.buf:
-            if isinstance(line, int):
-                raise err_scode_syntax('held buf untouchable')
-            self.par.write(line)
-            self.par.newline()
+            if isinstance(line, tuple):
+                hid, hidt = line
+                self.par._writeline((hid, self.par.idt + hidt))
+            else:
+                self.par.write(line)
+                self.par.newline()
         self.buf = []
         return self
 
@@ -427,7 +429,7 @@ class c_scode_program:
                     buf = ctx['buf'] = pbuf
                     return
         hid = buf.hold()
-        ctx['unkjmp'].append((nd.addr, lb.addr, hid))
+        ctx['unkjmp'][lb.addr] =(nd.addr, hid)
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
