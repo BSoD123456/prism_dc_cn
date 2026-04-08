@@ -272,6 +272,9 @@ class c_scode_program:
     def _gen_anode_label__lbscan(self, nd, ctx):
         pass
 
+    def _gen_anode_act_call__lbscan(self, nd, ctx):
+        pass
+
     def _rec_label_reverse(self, saddr, daddr, jtyp, ctx):
         lbrvs = ctx['lbrvs']
         if not daddr in lbrvs:
@@ -506,7 +509,7 @@ class c_scode_program:
                 return
             elif lb.addr > nd.addr:
                 if bslen > 1 and lb.addr <= ctx['bstack'][-2][1]:
-                    breakpoint()
+                    pass#breakpoint()
             else:
                 self._error(nd, f'jump back without loop: {nd}')
         hid = buf.hold()
