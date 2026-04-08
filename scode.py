@@ -449,17 +449,20 @@ class c_scode_program:
 
     def _gen_anode_label__prim(self, nd, ctx):
         buf = ctx['buf']
-        mbsinfo, _ = self._peek_bstack(nd.addr, None, ctx)
-        if mbsinfo:
-            btyp, paddr, saddr, daddr, pbuf = mbsinfo
-            assert btyp != 'lp'
-            buf.touch()
-            ctx['bstack'].pop()
-            buf = ctx['buf'] = pbuf
-            buf.write('}')
-            buf.newline()
-        elif mbsinfo is False:
-            self._error(nd, 'exceed no-end block')
+        while True:
+            mbsinfo, _ = self._peek_bstack(nd.addr, None, ctx)
+            if mbsinfo:
+                btyp, paddr, saddr, daddr, pbuf = mbsinfo
+                assert btyp != 'lp'
+                buf.touch()
+                ctx['bstack'].pop()
+                buf = ctx['buf'] = pbuf
+                buf.write('}')
+                buf.newline()
+            elif mbsinfo is False:
+                self._error(nd, 'exceed no-end block')
+            else:
+                break
         lbhld = ctx['lbhld']
         if nd.addr in lbhld:
             lbhinfo = lbhld[nd.addr]
@@ -467,7 +470,7 @@ class c_scode_program:
         else:
             lbhinfo = lbhld[nd.addr] = [None, None, False]
         lbhld[nd.addr][0] = buf.hold()
-        lbhld[nd.addr][1] = f'@lab.{nd.addr:x}'
+        lbhld[nd.addr][1] = f'@lab.{nd.addr:x}:'
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
         lb = self._getone(self._getone(nd))
@@ -514,6 +517,10 @@ class c_scode_program:
             lbhld[lb.addr][2] = True
         else:
             lbhld[lb.addr] = [None, None, True]
+        buf.write('jump(')
+        self._gen_anode(lb, None, ctx)
+        buf.write(');')
+        buf.newline()
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
@@ -655,7 +662,7 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        if True:
+        if False:
             #cd = c_scode_program(ast, c_scode_buf_null())
             cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
