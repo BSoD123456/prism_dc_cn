@@ -79,6 +79,8 @@ class c_scode_buf:
             return self
         for line in self.buf:
             if isinstance(line, tuple):
+                if self.par.tch:
+                    raise err_scode_syntax('touched parbuf unholdable')
                 hid, hidt = line
                 self.par._writeline((hid, self.par.idt + hidt))
             else:
