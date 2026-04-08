@@ -153,18 +153,12 @@ class c_scode_program:
         self.chrset = c_charset_jp()
 
     def _error(self, nd, msg):
-        if isinstance(nd, int):
-            addr = nd
-        else:
-            addr = getattr(nd, 'addr', -1)
+        addr = getattr(nd, 'addr', -1)
         report('err', f'(addr:{addr:x}) {msg}')
         raise err_scode_syntax(msg)
 
     def _warn(self, nd, msg):
-        if isinstance(nd, int):
-            addr = nd
-        else:
-            addr = getattr(nd, 'addr', -1)
+        addr = getattr(nd, 'addr', -1)
         report('war', f'(addr:{addr:x}) {msg}')
 
     def _getone(self, nd):
@@ -224,18 +218,10 @@ class c_scode_program:
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
         ctx['bstack'] = []
-        ctx['labset'] = (set(), set(), set())
-        ctx['unkjmp'] = []
         self._gen_anode(nd.sub, 'prim', ctx)
         bstack = ctx.pop('bstack')
         if bstack:
             self._error(nd, f'function block unbalance: {bstack}')
-        unkjmp = ctx.pop('unkjmp')
-        if unkjmp:
-            self._error(nd, f'function with unknown jump: {unkjmp}')
-        lbunused, lbneed, _ = ctx.pop('labset')
-        if lbunused or lbneed:
-            self._error(nd, f'function label unused: {lbunused} / needed: {lbneed}')
         buf.touch()
         ctx['buf'] = pbuf
         pbuf.write('}')
@@ -280,6 +266,12 @@ class c_scode_program:
         if not daddr in lbrvs:
             lbrvs[daddr] = {}
         lbrvs[daddr][saddr] = jtyp
+
+    def _chk_label_reverse(self, saddr, daddr, ctx):
+        lbrvs = ctx['lbrvs']
+        if not daddr in lbrvs:
+            return None
+        return lbrvs[daddr].get(saddr, None)
 
     def _gen_anode_act_jump__lbscan(self, nd, ctx):
         lb = self._getone(self._getone(nd))
@@ -416,121 +408,119 @@ class c_scode_program:
 
     # flow
 
-    def _use_label_in_ctx(self, addr, ctx):
-        lbunused, lbneed, lbdone = ctx['labset']
-        if not addr in lbdone:
-            if addr in lbunused:
-                lbunused.remove(addr)
-                lbdone.add(addr)
-            else:
-                lbneed.add(addr)
-
-    def _get_bstack_match(self, addr, ctx):
+    def _peek_bstack(self, addr, dbtyp, ctx):
         bstack = ctx['bstack']
         if not bstack:
-            return None
-        for i in range(len(bstack)):
-            saddr, daddr, paddr, pbuf, bels, bnt = bstack[-i-1]
-            if addr > daddr:
-                self._error(addr, f'no-end block at: {daddr:x}')
-            elif addr == daddr:
-                break
-            if not bels:
-                return None
-        else:
-            return None
-        if i > 0:
-            breakpoint()
+            return None, None
+        mbsinfo = bstack[-1]
+        btyp, paddr, saddr, daddr, pbuf = mbsinfo
         assert ctx['buf'].par == pbuf and not ctx['buf'].tch
-        return saddr, daddr, paddr, pbuf, bels, bnt
+        if addr > daddr:
+            return False, False
+        elif addr < daddr:
+            mbsinfo = None
+        for bsinfo in reversed(bstack):
+            btyp, paddr, saddr, daddr, pbuf = bsinfo
+            if dbtyp is None or btyp == dbtyp:
+                return mbsinfo, bsinfo
+        else:
+            return mbsinfo, None
+
+    def _check_bstack_bound(self, addr, shft, ctx):
+        bstack = ctx['bstack']
+        if len(bstack) <= shft:
+            return True
+        btyp, paddr, saddr, daddr, pbuf = bstack[-1-shft]
+        if btyp == 'lp':
+            return addr <= daddr - 2
+        else:
+            return addr <= daddr
 
     def _gen_anode_label__prim(self, nd, ctx):
         buf = ctx['buf']
-        lbunused, lbneed, lbdone = ctx['labset']
-        if nd.addr in lbdone:
-            # poped by while done
-            assert not nd.addr in lbneed
-        elif nd.addr in lbneed:
-            lbneed.remove(nd.addr)
-            lbdone.add(nd.addr)
-        else:
-            lbunused.add(nd.addr)
-        while True:
-            bsinfo = self._get_bstack_match(nd.addr, ctx)
-            if bsinfo is None:
-                break
-            saddr, daddr, paddr, pbuf, bels, bnt = bsinfo
-            if bnt:
-                pbuf.write('if not')
-            else:
-                pbuf.write('if')
-            buf.indent(-1)
-            buf.write('}')
-            buf.newline()
+        mbsinfo, _ = self._peek_bstack(nd.addr, None, ctx)
+        if mbsinfo:
+            btyp, paddr, saddr, daddr, pbuf = mbsinfo
+            assert btyp != 'lp'
             buf.touch()
-            self._use_label_in_ctx(nd.addr, ctx)
             ctx['bstack'].pop()
             buf = ctx['buf'] = pbuf
+            buf.write('}')
+            buf.newline()
+        elif mbsinfo is False:
+            self._error(nd, 'exceed no-end block')
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
         lb = self._getone(self._getone(nd))
         buf = ctx['buf']
-        bslen = len(ctx['bstack'])
-        bsinfo = self._get_bstack_match(nd.addr + 1, ctx)
-        if bsinfo:
-            saddr, daddr, paddr, pbuf, bels, bnt = bsinfo
-            if lb.addr == paddr:
-                if bnt:
-                    pbuf.write('while')
-                else:
-                    pbuf.write('while not')
-                buf.indent(-1)
-                buf.write('}')
-                buf.newline()
-                unkjmp = ctx['unkjmp']
-                for i in range(len(unkjmp)-1, -1, -1):
-                    hsaddr, hdaddr, hid, hbslen = unkjmp[i]
-                    if hbslen < bslen:
-                        break
-                    if hdaddr == ctx['prv_addr']:
-                        buf.reput(hid, 'continue')
-                        self._use_label_in_ctx(hdaddr, ctx)
-                    elif hdaddr == nd.addr + 1:
-                        buf.reput(hid, 'break')
-                        self._use_label_in_ctx(hdaddr, ctx)
-                    else:
-                        self._error(nd, f'unparsable jump at: 0x{hsaddr:x}')
-                    unkjmp.pop()
+        mbsinfo, bsinfo = self._peek_bstack(nd.addr + 1, 'lp', ctx)
+        if mbsinfo:
+            btyp, paddr, saddr, daddr, pbuf = mbsinfo
+            if btyp == 'lp':
+                assert lb.addr == paddr
                 buf.touch()
-                self._use_label_in_ctx(lb.addr, ctx)
-                self._use_label_in_ctx(daddr, ctx)
                 ctx['bstack'].pop()
                 buf = ctx['buf'] = pbuf
+                buf.write('}')
+                buf.newline()
                 return
-            elif lb.addr > nd.addr:
-                if bslen > 1 and lb.addr <= ctx['bstack'][-2][1]:
-                    pass#breakpoint()
+            elif btyp == 'if' and self._check_bstack_bound(lb.addr, 1, ctx):
+                buf.touch()
+                ctx['bstack'].pop()
+                buf = ctx['buf'] = pbuf
+                buf.write('} else {')
+                buf.newline()
+                ctx['bstack'].append(('el', ctx['prv_addr'], nd.addr, lb.addr, buf))
+                ctx['buf'] = buf.sub()
+                return
+        if bsinfo:
+            btyp, paddr, saddr, daddr, pbuf = bsinfo
+            assert btyp == 'lp'
+            if lb.addr == daddr:
+                buf.write('break;')
+                buf.newline()
+            elif lb.addr == daddr - 2:
+                buf.write('continue;')
+                buf.newline()
             else:
-                self._error(nd, f'jump back without loop: {nd}')
-        hid = buf.hold()
-        ctx['unkjmp'].append((nd.addr, lb.addr, hid, bslen))
+                self._error(nd, f'unparsable jump: {nd}')
+        elif bsinfo is None:
+            self._error(nd, f'isolated jump: {nd}')
+        else:
+            self._error(nd, 'exceed no-end block')
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
         if lb.addr <= nd.addr:
             self._error(nd, f'if-block should not be before jump')
+        lbrvs = ctx['lbrvs']
+        djtyp = self._chk_label_reverse(lb.addr - 1, ctx['prv_addr'], ctx)
+        buf = ctx['buf']
+        if djtyp:
+            if djtyp != 'j':
+                self._error(nd, f'while-block should not be end with condi')
+            buf.write('while ')
+            if not nt:
+                buf.write('not ')
+            buf.write('(')
+            self._gen_anode(condi, None, ctx)
+            buf.write(') {')
+            buf.newline()
+            btyp = 'lp'
+        else:
+            buf.write('if ')
+            if nt:
+                buf.write('not ')
+            buf.write('(')
+            self._gen_anode(condi, None, ctx)
+            buf.write(') {')
+            buf.newline()
+            btyp = 'if'
         bstack = ctx['bstack']
-        if bstack and bstack[-1][1] < lb.addr:
-            self._error(nd, f'if-block out of bounds: {lb}')
-        pbuf = ctx['buf']
-        bstack.append((nd.addr, lb.addr, ctx['prv_addr'], pbuf, False, nt))
-        buf = ctx['buf'] = pbuf.sub()
-        idt = buf.noindent()
-        buf.write('(')
-        self._gen_anode(condi, None, ctx)
-        buf.write(') {')
-        buf.newline()
-        buf.indent(idt)
+        if bstack and bstack[-1][3] < lb.addr:
+            self._error(nd, f'block out of bounds: {lb}')
+        bstack.append((btyp, ctx['prv_addr'], nd.addr, lb.addr, buf))
+        ctx['buf'] = buf.sub()
 
     def _gen_anode_act_jump_if__prim(self, nd, ctx):
         self._gen_vnode_if(False, nd, ctx)
