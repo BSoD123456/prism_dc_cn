@@ -378,6 +378,25 @@ class c_scode_program:
             else:
                 lbneed.add(addr)
 
+    def _get_bstack_match(self, addr, ctx):
+        bstack = ctx['bstack']
+        if not bstack:
+            return None
+        for i in range(len(bstack)):
+            saddr, daddr, paddr, pbuf, bnt, bels = bstack[-i-1]
+            if addr > daddr:
+                self._error(nd, f'no-end block at: {daddr:x}')
+            elif addr == daddr:
+                break
+            if not bels:
+                return None
+        else:
+            return None
+        if i > 0:
+            breakpoint()
+        assert ctx['buf'].par == pbuf and not ctx['buf'].tch
+        return saddr, daddr, paddr, pbuf, bnt, bels
+
     def _gen_anode_label__prim(self, nd, ctx):
         buf = ctx['buf']
         lbunused, lbneed, lbdone = ctx['labset']
@@ -389,14 +408,11 @@ class c_scode_program:
             lbdone.add(nd.addr)
         else:
             lbunused.add(nd.addr)
-        bstack = ctx['bstack']
-        while bstack:
-            saddr, daddr, paddr, bnt, pbuf = bstack[-1]
-            if daddr < nd.addr:
-                self._error(nd, f'no-end if-block at: {daddr:x}')
-            elif daddr > nd.addr:
+        while True:
+            bsinfo = self._get_bstack_match(nd.addr, ctx)
+            if bsinfo is None:
                 break
-            assert buf.par == pbuf and not buf.tch
+            saddr, daddr, paddr, pbuf, bnt, bels = bsinfo
             if bnt:
                 pbuf.write('if not')
             else:
@@ -406,47 +422,50 @@ class c_scode_program:
             buf.newline()
             buf.touch()
             self._use_label_in_ctx(nd.addr, ctx)
-            bstack.pop()
+            ctx['bstack'].pop()
             buf = ctx['buf'] = pbuf
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
         lb = self._getone(self._getone(nd))
         buf = ctx['buf']
-        bstack = ctx['bstack']
-        if bstack:
-            saddr, daddr, paddr, bnt, pbuf = bstack[-1]
-            if daddr == nd.addr + 1:
-                if lb.addr == paddr:
-                    assert buf.par == pbuf and not buf.tch
-                    if bnt:
-                        pbuf.write('while')
+        bslen = len(ctx['bstack'])
+        bsinfo = self._get_bstack_match(nd.addr + 1, ctx)
+        if bsinfo:
+            saddr, daddr, paddr, pbuf, bnt, bels = bsinfo
+            if lb.addr == paddr:
+                if bnt:
+                    pbuf.write('while')
+                else:
+                    pbuf.write('while not')
+                buf.indent(-1)
+                buf.write('}')
+                buf.newline()
+                unkjmp = ctx['unkjmp']
+                for i in range(len(unkjmp)-1, -1, -1):
+                    hsaddr, hdaddr, hid, hbslen = unkjmp[i]
+                    if hbslen < bslen:
+                        break
+                    if hdaddr == ctx['prv_addr']:
+                        buf.reput(hid, 'continue')
+                        self._use_label_in_ctx(hdaddr, ctx)
+                    elif hdaddr == nd.addr + 1:
+                        buf.reput(hid, 'break')
+                        self._use_label_in_ctx(hdaddr, ctx)
                     else:
-                        pbuf.write('while not')
-                    buf.indent(-1)
-                    buf.write('}')
-                    buf.newline()
-                    unkjmp = ctx['unkjmp']
-                    for i in range(len(unkjmp)-1, -1, -1):
-                        hsaddr, hdaddr, hid, hbslen = unkjmp[i]
-                        if hbslen < len(bstack):
-                            break
-                        if hdaddr == ctx['prv_addr']:
-                            buf.reput(hid, 'continue')
-                            self._use_label_in_ctx(hdaddr, ctx)
-                        elif hdaddr == nd.addr + 1:
-                            buf.reput(hid, 'break')
-                            self._use_label_in_ctx(hdaddr, ctx)
-                        else:
-                            self._error(nd, f'unparsable jump at: 0x{hsaddr:x}')
-                        unkjmp.pop()
-                    buf.touch()
-                    self._use_label_in_ctx(lb.addr, ctx)
-                    self._use_label_in_ctx(daddr, ctx)
-                    bstack.pop()
-                    buf = ctx['buf'] = pbuf
-                    return
+                        self._error(nd, f'unparsable jump at: 0x{hsaddr:x}')
+                    unkjmp.pop()
+                buf.touch()
+                self._use_label_in_ctx(lb.addr, ctx)
+                self._use_label_in_ctx(daddr, ctx)
+                ctx['bstack'].pop()
+                buf = ctx['buf'] = pbuf
+                return
+            elif lb.addr > nd.addr:
+                pass
+            else:
+                self._error(nd, f'jump back without loop: {nd}')
         hid = buf.hold()
-        ctx['unkjmp'].append((nd.addr, lb.addr, hid, len(bstack)))
+        ctx['unkjmp'].append((nd.addr, lb.addr, hid, bslen))
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
@@ -456,7 +475,7 @@ class c_scode_program:
         if bstack and bstack[-1][1] < lb.addr:
             self._error(nd, f'if-block out of bounds: {lb}')
         pbuf = ctx['buf']
-        bstack.append((nd.addr, lb.addr, ctx['prv_addr'], nt, pbuf))
+        bstack.append((nd.addr, lb.addr, ctx['prv_addr'], pbuf, nt, False))
         buf = ctx['buf'] = pbuf.sub()
         idt = buf.noindent()
         buf.write('(')
