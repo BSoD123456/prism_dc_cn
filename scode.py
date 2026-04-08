@@ -432,17 +432,21 @@ class c_scode_program:
                     buf.write('}')
                     buf.newline()
                     unkjmp = ctx['unkjmp']
+                    print(nd.addr, nd, len(bstack), unkjmp)
                     for i in range(len(unkjmp)-1, -1, -1):
                         hsaddr, hdaddr, hid, hbslen = unkjmp[i]
-                        if hbslen > len(bstack):
+                        if hbslen < len(bstack):
                             break
-                        if hdaddr == nd.addr:
+                        if hdaddr == nd.addr - 1:
                             buf.reput(hid, 'continue')
+                            print('c', hdaddr)
                             self._use_label_in_ctx(hdaddr, ctx)
                         elif hdaddr == nd.addr + 1:
                             buf.reput(hid, 'break')
+                            print('b', hdaddr)
                             self._use_label_in_ctx(hdaddr, ctx)
                         else:
+                            print(hdaddr, nd.addr)
                             self._error(nd, f'unparsable jump at: 0x{hsaddr:x}')
                         unkjmp.pop()
                     buf.touch()
