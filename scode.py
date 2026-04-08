@@ -384,16 +384,9 @@ class c_scode_program:
             else:
                 lbneed.add(addr)
 
-    def _get_bstack_push(self, saddr, daddr, bels, bnt, ctx):
-        if daddr <= saddr:
-            self._error(saddr, f'block should not be before jump')
+    def _get_bstack_check_bound(self, addr, ctx):
         bstack = ctx['bstack']
-        if bstack and bstack[-1][1] < daddr:
-            self._error(saddr, f'block out of bounds: 0x{daddr:x}')
-        pbuf = ctx['buf']
-        bstack.append((saddr, daddr, ctx['prv_addr'], pbuf, bels, bnt))
-        ctx['buf'] = pbuf.sub()
-        return pbuf
+        return not bstack or addr <= bstack[-1][1]
 
     def _get_bstack_match(self, addr, ctx):
         bstack = ctx['bstack']
@@ -478,7 +471,8 @@ class c_scode_program:
                 buf = ctx['buf'] = pbuf
                 return
             elif lb.addr > nd.addr:
-                pass
+                if self._get_bstack_check_bound(lb.addr, ctx):
+                    breakpoint()
             else:
                 self._error(nd, f'jump back without loop: {nd}')
         hid = buf.hold()
@@ -486,8 +480,13 @@ class c_scode_program:
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
-        pbuf = self._get_bstack_push(nd.addr, lb.addr, False, nt, ctx)
-        buf = ctx['buf']
+        if lb.addr <= nd.addr:
+            self._error(nd, f'if-block should not be before jump')
+        if not self._get_bstack_check_bound(lb.addr, ctx):
+            self._error(nd, f'if-block out of bounds: {lb}')
+        pbuf = ctx['buf']
+        ctx['bstack'].append((nd.addr, lb.addr, ctx['prv_addr'], pbuf, False, nt))
+        buf = ctx['buf'] = pbuf.sub()
         idt = buf.noindent()
         buf.write('(')
         self._gen_anode(condi, None, ctx)
