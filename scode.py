@@ -205,13 +205,15 @@ class c_scode_program:
         buf = ctx['buf'] = pbuf.sub()
         ctx['bstack'] = []
         ctx['labset'] = (set(), set(), set())
+        ctx['unkjmp'] = {}
         self._gen_anode(nd.sub, 'prim', ctx)
         buf.touch()
         if len(ctx.pop('bstack')) != 0:
             self._error(nd, 'function block unbalance')
-        print(ctx['labset'])
         if sum(len(s) for s in ctx.pop('labset')[:2]) != 0:
             self._error(nd, 'function label unmatch')
+        if ctx.pop('unkjmp'):
+            self._error(nd, 'function with unknown jump')
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
@@ -424,11 +426,8 @@ class c_scode_program:
                     bstack.pop()
                     buf = ctx['buf'] = pbuf
                     return
-        
-        buf.write('jump(')
-        self._gen_anode(lb, None, ctx)
-        buf.write(');')
-        buf.newline()
+        hid = buf.hold()
+        ctx['unkjmp'].append((nd.addr, lb.addr, hid))
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
