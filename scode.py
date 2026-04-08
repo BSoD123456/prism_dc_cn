@@ -62,7 +62,7 @@ class c_scode_buf:
         self._writeline((c_scode_buf.HDIDX, self.idt))
         return c_scode_buf.HDIDX
 
-    def reput(self, hid, line):
+    def reput(self, hid, line, idt_shft = 0, idt = None):
         if self.tch:
             raise err_scode_syntax('touched buf unchangable')
         for i, v in enumerate(self.buf):
@@ -73,7 +73,12 @@ class c_scode_buf:
                 break
         else:
             raise err_scode_syntax(f'invalid hid: {hid}')
-        self.buf[i] = ''.join((*self._idtsym(didt), line))
+        if line is None:
+            self.buf.pop(i)
+        else:
+            self.buf[i] = ''.join((*self._idtsym(
+                max(0, didt + idt_shft) if idt is None else idt
+            ), line))
 
     def touch(self):
         if self.tch:
@@ -218,10 +223,16 @@ class c_scode_program:
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
         ctx['bstack'] = []
+        ctx['lbhld'] = {}
         self._gen_anode(nd.sub, 'prim', ctx)
         bstack = ctx.pop('bstack')
         if bstack:
             self._error(nd, f'function block unbalance: {bstack}')
+        for laddr, (lhid, lbv, lkp) in ctx.pop('lbhld').items():
+            if lkp:
+                buf.reput(lhid, lbv, None, 0)
+            else:
+                buf.reput(lhid, None)
         buf.touch()
         ctx['buf'] = pbuf
         pbuf.write('}')
@@ -449,6 +460,14 @@ class c_scode_program:
             buf.newline()
         elif mbsinfo is False:
             self._error(nd, 'exceed no-end block')
+        lbhld = ctx['lbhld']
+        if nd.addr in lbhld:
+            lbhinfo = lbhld[nd.addr]
+            assert lbhld[nd.addr][0] is None and lbhinfo[2]
+        else:
+            lbhinfo = lbhld[nd.addr] = [None, None, False]
+        lbhld[nd.addr][0] = buf.hold()
+        lbhld[nd.addr][1] = f'@lab.{nd.addr:x}'
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
         lb = self._getone(self._getone(nd))
@@ -479,15 +498,22 @@ class c_scode_program:
             if lb.addr == daddr:
                 buf.write('break;')
                 buf.newline()
+                return
             elif lb.addr == daddr - 2:
                 buf.write('continue;')
                 buf.newline()
+                return
             else:
-                self._error(nd, f'unparsable jump: {nd}')
+                self._warn(nd, f'unparsable jump: {nd}')
         elif bsinfo is None:
-            self._error(nd, f'isolated jump: {nd}')
+            self._warn(nd, f'isolated jump: {nd}')
         else:
             self._error(nd, 'exceed no-end block')
+        lbhld = ctx['lbhld']
+        if lb.addr in lbhld:
+            lbhld[lb.addr][2] = True
+        else:
+            lbhld[lb.addr] = [None, None, True]
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
