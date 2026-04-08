@@ -148,12 +148,18 @@ class c_scode_program:
         self.chrset = c_charset_jp()
 
     def _error(self, nd, msg):
-        addr = getattr(nd, 'addr', -1)
+        if isinstance(nd, int):
+            addr = nd
+        else:
+            addr = getattr(nd, 'addr', -1)
         report('err', f'(addr:{addr:x}) {msg}')
         raise err_scode_syntax(msg)
 
     def _warn(self, nd, msg):
-        addr = getattr(nd, 'addr', -1)
+        if isinstance(nd, int):
+            addr = nd
+        else:
+            addr = getattr(nd, 'addr', -1)
         report('war', f'(addr:{addr:x}) {msg}')
 
     def _getone(self, nd):
@@ -378,14 +384,25 @@ class c_scode_program:
             else:
                 lbneed.add(addr)
 
+    def _get_bstack_push(self, saddr, daddr, bels, bnt, ctx):
+        if daddr <= saddr:
+            self._error(saddr, f'block should not be before jump')
+        bstack = ctx['bstack']
+        if bstack and bstack[-1][1] < daddr:
+            self._error(saddr, f'block out of bounds: 0x{daddr:x}')
+        pbuf = ctx['buf']
+        bstack.append((saddr, daddr, ctx['prv_addr'], pbuf, bels, bnt))
+        ctx['buf'] = pbuf.sub()
+        return pbuf
+
     def _get_bstack_match(self, addr, ctx):
         bstack = ctx['bstack']
         if not bstack:
             return None
         for i in range(len(bstack)):
-            saddr, daddr, paddr, pbuf, bnt, bels = bstack[-i-1]
+            saddr, daddr, paddr, pbuf, bels, bnt = bstack[-i-1]
             if addr > daddr:
-                self._error(nd, f'no-end block at: {daddr:x}')
+                self._error(addr, f'no-end block at: {daddr:x}')
             elif addr == daddr:
                 break
             if not bels:
@@ -395,7 +412,7 @@ class c_scode_program:
         if i > 0:
             breakpoint()
         assert ctx['buf'].par == pbuf and not ctx['buf'].tch
-        return saddr, daddr, paddr, pbuf, bnt, bels
+        return saddr, daddr, paddr, pbuf, bels, bnt
 
     def _gen_anode_label__prim(self, nd, ctx):
         buf = ctx['buf']
@@ -412,7 +429,7 @@ class c_scode_program:
             bsinfo = self._get_bstack_match(nd.addr, ctx)
             if bsinfo is None:
                 break
-            saddr, daddr, paddr, pbuf, bnt, bels = bsinfo
+            saddr, daddr, paddr, pbuf, bels, bnt = bsinfo
             if bnt:
                 pbuf.write('if not')
             else:
@@ -431,7 +448,7 @@ class c_scode_program:
         bslen = len(ctx['bstack'])
         bsinfo = self._get_bstack_match(nd.addr + 1, ctx)
         if bsinfo:
-            saddr, daddr, paddr, pbuf, bnt, bels = bsinfo
+            saddr, daddr, paddr, pbuf, bels, bnt = bsinfo
             if lb.addr == paddr:
                 if bnt:
                     pbuf.write('while')
@@ -469,14 +486,8 @@ class c_scode_program:
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
-        if lb.addr <= nd.addr:
-            self._error(nd, f'if-block should not be before jump')
-        bstack = ctx['bstack']
-        if bstack and bstack[-1][1] < lb.addr:
-            self._error(nd, f'if-block out of bounds: {lb}')
-        pbuf = ctx['buf']
-        bstack.append((nd.addr, lb.addr, ctx['prv_addr'], pbuf, nt, False))
-        buf = ctx['buf'] = pbuf.sub()
+        pbuf = self._get_bstack_push(nd.addr, lb.addr, False, nt, ctx)
+        buf = ctx['buf']
         idt = buf.noindent()
         buf.write('(')
         self._gen_anode(condi, None, ctx)
