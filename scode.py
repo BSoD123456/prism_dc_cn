@@ -118,7 +118,7 @@ class c_scode_buf_fd(c_scode_buf):
     def _writeline(self, line):
         self.fd.write(line + '\n')
 
-def with_anode(stricts):
+def with_anode(*stricts):
     def _deco(cls):
         nmset = set()
         for mn in dir(cls):
