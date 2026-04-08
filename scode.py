@@ -302,22 +302,22 @@ class c_scode_program:
         ctx['buf'].write(' >>5]')
 
     def _gen_anode_act_vset(self, nd, ctx):
-        ndl, ndr = nd.subs
+        ndr, ndl = nd.subs
         ctx['buf'].write('var')
         ctx['buf'].write('[')
-        self._gen_anode(self._getone(ndr), None, ctx)
+        self._gen_anode(self._getone(ndl), None, ctx)
         ctx['buf'].write(' >>5]')
         ctx['buf'].write(' = ')
-        self._gen_anode(self._getone(ndl), None, ctx)
+        self._gen_anode(self._getone(ndr), None, ctx)
 
     def _gen_anode_act_vmask(self, nd, ctx):
-        ndl, ndr = nd.subs
+        ndr, ndl = nd.subs
         ctx['buf'].write('flag')
         ctx['buf'].write('[')
-        self._gen_anode(self._getone(ndr), None, ctx)
+        self._gen_anode(self._getone(ndl), None, ctx)
         ctx['buf'].write(']')
         ctx['buf'].write(' = ')
-        self._gen_anode(self._getone(ndl), None, ctx)
+        self._gen_anode(self._getone(ndr), None, ctx)
 
     def _gen_anode_act_vcheck(self, nd, ctx):
         ctx['buf'].write('flag')
