@@ -344,7 +344,7 @@ class c_scode_program:
             elif laddr > nd.addr:
                 break
             assert buf.par == pbuf and not buf.tch
-            pbuf.write('if ')
+            pbuf.write('if')
             buf.indent(-1)
             buf.write('}')
             buf.newline()
@@ -375,10 +375,11 @@ class c_scode_program:
         ctx['bstack'].append((lb.addr, pbuf))
         buf = ctx['buf'] = pbuf.sub()
         idt = buf.noindent()
+        buf.write('(')
         if nt:
             buf.write('not ')
         self._gen_anode(condi, None, ctx)
-        buf.write(' {')
+        buf.write(') {')
         buf.newline()
         buf.indent(idt)
 
