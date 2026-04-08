@@ -31,6 +31,11 @@ class c_scode_buf:
         self.idt = self.par.idt if self.par else 0
         return idt - self.idt
 
+    def noindent(self):
+        idt = self.idt
+        self.idt = 0
+        return idt
+
     def _idtsym(self):
         return (self.IDTSYM for _ in range(self.idt))
 
@@ -55,8 +60,13 @@ class c_scode_buf:
         if self.tch:
             return self
         self.tch = True
+        if not self.par:
+            return self
         for line in self.buf:
-            self._writeline(line)
+            self.par.write(line)
+            self.par.newline()
+        for tok in self.lbuf:
+            self.par.write(tok)
         return self
 
 class c_scode_buf_null(c_scode_buf):
@@ -176,7 +186,10 @@ class c_scode_program:
         pbuf.write(f'{rr}fun.{nd.name}({ar}) {{')
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
+        ctx['bstack'] = []
         self._gen_anode(nd.sub, 'prim', ctx)
+        if len(ctx.pop('bstack')) != 0:
+            self._error(nd, 'function block unbalance')
         buf.touch()
         ctx['buf'] = pbuf
         pbuf.write('}')
@@ -197,12 +210,6 @@ class c_scode_program:
                 ctx['buf'].newline()
             else:
                 self._gen_anode(snd, 'prim', ctx)
-
-    def _gen_anode_label__prim(self, nd, ctx):
-        oidt = ctx['buf'].popindent()
-        ctx['buf'].write(f'@lab.{nd.name}:')
-        ctx['buf'].newline()
-        ctx['buf'].indent(oidt)
 
     # act
 
@@ -327,6 +334,31 @@ class c_scode_program:
 
     # flow
 
+    def _gen_anode_label__prim(self, nd, ctx):
+        buf = ctx['buf']
+        bstack = ctx['bstack']
+        poped = False
+        while bstack:
+            laddr, pbuf = bstack[-1]
+            if laddr < nd.addr:
+                self._error(nd, f'no-end if-block at: {laddr:x}')
+            elif laddr > nd.addr:
+                break
+            assert buf.par == pbuf and not buf.tch
+            pbuf.write('if ')
+            buf.indent(-1)
+            buf.write('}')
+            buf.newline()
+            buf.touch()
+            poped = True
+            bstack.pop()
+            buf = ctx['buf'] = pbuf
+        if not poped:
+            oidt = ctx['buf'].popindent()
+            ctx['buf'].write(f'@lab.{nd.name}:')
+            ctx['buf'].newline()
+            ctx['buf'].indent(oidt)
+
     def _gen_anode_act_jump__prim(self, nd, ctx):
         lb = self._getone(self._getone(nd))
         ctx['buf'].write('jump(')
@@ -338,7 +370,18 @@ class c_scode_program:
         condi, lb = (self._getone(i) for i in nd.subs)
         if lb.addr <= nd.addr:
             self._error(nd, f'if-block should not be before jump')
-        #TODO
+        if ctx['bstack'] and ctx['bstack'][-1][0] < lb.addr:
+            self._error(nd, f'if-block out of bounds: {lb}')
+        pbuf = ctx['buf']
+        ctx['bstack'].append((lb.addr, pbuf))
+        buf = ctx['buf'] = pbuf.sub()
+        idt = buf.noindent()
+        if nt:
+            buf.write('not ')
+        self._gen_anode(condi, None, ctx)
+        buf.write(' {')
+        buf.newline()
+        buf.indent(idt)
 
     def _gen_anode_act_jump_if__prim(self, nd, ctx):
         self._gen_vnode_if(False, nd, ctx)
