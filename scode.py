@@ -26,11 +26,6 @@ class c_scode_buf:
         if self.idt < 0:
             raise err_scode_syntax('indent underflow')
 
-    def popindent(self):
-        idt = self.idt
-        self.idt = self.par.idt if self.par else 0
-        return idt - self.idt
-
     def noindent(self):
         idt = self.idt
         self.idt = 0
@@ -358,7 +353,7 @@ class c_scode_program:
             bstack.pop()
             buf = ctx['buf'] = pbuf
         if not poped:
-            oidt = ctx['buf'].popindent()
+            oidt = ctx['buf'].noindent()
             ctx['buf'].write(f'@lab.{nd.name}:')
             ctx['buf'].newline()
             ctx['buf'].indent(oidt)
