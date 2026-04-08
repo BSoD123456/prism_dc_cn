@@ -19,7 +19,7 @@ class c_scode_buf:
         self.buf = []
 
     def sub(self, idt = 1):
-        return c_scode_buf(self, False, self.idt + idt)
+        return c_scode_buf(self, False, idt)
 
     def indent(self, val):
         self.idt += val
@@ -41,7 +41,8 @@ class c_scode_buf:
 
     def _writeline(self, line):
         if self.tch:
-            self.par._writeline(line)
+            self.par.write(line)
+            self.par.newline()
         else:
             self.buf.append(line)
 
@@ -65,8 +66,11 @@ class c_scode_buf:
         for line in self.buf:
             self.par.write(line)
             self.par.newline()
-        for tok in self.lbuf:
-            self.par.write(tok)
+        if self.lbuf:
+            for tok in self._idtsym():
+                self.par.write(tok)
+            for tok in self.lbuf:
+                self.par.write(tok)
         return self
 
 class c_scode_buf_null(c_scode_buf):
