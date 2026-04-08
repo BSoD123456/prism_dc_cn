@@ -212,12 +212,15 @@ class c_scode_program:
         ctx['unkjmp'] = {}
         self._gen_anode(nd.sub, 'prim', ctx)
         buf.touch()
-        if len(ctx.pop('bstack')) != 0:
-            self._error(nd, 'function block unbalance')
-        if sum(len(s) for s in ctx.pop('labset')[:2]) != 0:
-            self._error(nd, 'function label unmatch')
-        if ctx.pop('unkjmp'):
-            self._error(nd, 'function with unknown jump')
+        bstack = ctx.pop('bstack')
+        if bstack:
+            self._error(nd, 'function block unbalance: {bstack}')
+        lbunused, lbneed, _ = ctx.pop('labset')
+        if lbunused or lbneed:
+            self._error(nd, 'function label unused: {lbunused} / needed: {lbneed}')
+        unkjmp = ctx.pop('unkjmp')
+        if unkjmp:
+            self._error(nd, 'function with unknown jump: {unkjmp}')
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
