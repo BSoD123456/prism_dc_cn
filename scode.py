@@ -60,11 +60,15 @@ class c_scode_buf:
             raise err_scode_syntax('can only hold a newline')
         c_scode_buf.HDIDX += 1
         self._writeline((c_scode_buf.HDIDX, self.idt))
+        return c_scode_buf.HDIDX
 
     def reput(self, hid, line):
         if self.tch:
             raise err_scode_syntax('touched buf unchangable')
-        for i, (dhid, didt) in enumerate(self.buf):
+        for i, v in enumerate(self.buf):
+            if not isinstance(v, tuple):
+                continue
+            dhid, didt = v
             if dhid == hid:
                 break
         else:
@@ -209,18 +213,18 @@ class c_scode_program:
         buf = ctx['buf'] = pbuf.sub()
         ctx['bstack'] = []
         ctx['labset'] = (set(), set(), set())
-        ctx['unkjmp'] = {}
+        ctx['unkjmp'] = []
         self._gen_anode(nd.sub, 'prim', ctx)
-        buf.touch()
         bstack = ctx.pop('bstack')
         if bstack:
-            self._error(nd, 'function block unbalance: {bstack}')
-        lbunused, lbneed, _ = ctx.pop('labset')
-        if lbunused or lbneed:
-            self._error(nd, 'function label unused: {lbunused} / needed: {lbneed}')
+            self._error(nd, f'function block unbalance: {bstack}')
         unkjmp = ctx.pop('unkjmp')
         if unkjmp:
-            self._error(nd, 'function with unknown jump: {unkjmp}')
+            self._error(nd, f'function with unknown jump: {unkjmp}')
+        lbunused, lbneed, _ = ctx.pop('labset')
+        if lbunused or lbneed:
+            self._error(nd, f'function label unused: {lbunused} / needed: {lbneed}')
+        buf.touch()
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
@@ -427,6 +431,20 @@ class c_scode_program:
                     buf.indent(-1)
                     buf.write('}')
                     buf.newline()
+                    unkjmp = ctx['unkjmp']
+                    for i in range(len(unkjmp)-1, -1, -1):
+                        hsaddr, hdaddr, hid, hbslen = unkjmp[i]
+                        if hbslen > len(bstack):
+                            break
+                        if hdaddr == nd.addr:
+                            buf.reput(hid, 'continue')
+                            self._use_label_in_ctx(hdaddr, ctx)
+                        elif hdaddr == nd.addr + 1:
+                            buf.reput(hid, 'break')
+                            self._use_label_in_ctx(hdaddr, ctx)
+                        else:
+                            self._error(nd, f'unparsable jump at: 0x{hsaddr:x}')
+                        unkjmp.pop()
                     buf.touch()
                     self._use_label_in_ctx(lb.addr, ctx)
                     self._use_label_in_ctx(daddr, ctx)
@@ -434,7 +452,7 @@ class c_scode_program:
                     buf = ctx['buf'] = pbuf
                     return
         hid = buf.hold()
-        ctx['unkjmp'][lb.addr] =(nd.addr, hid)
+        ctx['unkjmp'].append((nd.addr, lb.addr, hid, len(bstack)))
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
