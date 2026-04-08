@@ -232,8 +232,10 @@ class c_scode_program:
         pass
 
     def _gen_anode_bat__prim(self, nd, ctx):
+        ctx['prv_addr'] = -1
         for snd in nd.subs:
             self._gen_anode(snd, 'prim', ctx)
+            ctx['prv_addr'] = snd.addr
 
     def _gen_anode_bat__inret(self, nd, ctx):
         for i, snd in enumerate(nd.subs):
@@ -389,7 +391,7 @@ class c_scode_program:
             lbunused.add(nd.addr)
         bstack = ctx['bstack']
         while bstack:
-            saddr, daddr, bnt, pbuf = bstack[-1]
+            saddr, daddr, paddr, bnt, pbuf = bstack[-1]
             if daddr < nd.addr:
                 self._error(nd, f'no-end if-block at: {daddr:x}')
             elif daddr > nd.addr:
@@ -412,9 +414,9 @@ class c_scode_program:
         buf = ctx['buf']
         bstack = ctx['bstack']
         if bstack:
-            saddr, daddr, bnt, pbuf = bstack[-1]
+            saddr, daddr, paddr, bnt, pbuf = bstack[-1]
             if daddr == nd.addr + 1:
-                if lb.addr == saddr - 2:
+                if lb.addr == paddr:
                     assert buf.par == pbuf and not buf.tch
                     if bnt:
                         pbuf.write('while')
@@ -428,7 +430,7 @@ class c_scode_program:
                         hsaddr, hdaddr, hid, hbslen = unkjmp[i]
                         if hbslen < len(bstack):
                             break
-                        if hdaddr == nd.addr - 1:
+                        if hdaddr == ctx['prv_addr']:
                             buf.reput(hid, 'continue')
                             self._use_label_in_ctx(hdaddr, ctx)
                         elif hdaddr == nd.addr + 1:
@@ -454,7 +456,7 @@ class c_scode_program:
         if bstack and bstack[-1][1] < lb.addr:
             self._error(nd, f'if-block out of bounds: {lb}')
         pbuf = ctx['buf']
-        bstack.append((nd.addr, lb.addr, nt, pbuf))
+        bstack.append((nd.addr, lb.addr, ctx['prv_addr'], nt, pbuf))
         buf = ctx['buf'] = pbuf.sub()
         idt = buf.noindent()
         buf.write('(')
