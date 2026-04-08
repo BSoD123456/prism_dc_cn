@@ -325,6 +325,27 @@ class c_scode_program:
         self._gen_anode(self._getone(self._getone(nd)), None, ctx)
         ctx['buf'].write(']')
 
+    # flow
+
+    def _gen_anode_act_jump__prim(self, nd, ctx):
+        lb = self._getone(self._getone(nd))
+        ctx['buf'].write('jump(')
+        self._gen_anode(lb, None, ctx)
+        ctx['buf'].write(');')
+        ctx['buf'].newline()
+
+    def _gen_vnode_if(self, nt, nd, ctx):
+        condi, lb = (self._getone(i) for i in nd.subs)
+        if lb.addr <= nd.addr:
+            self._error(nd, f'if-block should not be before jump')
+        #TODO
+
+    def _gen_anode_act_jump_if__prim(self, nd, ctx):
+        self._gen_vnode_if(False, nd, ctx)
+
+    def _gen_anode_act_jump_if_not__prim(self, nd, ctx):
+        self._gen_vnode_if(True, nd, ctx)
+
     # calc
 
     def _gen_vnode_act_calc_1(self, op, nd, ctx):
