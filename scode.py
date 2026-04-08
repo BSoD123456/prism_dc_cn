@@ -156,6 +156,7 @@ class c_scode_program:
         for snd in nd.subs:
             if self._gen_anode(snd, None, ctx) == 'func':
                 buf.newline()
+                breakpoint()
 
     # struct
 
@@ -186,10 +187,14 @@ class c_scode_program:
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
         ctx['bstack'] = []
+        ctx['labset'] = (set(), set(), set())
         self._gen_anode(nd.sub, 'prim', ctx)
+        buf.touch()
         if len(ctx.pop('bstack')) != 0:
             self._error(nd, 'function block unbalance')
-        buf.touch()
+        print(ctx['labset'])
+        if sum(len(s) for s in ctx.pop('labset')[:2]) != 0:
+            self._error(nd, 'function label unmatch')
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
@@ -333,23 +338,45 @@ class c_scode_program:
 
     # flow
 
+    def _use_label_in_ctx(self, addr, ctx):
+        lbunused, lbneed, lbdone = ctx['labset']
+        if not addr in lbdone:
+            if addr in lbunused:
+                lbunused.remove(addr)
+                lbdone.add(addr)
+            else:
+                lbneed.add(addr)
+
     def _gen_anode_label__prim(self, nd, ctx):
         buf = ctx['buf']
+        lbunused, lbneed, lbdone = ctx['labset']
+        if nd.addr in lbdone:
+            # poped by while done
+            assert not nd.addr in lbneed
+        elif nd.addr in lbneed:
+            lbneed.remove(nd.addr)
+            lbdone.add(nd.addr)
+        else:
+            lbunused.add(nd.addr)
         bstack = ctx['bstack']
         poped = False
         while bstack:
-            laddr, pbuf = bstack[-1]
-            if laddr < nd.addr:
-                self._error(nd, f'no-end if-block at: {laddr:x}')
-            elif laddr > nd.addr:
+            saddr, daddr, bnt, pbuf = bstack[-1]
+            if daddr < nd.addr:
+                self._error(nd, f'no-end if-block at: {daddr:x}')
+            elif daddr > nd.addr:
                 break
             assert buf.par == pbuf and not buf.tch
-            pbuf.write('if')
+            if bnt:
+                pbuf.write('if not')
+            else:
+                pbuf.write('if')
             buf.indent(-1)
             buf.write('}')
             buf.newline()
             buf.touch()
             poped = True
+            self._use_label_in_ctx(nd.addr, ctx)
             bstack.pop()
             buf = ctx['buf'] = pbuf
         if not poped:
@@ -360,24 +387,44 @@ class c_scode_program:
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
         lb = self._getone(self._getone(nd))
-        ctx['buf'].write('jump(')
+        buf = ctx['buf']
+        bstack = ctx['bstack']
+        if bstack:
+            saddr, daddr, bnt, pbuf = bstack[-1]
+            if daddr == nd.addr + 1:
+                if lb.addr == saddr - 2:
+                    assert buf.par == pbuf and not buf.tch
+                    if bnt:
+                        pbuf.write('while')
+                    else:
+                        pbuf.write('while not')
+                    buf.indent(-1)
+                    buf.write('}')
+                    buf.newline()
+                    buf.touch()
+                    self._use_label_in_ctx(lb.addr, ctx)
+                    self._use_label_in_ctx(daddr, ctx)
+                    bstack.pop()
+                    buf = ctx['buf'] = pbuf
+                    return
+        
+        buf.write('jump(')
         self._gen_anode(lb, None, ctx)
-        ctx['buf'].write(');')
-        ctx['buf'].newline()
+        buf.write(');')
+        buf.newline()
 
     def _gen_vnode_if(self, nt, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
         if lb.addr <= nd.addr:
             self._error(nd, f'if-block should not be before jump')
-        if ctx['bstack'] and ctx['bstack'][-1][0] < lb.addr:
+        bstack = ctx['bstack']
+        if bstack and bstack[-1][1] < lb.addr:
             self._error(nd, f'if-block out of bounds: {lb}')
         pbuf = ctx['buf']
-        ctx['bstack'].append((lb.addr, pbuf))
+        bstack.append((nd.addr, lb.addr, nt, pbuf))
         buf = ctx['buf'] = pbuf.sub()
         idt = buf.noindent()
         buf.write('(')
-        if nt:
-            buf.write('not ')
         self._gen_anode(condi, None, ctx)
         buf.write(') {')
         buf.newline()
