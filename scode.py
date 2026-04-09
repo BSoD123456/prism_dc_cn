@@ -335,13 +335,16 @@ class c_scode_program:
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, None, ctx)
 
+    def _gen_anode_act_setrval__prim(self, nd, ctx):
+        ridx, sub = (self._getone(i) for i in nd.subs)
+        ctx['buf'].write(f'ret{ridx.val+1} = ')
+        self._gen_anode(sub, None, ctx)
+        ctx['buf'].write(';')
+        ctx['buf'].newline()
+
     def _gen_anode_act_return__prim(self, nd, ctx):
-        ar = []
-        for i, bnd in enumerate(nd.subs):
-            an = f'ret{i+1}'
-            ctx['buf'].write(f'{an} = ')
-            ar.append(an)
-            self._gen_anode(bnd, 'inret', ctx)
+        rnum = self._getone(self._getone(nd)).val
+        ar = [f'ret{i+1}' for i in range(rnum)]
         ctx['buf'].write(f'return {", ".join(ar)}')
         ctx['buf'].write(';')
         ctx['buf'].newline()
@@ -662,7 +665,7 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        if True:
+        if False:
             cd = c_scode_program(ast, c_scode_buf_null())
             #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
