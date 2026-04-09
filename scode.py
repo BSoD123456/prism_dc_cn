@@ -311,6 +311,15 @@ class c_scode_program:
                 return True
         return False
 
+    def _mtch_holes(self, addr, ctx):
+        holes = ctx['holes']
+        for st, ed in holes:
+            if addr == st:
+                return st, ed
+            elif addr < st:
+                break
+        return None
+
     def _gen_anode_act__lbscan(self, nd, ctx):
         pass
 
@@ -547,7 +556,8 @@ class c_scode_program:
                 buf = ctx['buf'] = pbuf
                 buf.write('} else {')
                 buf.newline()
-                ctx['bstack'].append(('el', ctx['prv_addr'], nd.addr, lb.addr, buf))
+                ctx['bstack'].append((
+                    'el', ctx['prv_addr'], nd.addr, lb.addr, buf))
                 ctx['buf'] = buf.sub()
                 return
         if bsinfo:
@@ -564,6 +574,14 @@ class c_scode_program:
             else:
                 self._warn(nd, f'unparsable jump: {nd}')
         elif bsinfo is None:
+            holerng = self._mtch_holes(nd.addr + 1, ctx)
+            if holerng and lb.addr == holerng[1]:
+                buf.write('void {')
+                buf.newline()
+                ctx['bstack'].append((
+                    'vo', ctx['prv_addr'], nd.addr, lb.addr, buf))
+                ctx['buf'] = buf.sub()
+                return
             self._warn(nd, f'isolated jump: {nd}')
         else:
             self._error(nd, 'exceed no-end block')
@@ -718,8 +736,8 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         if False:
-            #cd = c_scode_program(ast, c_scode_buf_null())
-            cd = c_scode_program(ast, c_scode_buf_std())
+            cd = c_scode_program(ast, c_scode_buf_null())
+            #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
         else:
             with open(r'wktab\output.txt', 'w', encoding = 'utf-8') as fd:
