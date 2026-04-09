@@ -350,6 +350,15 @@ class c_script_program:
                     f'invalid text act: {nd}')
         return txt
 
+    @staticmethod
+    def _scan_hole(wkset, faddr, labset, braseq):
+        for i in range(min(wkset), max(wkset) + 1):
+            if not i in wkset and i - 1 in wkset:
+                labset.add(i)
+                braseq.append((
+                    i if faddr is None else faddr,
+                    i, [[]], None))
+
     def _parse_func(self, staddr, functab, gwkset):
         progctx = {}
         sustab = {}
@@ -416,10 +425,16 @@ class c_script_program:
                                     f'conflicting suspend info: {faddr, csaddr, len(cmstack), cmsneed} / {(sfaddr, scsaddr, len(scmstack), scmsneed)}')
 
             if not sustab:
-                break
+                for fa, fc in progctx.items():
+                    fw = fc['fwkset']
+                    lbs = fc['labset']
+                    self._scan_hole(fw, fa, lbs, braseq)
+                if not braseq:
+                    break
+                continue
             susstep = tuple(k for s in sustab.values() for k in s)
             if susstep in suswkset:
-                self._error(susstep[0], f'recursed invoke')
+                self._error(susstep[0], 'recursed invoke')
             suswkset.add(susstep)
             for a in sustab:
                 braseq.append((a, a, [[]], 0))
@@ -442,6 +457,8 @@ class c_script_program:
         def mpop():
             if len(mstack) < 2:
                 assert len(mstack) == 1
+                if msneed is None:
+                    self._error(staddr, f'hole mstack underflow')
                 msneed_cntn[0] += 1
                 b = [c_script_anode_parm(msneed_cntn[0])]
             else:
@@ -451,7 +468,14 @@ class c_script_program:
         def mcheck(a, ret):
             mdeep = len(mstack) - 1
             if mdeep != 0:
-                self._error(a, f'branch main stack unbalance: {mdeep}')
+                if msneed is None:
+                    # flush for holes
+                    rbat = mstack[0]
+                    for bat in mstack[1:]:
+                        mstack.pop() # mstack[1:] cached, not mstack, so you can do this
+                        rbat.extend(bat)
+                else:
+                    self._error(a, f'branch main stack unbalance: {mdeep}')
             if ret:
                 return c_script_anode_bat(mstack.pop())
 
@@ -459,7 +483,7 @@ class c_script_program:
             rbat = mstack[0]
             ridx = 0
             for bat in mstack[1:]:
-                mstack.pop()
+                mstack.pop() # mstack[1:] cached, not mstack, so you can do this
                 nd = bat[0]
                 rsnd = c_script_anode_act('setrval', [
                     c_script_anode_bat([c_script_anode_inst(ridx)]),
@@ -469,7 +493,8 @@ class c_script_program:
                 rbat.append(rsnd)
                 for nd in bat[1:]:
                     rbat.append(nd)
-            mstack.append([c_script_anode_inst(ridx)])
+            mpush()
+            bpush(c_script_anode_inst(ridx))
             return ridx
 
         addr = staddr
