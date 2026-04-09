@@ -202,30 +202,30 @@ class c_script_program:
 
     _SYS_FUNC = [
         # 0x0
-        ('0', 1, 1),
-        ('1', 1, 1),
+        ('set_name', 1, 1),
+        ('get_name', 1, 1),
         ('2', 1, 1),
         ('3', 0, 1),
-        ('4_i1', 0, 1),
-        ('5_e', 0, 1),
-        ('6_c', 4, 1),
-        ('7_c', 0, 1),
+        ('4_i1', 0, 1), #i1
+        ('5_e', 0, 1), #e
+        ('6_c', 4, 1), #c
+        ('7_c', 0, 1), #c
         # 0x8
-        ('8_c', 1, 1),
+        ('8_c', 1, 1), #c
         ('9', 0, 1),
         ('a', 0, 1),
         ('b', 1, 1),
-        ('c_n1i2ni34n5i', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n4|i3|n3 / 3:push1;->r / 4:call d27;->n5:pop1->i2
-        ('d_n1i2ni34n5i', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n3|i3|i4 / 3:push1->r / 4:call d27;->n5:pop1->i2
+        ('print_text', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n4|i3|n3 / 3:push1;->r / 4:call d27;->n5:pop1->i2
+        ('choose_text', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n3|i3|i4 / 3:push1->r / 4:call d27;->n5:pop1->i2
         ('e_i2', 0, 1),
         ('f_c', 1, 1),
         # 0x10
         ('10', 1, 1),
-        ('11_c', 1, 1),
-        ('12_c', 1, 1),
-        ('13_c', 1, 1),
-        ('14_c', 1, 1),
-        ('15_c', 1, 1),
+        ('11_c', 1, 1), #c
+        ('set_bg', 1, 1), #c
+        ('set_char', 1, 1), #c
+        ('14_c', 1, 1), #c
+        ('set_icon', 1, 1), #c
         ('16', 1, 1),
         ('17', 1, 1),
         # 0x18
@@ -233,7 +233,7 @@ class c_script_program:
         ('19', 1, 1),
         ('1a', 0, 1),
         ('1b', 1, 1),
-        ('1c_c', 1, 1),
+        ('1c_c', 1, 1), #c
         ('1d', 4, 1),
         ('1e', 1, 1),
         ('1f', 1, 1),
@@ -259,8 +259,8 @@ class c_script_program:
         ('30', 0, 1),
         ('31', 1, 1),
         ('32', 2, 1),
-        ('33_i3e', 1, 1),
-        ('34_i3e', 1, 1),
+        ('33_i3e', 1, 1), #i3e
+        ('34_i3e', 1, 1), #i3e
         ('35', 1, 1),
         ('36', 1, 1),
     ]
@@ -541,7 +541,7 @@ class c_script_program:
                             self._error(addr,
                                 f'unreachable call: {cname} {cdst:x}')
                         dname, dsnum, drnum = finfo
-                        dname = f's{dname}'
+                        dname = f'{dname}'
                     else:
                         if not cdst in functab:
                             mpush()
