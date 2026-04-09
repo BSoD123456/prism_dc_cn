@@ -328,8 +328,7 @@ class c_script_program:
     def _parse_text(self, bat):
         txt = []
         for i, nd in enumerate(bat.subs):
-            if not (
-                    isinstance(nd, c_script_anode_act)
+            if not (isinstance(nd, c_script_anode_act)
                     and nd.name.startswith('text')):
                 self._error(addr,
                     f'text func should not have non-text act: {nd}')
@@ -449,13 +448,28 @@ class c_script_program:
                 b = mstack.pop()
             nd = c_script_anode_bat(b)
             return nd
-        def mdeep():
-            return len(mstack) - 1
         def mcheck(a, ret):
-            if mdeep() != 0:
-                self._error(a, f'branch main stack unbalance: {mdeep()}')
+            mdeep = len(mstack) - 1
+            if mdeep != 0:
+                self._error(a, f'branch main stack unbalance: {mdeep}')
             if ret:
                 return c_script_anode_bat(mstack.pop())
+
+        def mrestruct_for_return():
+            rbat = mstack[0]
+            ridx = 0
+            for bat in mstack[1:]:
+                mstack.pop()
+                nd = bat[0]
+                rsnd = c_script_anode_act('setrval', [
+                    c_script_anode_bat([c_script_anode_inst(ridx)]),
+                    nd], 0, nd.addr)
+                ridx += 1
+                rbat.append(rsnd)
+                for nd in bat[1:]:
+                    rbat.append(nd)
+            mstack.append([c_script_anode_bat([c_script_anode_inst(ridx)])])
+            return ridx
 
         addr = staddr
         while True:
@@ -523,8 +537,9 @@ class c_script_program:
                 mpush()
                 bextend(self._rplcbhead(cdst_nd, lb))
             elif ctype == 'ret':
-                msret = mdeep()
-                snum += msret
+                msret = mrestruct_for_return()
+                assert snum == pnum == 0
+                snum = 1
             
             assert pnum < 2
             cargs = []
