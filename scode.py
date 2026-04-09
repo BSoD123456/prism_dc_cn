@@ -237,24 +237,26 @@ class c_scode_program:
         bstack = ctx.pop('bstack')
         if bstack:
             self._error(nd, f'function block unbalance: {bstack}')
-        sus_lhld = None
+        sus_lhld = []
         for laddr, (lhid, lbv, lkp) in sorted(
                 ctx.pop('lbhld').items(), key = lambda v: v[0]):
             if lkp == 'lookahead':
-                sus_lhld = (lhid, lbv)
+                sus_lhld.append((lhid, lbv))
             elif lkp:
                 if sus_lhld:
-                    buf.reput(*sus_lhld, None, 0)
-                    sus_lhld = None
+                    for slhid, slbv in sus_lhld:
+                        buf.reput(slhid, slbv, None, 0)
+                    sus_lhld.clear()
                 buf.reput(lhid, lbv, None, 0)
             else:
                 if sus_lhld:
-                    buf.reput(sus_lhld[0], None)
-                    sus_lhld = None
+                    for slhid, slbv in sus_lhld:
+                        buf.reput(slhid, None)
+                    sus_lhld.clear()
                 buf.reput(lhid, None)
         if sus_lhld:
-            buf.reput(sus_lhld[0], None)
-            sus_lhld = None
+            for slhid, slbv in sus_lhld:
+                buf.reput(slhid, None)
         buf.touch()
         ctx['buf'] = pbuf
         pbuf.write('}')
