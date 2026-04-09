@@ -429,7 +429,7 @@ class c_scode_program:
         if not nd.name in ctx['text']:
             self._error(nd, f'unknown text: {nd.name}')
         txt = ctx['text'][nd.name]
-        ctx['buf'].write(f'text = "{txt}"')
+        ctx['buf'].write(f'text "{txt}"')
 
     def _gen_anode_act_halloc__prim(self, nd, ctx):
         ctx['buf'].write('local = heap[')
