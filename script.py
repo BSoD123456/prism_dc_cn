@@ -463,12 +463,13 @@ class c_script_program:
                 nd = bat[0]
                 rsnd = c_script_anode_act('setrval', [
                     c_script_anode_bat([c_script_anode_inst(ridx)]),
-                    nd], 0, nd.addr)
+                    c_script_anode_bat([nd])
+                ], 0, nd.addr)
                 ridx += 1
                 rbat.append(rsnd)
                 for nd in bat[1:]:
                     rbat.append(nd)
-            mstack.append([c_script_anode_bat([c_script_anode_inst(ridx)])])
+            mstack.append([c_script_anode_inst(ridx)])
             return ridx
 
         addr = staddr
