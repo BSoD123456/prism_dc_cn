@@ -237,11 +237,24 @@ class c_scode_program:
         bstack = ctx.pop('bstack')
         if bstack:
             self._error(nd, f'function block unbalance: {bstack}')
-        for laddr, (lhid, lbv, lkp) in ctx.pop('lbhld').items():
-            if lkp:
+        sus_lhld = None
+        for laddr, (lhid, lbv, lkp) in sorted(
+                ctx.pop('lbhld').items(), key = lambda v: v[0]):
+            if lkp == 'lookahead':
+                sus_lhld = (lhid, lbv)
+            elif lkp:
+                if sus_lhld:
+                    buf.reput(*sus_lhld, None, 0)
+                    sus_lhld = None
                 buf.reput(lhid, lbv, None, 0)
             else:
+                if sus_lhld:
+                    buf.reput(sus_lhld[0], None)
+                    sus_lhld = None
                 buf.reput(lhid, None)
+        if sus_lhld:
+            buf.reput(sus_lhld[0], None)
+            sus_lhld = None
         buf.touch()
         ctx['buf'] = pbuf
         pbuf.write('}')
@@ -502,7 +515,7 @@ class c_scode_program:
         lbhld = ctx['lbhld']
         if not nd.addr in ctx['lbrvs']:
             assert not nd.addr in lbhld
-            lbhld[nd.addr] = [buf.hold(), f'@hol.{nd.addr:x}:', True]
+            lbhld[nd.addr] = [buf.hold(), f'@hol.{nd.addr:x}:', 'lookahead']
             return
         if nd.addr in lbhld:
             lbhinfo = lbhld[nd.addr]
