@@ -178,6 +178,14 @@ class c_scode_program:
         mth(nd, ctx)
         return mn
 
+    def _gen_any_anode(self, nd, assumes, ctx = None):
+        for assume in assumes:
+            mth, mn = self._dispatch_anode(nd, assume)
+            if mth:
+                mth(nd, ctx)
+                return mn, assume
+        self._error(nd, f'should not be assumed as: {mn} / {assumes}')
+
     # program
 
     def _gen_anode_prog(self, nd, ctx):
@@ -210,6 +218,7 @@ class c_scode_program:
 
     def _gen_anode_func(self, nd, ctx):
         ctx['lbrvs'] = {}
+        ctx['holes'] = []
         self._gen_anode(nd.sub, 'lbscan', ctx)
         pbuf = ctx['buf']
         if nd.rnum == 1:
@@ -237,6 +246,7 @@ class c_scode_program:
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
+        ctx.pop('holes')
         ctx.pop('lbrvs')
 
     def _gen_anode_text(self, nd, ctx):
@@ -245,20 +255,52 @@ class c_scode_program:
     def _gen_anode_bat__prim(self, nd, ctx):
         ctx['prv_addr'] = -1
         for snd in nd.subs:
-            self._gen_anode(snd, 'prim', ctx)
+            if self._chk_holes(snd.addr, ctx):
+                _, am = self._gen_any_anode(snd, ('prim', None), ctx)
+                if am == None:
+                    ctx['buf'].write(';')
+                    ctx['buf'].newline()
+            else:
+                self._gen_anode(snd, 'prim', ctx)
             ctx['prv_addr'] = snd.addr
 
     # label scan
 
     def _gen_anode_bat__lbscan(self, nd, ctx):
+        ctx['lbseq'] = []
+        lst_addr = 0
         for snd in nd.subs:
             self._gen_anode(snd, 'lbscan', ctx)
+            lst_addr = snd.addr
+        lbrvs = ctx['lbrvs']
+        holes = ctx['holes']
+        lbseq = ctx.pop('lbseq')
+        ishole = False
+        hole_st = None
+        for la in lbseq:
+            if ishole:
+                if la in lbrvs:
+                    holes.append((hole_st, la))
+                    ishole = False
+            else:
+                if not la in lbrvs:
+                    hole_st = la
+                    ishole = True
+        if ishole:
+            holes.append((hole_st, lst_addr + 1))
+
+    def _chk_holes(self, addr, ctx):
+        holes = ctx['holes']
+        for st, ed in holes:
+            if st <= addr < ed:
+                return True
+        return False
 
     def _gen_anode_act__lbscan(self, nd, ctx):
         pass
 
     def _gen_anode_label__lbscan(self, nd, ctx):
-        pass
+        ctx['lbseq'].append(nd.addr)
 
     def _gen_anode_act_call__lbscan(self, nd, ctx):
         pass
@@ -656,9 +698,9 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        if False:
-            cd = c_scode_program(ast, c_scode_buf_null())
-            #cd = c_scode_program(ast, c_scode_buf_std())
+        if True:
+            #cd = c_scode_program(ast, c_scode_buf_null())
+            cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
         else:
             with open(r'wktab\output.txt', 'w', encoding = 'utf-8') as fd:
