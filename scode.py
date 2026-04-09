@@ -248,15 +248,6 @@ class c_scode_program:
             self._gen_anode(snd, 'prim', ctx)
             ctx['prv_addr'] = snd.addr
 
-    def _gen_anode_bat__inret(self, nd, ctx):
-        for i, snd in enumerate(nd.subs):
-            if i == 0:
-                self._gen_anode(snd, None, ctx)
-                ctx['buf'].write(';')
-                ctx['buf'].newline()
-            else:
-                self._gen_anode(snd, 'prim', ctx)
-
     # label scan
 
     def _gen_anode_bat__lbscan(self, nd, ctx):
