@@ -189,7 +189,6 @@ class c_scode_program:
     # program
 
     def _gen_anode_prog(self, nd, ctx):
-        print('start')
         ctx = {}
         ctx['buf'] = c_scode_buf_null()
         ctx['text'] = {}
@@ -742,5 +741,6 @@ if __name__ == '__main__':
         else:
             with open(r'wktab\output.txt', 'w', encoding = 'utf-8') as fd:
                 cd = c_scode_program(ast, c_scode_buf_fd(fd))
+                print('start')
                 cd.gen_code()
     tst1()
