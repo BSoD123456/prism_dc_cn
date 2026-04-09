@@ -500,6 +500,10 @@ class c_scode_program:
             else:
                 break
         lbhld = ctx['lbhld']
+        if not nd.addr in ctx['lbrvs']:
+            assert not nd.addr in lbhld
+            lbhld[nd.addr] = [buf.hold(), f'@hol.{nd.addr:x}:', True]
+            return
         if nd.addr in lbhld:
             lbhinfo = lbhld[nd.addr]
             assert lbhld[nd.addr][0] is None and lbhinfo[2]
@@ -698,7 +702,7 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        if True:
+        if False:
             #cd = c_scode_program(ast, c_scode_buf_null())
             cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
