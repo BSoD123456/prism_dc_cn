@@ -448,9 +448,6 @@ class c_scode_program:
         dnd = self._getone(subs.pop())
         if nd.name == 'syscall':
             dname = f'sys.{dnd.name}'
-        elif nd.name == 'txtcall':
-            self._gen_vnode_text(nd.addr, dnd, ctx)
-            return
         else:
             dname = f'fun.{dnd.name}'
         ctx['buf'].write(dname)
@@ -458,17 +455,19 @@ class c_scode_program:
         self._gen_vnode_args(subs, ctx)
         ctx['buf'].write(')')
 
-    def _gen_vnode_text(self, saddr, nd, ctx):
-        if not nd.name in ctx['text']:
-            self._error(nd, f'unknown text: {nd.name}')
-        txt = ctx['text'][nd.name]
-        in_text, is_thead, is_ttail = self._chk_txtrng(saddr, ctx)
+    def _gen_anode_act_call_txtcall__prim(self, nd, ctx):
+        dnd = self._getone(self._getone(nd))
+        if not dnd.name in ctx['text']:
+            self._error(nd, f'unknown text: {dnd.name}')
+        txt = ctx['text'][dnd.name]
+        in_text, is_thead, is_ttail = self._chk_txtrng(nd.addr, ctx)
         assert in_text
         if is_thead:
             ctx['buf'].write(f'text "')
         ctx['buf'].write(txt)
         if is_ttail:
-            ctx['buf'].write(f'"')
+            ctx['buf'].write(f'";')
+            ctx['buf'].newline()
 
     def _gen_anode_act_halloc__prim(self, nd, ctx):
         ctx['buf'].write('local = heap[')
