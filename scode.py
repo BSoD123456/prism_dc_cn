@@ -218,7 +218,7 @@ class c_scode_program:
     def _gen_anode_func(self, nd, ctx):
         ctx['lbrvs'] = {}
         ctx['holes'] = []
-        self._gen_anode(nd.sub, 'lbscan', ctx)
+        self._gen_anode(nd.sub, 'prescan', ctx)
         pbuf = ctx['buf']
         if nd.rnum == 1:
             rr = 'ret '
@@ -278,13 +278,13 @@ class c_scode_program:
                 self._gen_anode(snd, 'prim', ctx)
             ctx['prv_addr'] = snd.addr
 
-    # label scan
+    # pre-scan
 
-    def _gen_anode_bat__lbscan(self, nd, ctx):
+    def _gen_anode_bat__prescan(self, nd, ctx):
         ctx['lbseq'] = []
         lst_addr = 0
         for snd in nd.subs:
-            self._gen_anode(snd, 'lbscan', ctx)
+            self._gen_anode(snd, 'prescan', ctx)
             lst_addr = snd.addr
         lbrvs = ctx['lbrvs']
         holes = ctx['holes']
@@ -319,13 +319,13 @@ class c_scode_program:
                 break
         return None
 
-    def _gen_anode_act__lbscan(self, nd, ctx):
+    def _gen_anode_act__prescan(self, nd, ctx):
         pass
 
-    def _gen_anode_label__lbscan(self, nd, ctx):
+    def _gen_anode_label__prescan(self, nd, ctx):
         ctx['lbseq'].append(nd.addr)
 
-    def _gen_anode_act_call__lbscan(self, nd, ctx):
+    def _gen_anode_act_call__prescan(self, nd, ctx):
         pass
 
     def _rec_label_reverse(self, saddr, daddr, jtyp, ctx):
@@ -340,15 +340,15 @@ class c_scode_program:
             return None
         return lbrvs[daddr].get(saddr, None)
 
-    def _gen_anode_act_jump__lbscan(self, nd, ctx):
+    def _gen_anode_act_jump__prescan(self, nd, ctx):
         lb = self._getone(self._getone(nd))
         self._rec_label_reverse(nd.addr, lb.addr, 'j', ctx)
 
-    def _gen_anode_act_jump_if__lbscan(self, nd, ctx):
+    def _gen_anode_act_jump_if__prescan(self, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
         self._rec_label_reverse(nd.addr, lb.addr, 'jt', ctx)
 
-    def _gen_anode_act_jump_if_not__lbscan(self, nd, ctx):
+    def _gen_anode_act_jump_if_not__prescan(self, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
         self._rec_label_reverse(nd.addr, lb.addr, 'jf', ctx)
 
@@ -734,7 +734,7 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        if False:
+        if True:
             cd = c_scode_program(ast, c_scode_buf_null())
             #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
