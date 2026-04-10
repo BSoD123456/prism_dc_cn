@@ -129,8 +129,9 @@ def with_anode(*stricts):
         for mn in dir(cls):
             if not mn.startswith('_gen_anode_'):
                 continue
-            nm = mn.split('__')[0]
-            nmset.add(nm)
+            nms = mn.split('__')
+            if len(nms) < 2 or nms[1] in stricts:
+                nmset.add(nms[0])
         def _dispatch_anode(self, nd, assume):
             ctype = nd.__class__.__name__
             assert ctype.startswith('c_script_anode_')
@@ -138,7 +139,7 @@ def with_anode(*stricts):
             nm = nm1
             if hasattr(nd, 'name'):
                 nm2 = '_'.join((nm, nd.name))
-                if nm2 in nmset:
+                if nm2 in nmset or (assume and not assume in stricts):
                     nm = nm2
             if assume:
                 nm = '__'.join((nm, assume))
@@ -218,6 +219,7 @@ class c_scode_program:
     def _gen_anode_func(self, nd, ctx):
         ctx['lbrvs'] = {}
         ctx['holes'] = []
+        ctx['txtrng'] = []
         self._gen_anode(nd.sub, 'prescan', ctx)
         pbuf = ctx['buf']
         if nd.rnum == 1:
@@ -260,6 +262,7 @@ class c_scode_program:
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
+        ctx.pop('txtrng')
         ctx.pop('holes')
         ctx.pop('lbrvs')
 
@@ -282,10 +285,23 @@ class c_scode_program:
 
     def _gen_anode_bat__prescan(self, nd, ctx):
         ctx['lbseq'] = []
+        ctx['txtage'] = 0
         lst_addr = 0
         for snd in nd.subs:
+            if ctx['txtage'] > 0:
+                in_text = True
+            else:
+                in_text = False
             self._gen_anode(snd, 'prescan', ctx)
+            if ctx['txtage'] > 1:
+                if in_text:
+                    ctx['txtrng'][-1][1] = snd.addr
+                else:
+                    ctx['txtrng'].append([snd.addr, None])
+            elif ctx['txtage'] > 0:
+                ctx['txtage'] -= 1
             lst_addr = snd.addr
+        ctx.pop('txtage')
         lbrvs = ctx['lbrvs']
         holes = ctx['holes']
         lbseq = ctx.pop('lbseq')
@@ -351,6 +367,9 @@ class c_scode_program:
     def _gen_anode_act_jump_if_not__prescan(self, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
         self._rec_label_reverse(nd.addr, lb.addr, 'jf', ctx)
+
+    def _gen_anode_act_call_txtcall__prescan(self, nd, ctx):
+        ctx['txtage'] = 2
 
     # act
 
