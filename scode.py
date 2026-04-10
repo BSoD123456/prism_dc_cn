@@ -293,13 +293,16 @@ class c_scode_program:
             else:
                 in_text = False
             self._gen_anode(snd, 'prescan', ctx)
-            if ctx['txtage'] > 1:
-                if in_text:
-                    ctx['txtrng'][-1][1] = snd.addr
-                else:
-                    ctx['txtrng'].append([snd.addr, None])
-            elif ctx['txtage'] > 0:
+            if ctx['txtage'] > 0:
                 ctx['txtage'] -= 1
+                if ctx['txtage'] > 0:
+                    if in_text:
+                        ctx['txtrng'][-1][1] = snd.addr
+                    else:
+                        ctx['txtrng'].append([snd.addr, None])
+                else:
+                    if ctx['txtrng'] and ctx['txtrng'][-1][1] is None:
+                        ctx['txtrng'][-1][1] = ctx['txtrng'][-1][0]
             lst_addr = snd.addr
         ctx.pop('txtage')
         lbrvs = ctx['lbrvs']
@@ -324,6 +327,8 @@ class c_scode_program:
         for st, ed in holes:
             if st <= addr < ed:
                 return True
+            elif addr < st:
+                break
         return False
 
     def _mtch_holes(self, addr, ctx):
@@ -367,6 +372,15 @@ class c_scode_program:
     def _gen_anode_act_jump_if_not__prescan(self, nd, ctx):
         condi, lb = (self._getone(i) for i in nd.subs)
         self._rec_label_reverse(nd.addr, lb.addr, 'jf', ctx)
+
+    def _chk_txtrng(self, addr, ctx):
+        txtrng = ctx['txtrng']
+        for st, ed in txtrng:
+            if st <= addr <= ed:
+                return True, addr == st, addr == ed
+            elif addr < st:
+                break
+        return False, None, None
 
     def _gen_anode_act_call_txtcall__prescan(self, nd, ctx):
         ctx['txtage'] = 2
@@ -435,7 +449,7 @@ class c_scode_program:
         if nd.name == 'syscall':
             dname = f'sys.{dnd.name}'
         elif nd.name == 'txtcall':
-            self._gen_vnode_text(dnd, ctx)
+            self._gen_vnode_text(nd.addr, dnd, ctx)
             return
         else:
             dname = f'fun.{dnd.name}'
@@ -444,11 +458,17 @@ class c_scode_program:
         self._gen_vnode_args(subs, ctx)
         ctx['buf'].write(')')
 
-    def _gen_vnode_text(self, nd, ctx):
+    def _gen_vnode_text(self, saddr, nd, ctx):
         if not nd.name in ctx['text']:
             self._error(nd, f'unknown text: {nd.name}')
         txt = ctx['text'][nd.name]
-        ctx['buf'].write(f'text "{txt}"')
+        in_text, is_thead, is_ttail = self._chk_txtrng(saddr, ctx)
+        assert in_text
+        if is_thead:
+            ctx['buf'].write(f'text "')
+        ctx['buf'].write(txt)
+        if is_ttail:
+            ctx['buf'].write(f'"')
 
     def _gen_anode_act_halloc__prim(self, nd, ctx):
         ctx['buf'].write('local = heap[')
@@ -753,7 +773,7 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        if True:
+        if False:
             cd = c_scode_program(ast, c_scode_buf_null())
             #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
