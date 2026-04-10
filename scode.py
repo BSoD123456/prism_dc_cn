@@ -239,6 +239,9 @@ class c_scode_program:
         ctx.pop('ivkwk')
         ctx.pop('ftxt')
 
+    def _gen_anode_text__ivkscan(self, nd, ctx):
+        pass
+
     def _gen_anode_func__ivkscan(self, nd, ctx):
         ivkwk = ctx['ivkwk']
         if nd.addr in ivkwk:
@@ -255,13 +258,10 @@ class c_scode_program:
         ivkwk.add(nd.addr)
 
     def _gen_anode_bat__ivkscan(self, nd, ctx):
-        ctx['prv_tsta'] = 0
         for snd in nd.subs:
             self._gen_anode(snd, 'ivkscan', ctx)
-        ctx.pop('prv_tsta')
 
     def _set_tsta_lvl(self, lvl, ctx):
-        ctx['prv_tsta'] = lvl
         if ctx['tsta'] < lvl:
             ctx['tsta'] = lvl
 
@@ -286,10 +286,6 @@ class c_scode_program:
     def _gen_anode_act_call_syscall__ivkscan(self, nd, ctx):
         dnd = self._getone(nd.subs[-1])
         if dnd.name in self.SC_TXT_DONE:
-            if ctx['prv_tsta'] == 1:
-                ctx['tsta'] = False
-            else:
-                self._error(nd, f'text syscall should be after text cmds')
             self._set_tsta_lvl(2, ctx)
         elif dnd.name in self.SC_TXT_INLINE:
             self._set_tsta_lvl(1, ctx)
