@@ -202,7 +202,6 @@ class c_scode_program:
             self._gen_anode(snd, 'restab', ctx)
         ctx['ftxt'] = {}
         self._gen_anode(nd, 'ivkscan', ctx)
-        print(*(f'fun.{k:x}' for k, v in ctx['ftxt'].items() if v == 1))
         buf = ctx['buf'] = self.buf
         for snd in nd.subs:
             if self._gen_anode(snd, None, ctx) == 'func':
@@ -353,8 +352,10 @@ class c_scode_program:
         pass
 
     def _gen_anode_bat__prim(self, nd, ctx):
+        ctx['cur_addr'] = -1
         ctx['prv_addr'] = -1
         for snd in nd.subs:
+            ctx['cur_addr'] = snd.addr
             if self._chk_holes(snd.addr, ctx):
                 _, am = self._gen_any_anode(snd, ('prim', None), ctx)
                 if am == None:
@@ -366,6 +367,7 @@ class c_scode_program:
                 self._gen_anode(snd, 'prim', ctx)
             ctx['prv_addr'] = snd.addr
         ctx.pop('prv_addr')
+        ctx.pop('cur_addr')
 
     # pre-scan
 
@@ -562,16 +564,11 @@ class c_scode_program:
 
     def _gen_anode_act_pop__intext(self, nd, ctx):
         snd = self._getone(self._getone(nd))
-        ctx['prim_addr'] = nd.addr
         self._gen_anode(snd, 'intext', ctx)
-        ctx.pop('prim_addr')
-
-    def _get_prime_addr(self, nd, ctx):
-        return ctx.get('prim_addr', nd.addr)
 
     def _gen_anode_act_call__intext(self, nd, ctx):
         assert nd.name == 'call'
-        vtc = self._gen_vnode_text_pre(self._get_prime_addr(nd, ctx), ctx)
+        vtc = self._gen_vnode_text_pre(ctx)
         ctx['buf'].write('{')
         self._gen_vnode_call('fun', nd, ctx)
         ctx['buf'].write('}')
@@ -579,7 +576,7 @@ class c_scode_program:
 
     def _gen_anode_act_call_syscall__intext(self, nd, ctx):
         assert self._getone(nd.subs[-1]).name in self.SC_TXT_INLINE
-        vtc = self._gen_vnode_text_pre(self._get_prime_addr(nd, ctx), ctx)
+        vtc = self._gen_vnode_text_pre(ctx)
         ctx['buf'].write('{')
         self._gen_vnode_call('sys', nd, ctx)
         ctx['buf'].write('}')
@@ -590,12 +587,12 @@ class c_scode_program:
         if not dnd.name in ctx['restab']['text']:
             self._error(nd, f'unknown text: {dnd.name}')
         txt = ctx['restab']['text'][dnd.name]
-        vtc = self._gen_vnode_text_pre(nd.addr, ctx)
+        vtc = self._gen_vnode_text_pre(ctx)
         ctx['buf'].write(txt)
         self._gen_vnode_text_post(vtc, ctx)
 
-    def _gen_vnode_text_pre(self, addr, ctx):
-        in_text, is_thead, is_ttail = self._chk_txtrng(addr, ctx)
+    def _gen_vnode_text_pre(self, ctx):
+        in_text, is_thead, is_ttail = self._chk_txtrng(ctx['cur_addr'], ctx)
         assert in_text
         if is_thead:
             ctx['buf'].write(f'text "')
