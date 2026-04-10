@@ -188,7 +188,7 @@ class c_scode_program:
         self._error(nd, f'should not be assumed as: {mn} / {assumes}')
 
     SC_TXT_INLINE = {'get_name'}
-    SC_TXT_DONE = {'print_text', 'choose_text'}
+    SC_TXT_DONE = {'print_text', 'choose_text', 'set_name'}
 
     # program
 
@@ -200,6 +200,7 @@ class c_scode_program:
         ctx['buf'] = c_scode_buf_null()
         for snd in nd.subs:
             self._gen_anode(snd, 'restab', ctx)
+        ctx['ftxt'] = {}
         self._gen_anode(nd, 'ivkscan', ctx)
         buf = ctx['buf'] = self.buf
         for snd in nd.subs:
@@ -232,12 +233,10 @@ class c_scode_program:
     # invoke-order scan
 
     def _gen_anode_prog__ivkscan(self, nd, ctx):
-        ctx['ftxt'] = {}
         ctx['ivkwk'] = set()
         for snd in nd.subs:
             self._gen_anode(snd, 'ivkscan', ctx)
         ctx.pop('ivkwk')
-        ctx.pop('ftxt')
 
     def _gen_anode_text__ivkscan(self, nd, ctx):
         pass
@@ -280,7 +279,7 @@ class c_scode_program:
         dnd = self._getone(nd.subs[-1])
         if not dnd.addr in ctx['ftxt']:
             self._gen_anode(ctx['restab']['func'][dnd.name], 'ivkscan', ctx)
-        assert dnd.addr in ctx['ftxt']
+            assert dnd.addr in ctx['ftxt']
         self._set_tsta_lvl(ctx['ftxt'][dnd.addr], ctx)
 
     def _gen_anode_act_call_syscall__ivkscan(self, nd, ctx):
@@ -472,6 +471,13 @@ class c_scode_program:
                 break
         return False, None, None
 
+    def _gen_anode_act_call__prescan(self, nd, ctx):
+        assert nd.name == 'call'
+        dnd = self._getone(nd.subs[-1])
+        tsta = ctx['ftxt'][dnd.addr]
+        if tsta == 1:
+            ctx['txtage'] = 2
+
     def _gen_anode_act_call_txtcall__prescan(self, nd, ctx):
         ctx['txtage'] = 2
 
@@ -556,6 +562,12 @@ class c_scode_program:
     def _gen_anode_act_pop__intext(self, nd, ctx):
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, 'intext', ctx)
+
+    def _gen_anode_act_call__intext(self, nd, ctx):
+        assert nd.name == 'call'
+        ctx['buf'].write('{')
+        self._gen_vnode_call('fun', nd, ctx)
+        ctx['buf'].write('}')
 
     def _gen_anode_act_call_syscall__intext(self, nd, ctx):
         assert self._getone(nd.subs[-1]).name in self.SC_TXT_INLINE
@@ -883,13 +895,13 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        if 1:
-            #cd = c_scode_program(ast, c_scode_buf_null())
-            cd = c_scode_program(ast, c_scode_buf_std())
+        print('start')
+        if 0:
+            cd = c_scode_program(ast, c_scode_buf_null())
+            #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
         else:
             with open(r'wktab\output.txt', 'w', encoding = 'utf-8') as fd:
                 cd = c_scode_program(ast, c_scode_buf_fd(fd))
-                print('start')
                 cd.gen_code()
     tst1()
