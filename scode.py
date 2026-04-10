@@ -194,51 +194,70 @@ class c_scode_program:
 
     def _gen_anode_prog(self, nd, ctx):
         ctx = {}
+        ctx['restab'] = {
+            'func': {},
+            'text': {},}
         ctx['buf'] = c_scode_buf_null()
-        ctx['text'] = {}
-        ctx['ftxt'] = {}
-        ctx['ftxt_ref'] = {}
         for snd in nd.subs:
-            self._gen_anode(snd, 'prstext', ctx)
-        if ctx.pop('ftxt_ref'):
-            self._error(nd, f'text parse unbalance')
+            self._gen_anode(snd, 'restab', ctx)
+        self._gen_anode(nd, 'ivkscan', ctx)
         buf = ctx['buf'] = self.buf
         for snd in nd.subs:
             if self._gen_anode(snd, None, ctx) == 'func':
                 buf.newline()
 
-    # parse text
+    # resource tab
 
-    def _gen_anode_text__prstext(self, nd, ctx):
-        if nd.name in ctx['text']:
+    def _gen_anode_func__restab(self, nd, ctx):
+        ftab = ctx['restab']['func']
+        if nd.name in ftab:
+            self._error(nd, f'duplicated function name: {nd.name}')
+        ftab[nd.name] = nd
+        self._gen_vnode_func_proto(nd, ctx)
+        ctx['buf'].write(';')
+        ctx['buf'].newline()
+
+    def _gen_anode_text__restab(self, nd, ctx):
+        ttab = ctx['restab']['text']
+        if nd.name in ttab:
             self._error(nd, f'duplicated text name: {nd.name}')
         txts = []
         for c in nd.text:
             txts.append(self.chrset.dec(c))
         txt = ''.join(txts)
-        ctx['text'][nd.name] = txt
+        ttab[nd.name] = txt
         ctx['buf'].write(f'txt.{nd.name} = "{txt}";')
         ctx['buf'].newline()
 
-    def _gen_anode_func__prstext(self, nd, ctx):
-        ctx['tsta'] = 0
-        faddr = ctx['faddr'] = nd.addr
-        self._gen_anode(nd.sub, 'prstext', ctx)
-        ctx.pop('faddr')
-        tsta = ctx['ftxt'][faddr] = ctx.pop('tsta')
-        if faddr in ctx['ftxt_ref']:
-            rfaddr, rval = ctx['ftxt_ref'][faddr]
-            if rval == tsta:
-                pass
-            assert not rfaddr in ctx['ftxt']
-            ctx['ftxt'][rfaddr] = tsta
+    # invoke-order scan
 
-    def _gen_anode_bat__prstext(self, nd, ctx):
+    def _gen_anode_prog__ivkscan(self, nd, ctx):
+        ctx['ftxt'] = {}
+        ctx['ivkwk'] = set()
+        for snd in nd.subs:
+            self._gen_anode(snd, 'ivkscan', ctx)
+        ctx.pop('ivkwk')
+        ctx.pop('ftxt')
+
+    def _gen_anode_func__ivkscan(self, nd, ctx):
+        ivkwk = ctx['ivkwk']
+        if nd.addr in ivkwk:
+            return
+        ftxt = ctx['ftxt']
+        fctx = {
+            'tsta': 0,
+            'ftxt': ftxt,
+            'restab': ctx['restab'],
+            'buf': ctx['buf'],
+            'ivkwk': ivkwk, }
+        self._gen_anode(nd.sub, 'ivkscan', fctx)
+        ftxt[nd.addr] = fctx['tsta']
+        ivkwk.add(nd.addr)
+
+    def _gen_anode_bat__ivkscan(self, nd, ctx):
         ctx['prv_tsta'] = 0
         for snd in nd.subs:
-            self._gen_anode(snd, 'prstext', ctx)
-            if ctx['prv_tsta'] < 0:
-                ctx['ftxt_ref'][-ctx['prv_tsta']-1] = [ctx['faddr'], None]
+            self._gen_anode(snd, 'ivkscan', ctx)
         ctx.pop('prv_tsta')
 
     def _set_tsta_lvl(self, lvl, ctx):
@@ -246,49 +265,41 @@ class c_scode_program:
         if ctx['tsta'] < lvl:
             ctx['tsta'] = lvl
 
-    def _gen_anode_act__prstext(self, nd, ctx):
+    def _gen_anode_act__ivkscan(self, nd, ctx):
         self._set_tsta_lvl(0, ctx)
 
-    def _gen_anode_label__prstext(self, nd, ctx):
+    def _gen_anode_label__ivkscan(self, nd, ctx):
         self._set_tsta_lvl(0, ctx)
 
-    def _gen_anode_act_pop__prstext(self, nd, ctx):
+    def _gen_anode_act_pop__ivkscan(self, nd, ctx):
         snd = self._getone(self._getone(nd))
-        self._gen_anode(snd, 'prstext', ctx)
+        self._gen_anode(snd, 'ivkscan', ctx)
 
-    def _gen_anode_act_call__prstext(self, nd, ctx):
+    def _gen_anode_act_call__ivkscan(self, nd, ctx):
         assert nd.name == 'call'
         dnd = self._getone(nd.subs[-1])
-        if dnd.addr in ctx['ftxt']:
-            self._set_tsta_lvl(ctx['ftxt'][dnd.addr])
-        else:
-            ctx['prv_tsta'] = -dnd.addr-1
+        if not dnd.addr in ctx['ftxt']:
+            self._gen_anode(ctx['restab']['func'][dnd.name], 'ivkscan', ctx)
+        assert dnd.addr in ctx['ftxt']
+        self._set_tsta_lvl(ctx['ftxt'][dnd.addr], ctx)
 
-    def _gen_anode_act_call_syscall__prstext(self, nd, ctx):
+    def _gen_anode_act_call_syscall__ivkscan(self, nd, ctx):
         dnd = self._getone(nd.subs[-1])
         if dnd.name in self.SC_TXT_DONE:
-            prv_tsta = ctx['prv_tsta']
-            if prv_tsta < 0:
-                
-            elif prv_tsta == 1:
+            if ctx['prv_tsta'] == 1:
                 ctx['tsta'] = False
             else:
                 self._error(nd, f'text syscall should be after text cmds')
-            self._set_tsta_lvl(2)
+            self._set_tsta_lvl(2, ctx)
         elif dnd.name in self.SC_TXT_INLINE:
-            self._set_tsta_lvl(1)
+            self._set_tsta_lvl(1, ctx)
 
-    def _gen_anode_act_call_txtcall__prstext(self, nd, ctx):
-        self._set_tsta_lvl(1)
+    def _gen_anode_act_call_txtcall__ivkscan(self, nd, ctx):
+        self._set_tsta_lvl(1, ctx)
 
     # struct
 
-    def _gen_anode_func(self, nd, ctx):
-        ctx['lbrvs'] = {}
-        ctx['holes'] = []
-        ctx['txtrng'] = []
-        self._gen_anode(nd.sub, 'prescan', ctx)
-        pbuf = ctx['buf']
+    def _gen_vnode_func_proto(self, nd, ctx):
         if nd.rnum == 1:
             rr = 'ret '
         else:
@@ -296,7 +307,16 @@ class c_scode_program:
             if nd.rnum > 1:
                 rr = rr + ' '
         ar = ', '.join(f'arg{i+1}' for i in range(nd.anum))
-        pbuf.write(f'{rr}fun.{nd.name}({ar}) {{')
+        ctx['buf'].write(f'{rr}fun.{nd.name}({ar})')
+
+    def _gen_anode_func(self, nd, ctx):
+        ctx['lbrvs'] = {}
+        ctx['holes'] = []
+        ctx['txtrng'] = []
+        self._gen_anode(nd.sub, 'prescan', ctx)
+        self._gen_vnode_func_proto(nd, ctx)
+        pbuf = ctx['buf']
+        pbuf.write(' {')
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
         ctx['bstack'] = []
@@ -549,9 +569,9 @@ class c_scode_program:
 
     def _gen_anode_act_call_txtcall__intext(self, nd, ctx):
         dnd = self._getone(self._getone(nd))
-        if not dnd.name in ctx['text']:
+        if not dnd.name in ctx['restab']['text']:
             self._error(nd, f'unknown text: {dnd.name}')
-        txt = ctx['text'][dnd.name]
+        txt = ctx['restab']['text'][dnd.name]
         self._gen_vnode_text(nd, txt, ctx)
 
     def _gen_vnode_text(self, nd, txt, ctx):
@@ -867,9 +887,9 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
-        if 0:
-            cd = c_scode_program(ast, c_scode_buf_null())
-            #cd = c_scode_program(ast, c_scode_buf_std())
+        if 1:
+            #cd = c_scode_program(ast, c_scode_buf_null())
+            cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
         else:
             with open(r'wktab\output.txt', 'w', encoding = 'utf-8') as fd:
