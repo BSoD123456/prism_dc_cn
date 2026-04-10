@@ -202,6 +202,7 @@ class c_scode_program:
             self._gen_anode(snd, 'restab', ctx)
         ctx['ftxt'] = {}
         self._gen_anode(nd, 'ivkscan', ctx)
+        print(*(f'fun.{k:x}' for k, v in ctx['ftxt'].items() if v == 1))
         buf = ctx['buf'] = self.buf
         for snd in nd.subs:
             if self._gen_anode(snd, None, ctx) == 'func':
@@ -565,29 +566,37 @@ class c_scode_program:
 
     def _gen_anode_act_call__intext(self, nd, ctx):
         assert nd.name == 'call'
+        vtc = self._gen_vnode_text_pre(nd, ctx)
         ctx['buf'].write('{')
         self._gen_vnode_call('fun', nd, ctx)
         ctx['buf'].write('}')
+        self._gen_vnode_text_post(vtc, ctx)
 
     def _gen_anode_act_call_syscall__intext(self, nd, ctx):
         assert self._getone(nd.subs[-1]).name in self.SC_TXT_INLINE
+        vtc = self._gen_vnode_text_pre(nd, ctx)
         ctx['buf'].write('{')
         self._gen_vnode_call('sys', nd, ctx)
         ctx['buf'].write('}')
+        self._gen_vnode_text_post(vtc, ctx)
 
     def _gen_anode_act_call_txtcall__intext(self, nd, ctx):
         dnd = self._getone(self._getone(nd))
         if not dnd.name in ctx['restab']['text']:
             self._error(nd, f'unknown text: {dnd.name}')
         txt = ctx['restab']['text'][dnd.name]
-        self._gen_vnode_text(nd, txt, ctx)
+        vtc = self._gen_vnode_text_pre(nd, ctx)
+        ctx['buf'].write(txt)
+        self._gen_vnode_text_post(vtc, ctx)
 
-    def _gen_vnode_text(self, nd, txt, ctx):
+    def _gen_vnode_text_pre(self, nd, ctx):
         in_text, is_thead, is_ttail = self._chk_txtrng(nd.addr, ctx)
         assert in_text
         if is_thead:
             ctx['buf'].write(f'text "')
-        ctx['buf'].write(txt)
+        return is_ttail
+
+    def _gen_vnode_text_post(self, is_ttail, ctx):
         if is_ttail:
             ctx['buf'].write(f'";')
             ctx['buf'].newline()
