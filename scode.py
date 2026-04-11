@@ -637,14 +637,16 @@ class c_scode_program:
     def _gen_anode_act_vget(self, nd, ctx):
         ctx['buf'].write('var')
         ctx['buf'].write('[')
-        self._gen_anode(self._getone(self._getone(nd)), None, ctx)
+        self._gen_optkargs_anode(self._getone(self._getone(nd)), None, ctx,
+            prv_oplvl = self.CALC_OPLVL['>>'], prv_opdir = 0)
         ctx['buf'].write(' >>5]')
 
     def _gen_anode_act_vset(self, nd, ctx):
         ndr, ndl = nd.subs
         ctx['buf'].write('var')
         ctx['buf'].write('[')
-        self._gen_anode(self._getone(ndl), None, ctx)
+        self._gen_optkargs_anode(self._getone(ndl), None, ctx,
+            prv_oplvl = self.CALC_OPLVL['>>'], prv_opdir = 0)
         ctx['buf'].write(' >>5]')
         ctx['buf'].write(' = ')
         self._gen_anode(self._getone(ndr), None, ctx)
