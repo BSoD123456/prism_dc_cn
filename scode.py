@@ -198,14 +198,8 @@ class c_scode_program:
             'func': {},
             'text': {},}
         ctx['buf'] = c_scode_buf_null()
-        ctx['unkchars'] = {}
         for snd in nd.subs:
             self._gen_anode(snd, 'restab', ctx)
-        for k, v in sorted(ctx['unkchars'].items(), key=lambda v:v[0]):
-            print(f'{k:x}:')
-            for lv in v:
-                print(lv)
-            print()
         ctx['ftxt'] = {}
         self._gen_anode(nd, 'ivkscan', ctx)
         buf = ctx['buf'] = self.buf
@@ -229,17 +223,9 @@ class c_scode_program:
         if nd.name in ttab:
             self._error(nd, f'duplicated text name: {nd.name}')
         txts = []
-        ukc = set()
         for c in nd.text:
-            cs = self.chrset.dec(c)
-            if cs.startswith('[') and (c & 0x2000) == 0:
-                ukc.add(c)
-            txts.append(cs)
+            txts.append(self.chrset.dec(c))
         txt = ''.join(txts)
-        for cc in ukc:
-            if not cc in ctx['unkchars']:
-                ctx['unkchars'][cc] = []
-            ctx['unkchars'][cc].append(txt)
         ttab[nd.name] = txt
         ctx['buf'].write(f'txt.{nd.name} = "{txt}";')
         ctx['buf'].newline()
@@ -921,7 +907,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             cd = c_scode_program(ast, c_scode_buf_null())
             #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
