@@ -219,10 +219,14 @@ def with_anode(*stricts):
 @with_anode('prim', 'intext')
 class c_scode_program:
 
-    def __init__(self, ast, buf):
+    def __init__(self, ast, buf, conf = None):
         self.ast = ast
         self.buf = buf
         self.chrset = c_charset_jp()
+        self.conf = {
+            'reduce_calc': True, }
+        if conf:
+            self.conf = {**self.conf, **conf}
 
     def _error(self, nd, msg):
         addr = getattr(nd, 'addr', -1)
@@ -992,6 +996,8 @@ class c_scode_program:
                     break
                 elif skplvl[i] > 0:
                     skpopd = i
+        if not self.conf.get('reduce_calc'):
+            skpopd = None
         if skpopd is None:
             if needb:
                 pbuf.write('(')
