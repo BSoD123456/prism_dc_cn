@@ -882,6 +882,28 @@ class c_scode_program:
 
     # calc
 
+    CALC_OPSYM = {
+        'add':  ('+',  2),
+        'sub':  ('-',  2),
+        'mul':  ('*',  2),
+        'div':  ('//', 2),
+        'mod':  ('%',  2),
+        'neg':  ('-',  1),
+        'eq':   ('==', 2),
+        'gt':   ('>',  2),
+        'ge':   ('>=', 2),
+        'lt':   ('<',  2),
+        'le':   ('<=', 2),
+        'ne':   ('!=', 2),
+        'and':  ('&&', 2),
+        'or':   ('||', 2),
+        'band': ('&',  2),
+        'bor':  ('|',  2),
+        'bxor': ('^',  2),
+        'shl':  ('<<', 2),
+        'shr':  ('>>', 2),
+    }
+
     CALC_OPLVL = (lambda lst: {
         op: len(lst) - lv
         for lv, ops in enumerate(lst)
@@ -897,6 +919,19 @@ class c_scode_program:
             ['&&'],
             ['||'],
         ])
+
+    locals().update(
+        (
+            f'_gen_anode_act_calc_{name}',
+            (lambda dsym: (
+                lambda self, nd, ctx, **ka:
+                self._gen_vnode_act_calc_2(dsym, *nd.subs, ctx, **ka)
+            ) if opnum == 2 else (
+                lambda self, nd, ctx, **ka:
+                self._gen_vnode_act_calc_1(dsym, *nd.subs, ctx, **ka)
+            ))(sym)
+        )
+        for name, (sym, opnum) in CALC_OPSYM.items())
 
     def _gen_vnode_act_calc_1(self, op, nd, ctx, *,
             prv_oplvl = 0, prv_opdir = 0):
@@ -923,63 +958,6 @@ class c_scode_program:
             prv_oplvl = oplvl, prv_opdir = 1)
         if needb:
             ctx['buf'].write(')')
-
-    def _gen_anode_act_calc_add(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('+', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_sub(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('-', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_mul(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('*', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_div(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('//', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_mod(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('%', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_neg(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_1('-', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_eq(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('==', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_gt(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('>', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_ge(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('>=', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_lt(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('<', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_le(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('<=', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_ne(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('!=', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_and(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('&&', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_or(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('||', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_band(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('&', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_bor(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('|', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_bxor(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('^', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_shl(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('<<', *nd.subs, ctx, **ka)
-
-    def _gen_anode_act_calc_shr(self, nd, ctx, **ka):
-        self._gen_vnode_act_calc_2('>>', *nd.subs, ctx, **ka)
 
     # ref
 
