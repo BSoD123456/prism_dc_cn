@@ -216,8 +216,8 @@ class c_script_program:
         ('a', 0, 1),
         ('b', 1, 1),
         ('print_text', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n4|i3|n3 / 3:push1;->r / 4:call d27;->n5:pop1->i2
-        ('choose_text', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n3|i3|i4 / 3:push1->r / 4:call d27;->n5:pop1->i2
-        ('e_i2', 0, 1),
+        ('print_text_choose', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n3|i3|i4 / 3:push1->r / 4:call d27;->n5:pop1->i2
+        ('print_text_continue', 0, 1), #i2
         ('f_c', 1, 1),
         # 0x10
         ('10', 1, 1),

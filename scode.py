@@ -188,7 +188,9 @@ class c_scode_program:
         self._error(nd, f'should not be assumed as: {mn} / {assumes}')
 
     SC_TXT_INLINE = {'get_name'}
-    SC_TXT_DONE = {'print_text', 'choose_text', 'set_name'}
+    SC_TXT_DONE = {
+        'set_name',
+        'print_text', 'print_text_choose', 'print_text_continue'}
 
     # program
 
