@@ -127,6 +127,40 @@ class c_scode_buf:
         self.buf = []
         return self
 
+class c_scode_buf_inline(c_scode_buf):
+
+    def __init__(self, parent, touched):
+        super().__init__(parent, touched, 0)
+
+    def sub(self, idt = 1):
+        raise NotImplementedError('buf inline should not do this')
+
+    def indent(self, val):
+        raise NotImplementedError('buf inline should not do this')
+
+    def noindent(self):
+        raise NotImplementedError('buf inline should not do this')
+
+    def newline(self):
+        raise NotImplementedError('buf inline should not do this')
+
+    def touch(self):
+        if self.tch:
+            return self
+        self.tch = True
+        if not self.par:
+            return self
+        for tok in self.lbuf:
+            if isinstance(tok, tuple):
+                if self.par.tch:
+                    raise err_scode_syntax('touched parbuf unholdable')
+                hid, = tok
+                self.par.write((hid,))
+            else:
+                self.par.write(tok)
+        self.lbuf = []
+        return self
+
 class c_scode_buf_null(c_scode_buf):
 
     def __init__(self):
