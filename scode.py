@@ -886,25 +886,25 @@ class c_scode_program:
     # calc
 
     CALC_OPDESC = {
-        '+' : ('add' , 2),
-        '-' : ('sub' , 2),
-        '*' : ('mul' , 2),
-        '//': ('div' , 2),
-        '%' : ('mod' , 2),
-        '-1': ('neg' , 1),
-        '==': ('eq'  , 2),
-        '>' : ('gt'  , 2),
-        '>=': ('ge'  , 2),
-        '<' : ('lt'  , 2),
-        '<=': ('le'  , 2),
-        '!=': ('ne'  , 2),
-        '&&': ('and' , 2),
-        '||': ('or'  , 2),
-        '&' : ('band', 2),
-        '|' : ('bor' , 2),
-        '^' : ('bxor', 2),
-        '<<': ('shl' , 2),
-        '>>': ('shr' , 2),
+        '+' : ('add' , 2, (1, 2), (0, 0)),
+        '-' : ('sub' , 2, (0, 2), (0, 0)),
+        '*' : ('mul' , 2, (3, 3), (0, 0)),
+        '//': ('div' , 2, (3, 1), (0, 1)),
+        '%' : ('mod' , 2, (3, 2), (0, 1)),
+        '-1': ('neg' , 1, (1,  ), (0,  )),
+        '==': ('eq'  , 2, (0, 0), (0, 0)),
+        '>' : ('gt'  , 2, (0, 0), (0, 0)),
+        '>=': ('ge'  , 2, (0, 0), (0, 0)),
+        '<' : ('lt'  , 2, (0, 0), (0, 0)),
+        '<=': ('le'  , 2, (0, 0), (0, 0)),
+        '!=': ('ne'  , 2, (0, 0), (0, 0)),
+        '&&': ('and' , 2, (2, 0), (0, 0)),
+        '||': ('or'  , 2, (2, 0), (2, 2)),
+        '&' : ('band', 2, (3, 3), (0, 0)),
+        '|' : ('bor' , 2, (1, 2), (0, 0)),
+        '^' : ('bxor', 2, (0, 0), (0, 0)),
+        '<<': ('shl' , 2, (3, 2), (0, 0)),
+        '>>': ('shr' , 2, (3, 2), (0, 0)),
     }
 
     CALC_OPLVL = (lambda lst: {
@@ -923,8 +923,14 @@ class c_scode_program:
             ['||'],
         ])
 
+    CALC_OPSKPCHK = [
+        (lambda v: v == 0, None),
+        (lambda v: v == 1, lambda v: v == 0),
+        (lambda v: v != 0, None),
+    ]
+
     locals().update(d
-        for sym, (name, opnum) in CALC_OPDESC.items()
+        for sym, (name, opnum, *_) in CALC_OPDESC.items()
         for d in [(
             f'_gen_anode_act_calc_{name}',
             (lambda dsym: (
@@ -939,6 +945,7 @@ class c_scode_program:
     def _gen_vnode_act_calc_1(self, op, nd, ctx, *,
             prv_oplvl = 0, prv_opdir = 0, calc_value = None, **ka):
         oplvl = self.CALC_OPLVL[op]
+        skplvl, skptyp = self.CALC_OPDESC[op][2:4]
         op = op[:-1]
         needb = (prv_oplvl == oplvl and prv_opdir == 0 or prv_oplvl > oplvl)
         pbuf = ctx['buf']
@@ -949,6 +956,12 @@ class c_scode_program:
         opdv = opdv_cntn[0]
         if calc_value and not opdv is None:
             calc_value[0] = eval(f'{op}{opdv}')
+            chkskp, chkerr = self.CALC_OPSKPCHK[skptyp[0]]
+            if chkerr and chkerr(opdv):
+                self._error(nd, f'invalid value: {opdv}')
+            if chkskp(opdv):
+                if skplvl[0]:
+                    return
         if needb:
             pbuf.write('(')
         pbuf.write(op)
@@ -960,6 +973,7 @@ class c_scode_program:
     def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx, *,
             prv_oplvl = 0, prv_opdir = 0, calc_value = None, **ka):
         oplvl = self.CALC_OPLVL[op]
+        skplvl, skptyp = self.CALC_OPDESC[op][2:4]
         pyop = {'&&': ' and ', '||': ' or '}.get(op, op)
         needb = (prv_oplvl == oplvl and prv_opdir == 1 or prv_oplvl > oplvl)
         pbuf = ctx['buf']
