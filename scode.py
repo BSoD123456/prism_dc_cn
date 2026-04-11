@@ -565,9 +565,9 @@ class c_scode_program:
         ctx['buf'].write(';')
         ctx['buf'].newline()
 
-    def _gen_anode_act_push(self, nd, ctx, **ka):
+    def _gen_anode_act_push(self, nd, ctx):
         snd = self._getone(self._getone(nd))
-        self._gen_optkargs_anode(snd, None, ctx, **ka)
+        self._gen_anode(snd, None, ctx)
 
     def _gen_anode_act_setrval__prim(self, nd, ctx):
         ridx, sub = (self._getone(i) for i in nd.subs)
@@ -865,65 +865,30 @@ class c_scode_program:
         ])
 
     def _gen_vnode_act_calc_1(self, op, nd, ctx, *,
-            prv_oplvl = 0, prv_opdir = 0, reduce_zero = None):
+            prv_oplvl = 0, prv_opdir = 0):
         oplvl = self.CALC_OPLVL[f'{op}1']
         needb = (prv_oplvl == oplvl and prv_opdir == 0 or prv_oplvl > oplvl)
         if needb:
-            hid_b1 = ctx['buf'].hold_tok()
-        hid_op = ctx['buf'].hold_tok()
-        sub_reduce_zero = [False]
+            ctx['buf'].write('(')
+        ctx['buf'].write(op)
         self._gen_optkargs_anode(self._getone(nd), None, ctx,
-            prv_oplvl = oplvl, prv_opdir = 1, reduce_zero = sub_reduce_zero)
-        if sub_reduce_zero[0]:
-            if reduce_zero:
-                reduce_zero[0] = True
-            else:
-                ctx['buf'].write('0')
-            ctx['buf'].reput_tok(hid_op, None)
-            if needb:
-                ctx['buf'].reput_tok(hid_b1, None)
-        else:
-            ctx['buf'].reput_tok(hid_op, op)
-            if needb:
-                ctx['buf'].reput_tok(hid_b1, ')')
-                ctx['buf'].write(')')
+            prv_oplvl = oplvl, prv_opdir = 1)
+        if needb:
+            ctx['buf'].write(')')
 
     def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx, *,
-            prv_oplvl = 0, prv_opdir = 0, reduce_zero = None):
+            prv_oplvl = 0, prv_opdir = 0):
         oplvl = self.CALC_OPLVL[op]
         needb = (prv_oplvl == oplvl and prv_opdir == 1 or prv_oplvl > oplvl)
         if needb:
-            hid_b1 = ctx['buf'].hold_tok()
-        sub_reduce_zero = [False]
+            ctx['buf'].write('(')
         self._gen_optkargs_anode(self._getone(nd1), None, ctx,
-            prv_oplvl = oplvl, prv_opdir = 0, reduce_zero = sub_reduce_zero)
-        z1 = sub_reduce_zero[0]
-        if z1:
-            hid_opd1 = ctx['buf'].hold_tok()
-        else:
-            hid_opd1 = None
-        sub_reduce_zero = [False]
-        hid_op = ctx['buf'].hold_tok()
+            prv_oplvl = oplvl, prv_opdir = 0)
+        ctx['buf'].write(f' {op} ')
         self._gen_optkargs_anode(self._getone(nd2), None, ctx,
-            prv_oplvl = oplvl, prv_opdir = 1, reduce_zero = sub_reduce_zero)
-        z2 = sub_reduce_zero[0]
-        if z1:
-            hid_opd2 = ctx['buf'].hold_tok()
-        else:
-            hid_opd2 = None
-        if reduce_zero:
-            reduce_zero[0] = True
-        if z1 or z2:
-            if z1 and z2 and not reduce_zero:
-                ctx['buf'].write('0')
-            ctx['buf'].reput_tok(hid_op, None)
-            if needb:
-                ctx['buf'].reput_tok(hid_b1, None)
-        else:
-            ctx['buf'].reput_tok(hid_op, f' {op} ')
-            if needb:
-                ctx['buf'].reput_tok(hid_b1, ')')
-                ctx['buf'].write(')')
+            prv_oplvl = oplvl, prv_opdir = 1)
+        if needb:
+            ctx['buf'].write(')')
 
     def _gen_anode_act_calc_add(self, nd, ctx, **ka):
         self._gen_vnode_act_calc_2('+', *nd.subs, ctx, **ka)
@@ -993,14 +958,10 @@ class c_scode_program:
     def _gen_anode_parm(self, nd, ctx):
         ctx['buf'].write(str(nd))
 
-    def _gen_anode_inst(self, nd, ctx, **ka):
+    def _gen_anode_inst(self, nd, ctx):
         val = nd.val
         if val & 0x4000000:
             val -= 0x8000000
-        if ka.get('reduce_zero', None):
-            if val == 0:
-                ka['reduce_zero'][0] = True
-                return
         ctx['buf'].write(hex(val))
 
     def gen_code(self):
@@ -1022,7 +983,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
+        if 1:
             cd = c_scode_program(ast, c_scode_buf_null())
             #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
