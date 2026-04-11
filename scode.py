@@ -891,7 +891,7 @@ class c_scode_program:
         '*' : ('mul' , 2, (3, 3), (0, 0)),
         '//': ('div' , 2, (3, 1), (0, 1)),
         '%' : ('mod' , 2, (3, 2), (0, 1)),
-        '-1': ('neg' , 1, (1,  ), (0,  )),
+        '-1': ('neg' , 1, (0,  ), (0,  )),
         '==': ('eq'  , 2, (0, 0), (0, 0)),
         '>' : ('gt'  , 2, (0, 0), (0, 0)),
         '>=': ('ge'  , 2, (0, 0), (0, 0)),
@@ -945,30 +945,19 @@ class c_scode_program:
     def _gen_vnode_act_calc_1(self, op, nd, ctx, *,
             prv_oplvl = 0, prv_opdir = 0, calc_value = None, **ka):
         oplvl = self.CALC_OPLVL[op]
-        skplvl, skptyp = self.CALC_OPDESC[op][2:4]
         op = op[:-1]
         needb = (prv_oplvl == oplvl and prv_opdir == 0 or prv_oplvl > oplvl)
-        pbuf = ctx['buf']
-        sbuf = ctx['buf'] = pbuf.sub_inline()
+        if needb:
+            ctx['buf'].write('(')
+        ctx['buf'].write(op)
         opdv_cntn = [None]
         self._gen_optkargs_anode(self._getone(nd), None, ctx,
             prv_oplvl = oplvl, prv_opdir = 1, calc_value = opdv_cntn)
         opdv = opdv_cntn[0]
+        if needb:
+            ctx['buf'].write(')')
         if calc_value and not opdv is None:
             calc_value[0] = eval(f'{op}{opdv}')
-            chkskp, chkerr = self.CALC_OPSKPCHK[skptyp[0]]
-            if chkerr and chkerr(opdv):
-                self._error(nd, f'invalid value: {opdv}')
-            if chkskp(opdv):
-                if skplvl[0]:
-                    return
-        if needb:
-            pbuf.write('(')
-        pbuf.write(op)
-        sbuf.touch()
-        if needb:
-            pbuf.write(')')
-        ctx['buf'] = pbuf
 
     def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx, *,
             prv_oplvl = 0, prv_opdir = 0, calc_value = None, **ka):
