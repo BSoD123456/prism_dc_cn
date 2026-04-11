@@ -564,6 +564,8 @@ class c_scode_program:
         self._gen_vnode_args(subs, ctx)
         ctx['buf'].write(')')
 
+    # text push
+
     def _gen_anode_act_pop__intext(self, nd, ctx):
         snd = self._getone(self._getone(nd))
         self._gen_anode(snd, 'intext', ctx)
@@ -604,6 +606,8 @@ class c_scode_program:
         if is_ttail:
             ctx['buf'].write(f'";')
             ctx['buf'].newline()
+
+    # heap
 
     def _gen_anode_act_halloc__prim(self, nd, ctx):
         ctx['buf'].write('local = heap[')
@@ -909,7 +913,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
+        if 1:
             cd = c_scode_program(ast, c_scode_buf_null())
             #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
