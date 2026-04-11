@@ -920,8 +920,9 @@ class c_scode_program:
             ['||'],
         ])
 
-    locals().update(
-        (
+    locals().update(d
+        for name, (sym, opnum) in CALC_OPSYM.items()
+        for d in [(
             f'_gen_anode_act_calc_{name}',
             (lambda dsym: (
                 lambda self, nd, ctx, **ka:
@@ -930,8 +931,7 @@ class c_scode_program:
                 lambda self, nd, ctx, **ka:
                 self._gen_vnode_act_calc_1(dsym, *nd.subs, ctx, **ka)
             ))(sym)
-        )
-        for name, (sym, opnum) in CALC_OPSYM.items())
+        )])
 
     def _gen_vnode_act_calc_1(self, op, nd, ctx, *,
             prv_oplvl = 0, prv_opdir = 0):
