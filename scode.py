@@ -46,7 +46,13 @@ class c_scode_buf:
 
     def newline(self):
         if self.lbuf:
-            line = ''.join((*self._idtsym(self.idt), *self.lbuf))
+            ltoks = [*self._idtsym(self.idt)]
+            for tok in self.lbuf:
+                if isinstance(tok, tuple):
+                    raise err_scode_syntax('held line unput')
+                else:
+                    ltoks.append(tok)
+            line = ''.join(ltoks)
             self.lbuf = []
         else:
             line = ''
@@ -79,6 +85,29 @@ class c_scode_buf:
             self.buf[i] = ''.join((*self._idtsym(
                 max(0, didt + idt_shft) if idt is None else idt
             ), line))
+
+    def hold_tok(self):
+        if self.tch:
+            raise err_scode_syntax('touched buf unholdable')
+        c_scode_buf.HDIDX += 1
+        self.write((c_scode_buf.HDIDX,))
+        return c_scode_buf.HDIDX
+
+    def reput_tok(self, hid, tok):
+        if self.tch:
+            raise err_scode_syntax('touched buf unchangable')
+        for i, v in enumerate(self.lbuf):
+            if not isinstance(v, tuple):
+                continue
+            dhid, = v
+            if dhid == hid:
+                break
+        else:
+            raise err_scode_syntax(f'invalid hid: {hid}')
+        if tok is None:
+            self.lbuf.pop(i)
+        else:
+            self.lbuf[i] = tok
 
     def touch(self):
         if self.tch:
@@ -187,12 +216,12 @@ class c_scode_program:
                 return mn, assume
         self._error(nd, f'should not be assumed as: {mn} / {assumes}')
 
-    def _gen_optkargs_anode(self, nd, assume = None, ctx = None, **kargs):
+    def _gen_optkargs_anode(self, nd, assume = None, ctx = None, **ka):
         mth, mn = self._dispatch_anode(nd, assume)
         if not mth:
             self._error(nd, f'should not be assumed as: {mn}')
         if mth.__code__.co_flags & 0x8:
-            mth(nd, ctx, **kargs)
+            mth(nd, ctx, **ka)
         else:
             mth(nd, ctx)
         return mn
@@ -536,9 +565,9 @@ class c_scode_program:
         ctx['buf'].write(';')
         ctx['buf'].newline()
 
-    def _gen_anode_act_push(self, nd, ctx):
+    def _gen_anode_act_push(self, nd, ctx, **ka):
         snd = self._getone(self._getone(nd))
-        self._gen_anode(snd, None, ctx)
+        self._gen_optkargs_anode(snd, None, ctx, **ka)
 
     def _gen_anode_act_setrval__prim(self, nd, ctx):
         ridx, sub = (self._getone(i) for i in nd.subs)
@@ -835,84 +864,123 @@ class c_scode_program:
             ['||'],
         ])
 
-    def _gen_vnode_act_calc_1(self, op, nd, ctx, *, prv_oplvl = 0, prv_opdir = 0):
+    def _gen_vnode_act_calc_1(self, op, nd, ctx, *,
+            prv_oplvl = 0, prv_opdir = 0, reduce_zero = None):
         oplvl = self.CALC_OPLVL[f'{op}1']
-        if prv_oplvl == oplvl and prv_opdir == 0 or prv_oplvl > oplvl:
-            ctx['buf'].write('(')
-        ctx['buf'].write(op)
+        needb = (prv_oplvl == oplvl and prv_opdir == 0 or prv_oplvl > oplvl)
+        if needb:
+            hid_b1 = ctx['buf'].hold_tok()
+        hid_op = ctx['buf'].hold_tok()
+        sub_reduce_zero = [False]
         self._gen_optkargs_anode(self._getone(nd), None, ctx,
-            prv_oplvl = oplvl, prv_opdir = 1)
-        if prv_oplvl == oplvl and prv_opdir == 0 or prv_oplvl > oplvl:
-            ctx['buf'].write(')')
+            prv_oplvl = oplvl, prv_opdir = 1, reduce_zero = sub_reduce_zero)
+        if sub_reduce_zero[0]:
+            if reduce_zero:
+                reduce_zero[0] = True
+            else:
+                ctx['buf'].write('0')
+            ctx['buf'].reput_tok(hid_op, None)
+            if needb:
+                ctx['buf'].reput_tok(hid_b1, None)
+        else:
+            ctx['buf'].reput_tok(hid_op, op)
+            if needb:
+                ctx['buf'].reput_tok(hid_b1, ')')
+                ctx['buf'].write(')')
 
-    def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx, *, prv_oplvl = 0, prv_opdir = 0):
+    def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx, *,
+            prv_oplvl = 0, prv_opdir = 0, reduce_zero = None):
         oplvl = self.CALC_OPLVL[op]
-        if prv_oplvl == oplvl and prv_opdir == 1 or prv_oplvl > oplvl:
-            ctx['buf'].write('(')
+        needb = (prv_oplvl == oplvl and prv_opdir == 1 or prv_oplvl > oplvl)
+        if needb:
+            hid_b1 = ctx['buf'].hold_tok()
+        sub_reduce_zero = [False]
         self._gen_optkargs_anode(self._getone(nd1), None, ctx,
-            prv_oplvl = oplvl, prv_opdir = 0)
-        ctx['buf'].write(f' {op} ')
+            prv_oplvl = oplvl, prv_opdir = 0, reduce_zero = sub_reduce_zero)
+        z1 = sub_reduce_zero[0]
+        if z1:
+            hid_opd1 = ctx['buf'].hold_tok()
+        else:
+            hid_opd1 = None
+        sub_reduce_zero = [False]
+        hid_op = ctx['buf'].hold_tok()
         self._gen_optkargs_anode(self._getone(nd2), None, ctx,
-            prv_oplvl = oplvl, prv_opdir = 1)
-        if prv_oplvl == oplvl and prv_opdir == 1 or prv_oplvl > oplvl:
-            ctx['buf'].write(')')
+            prv_oplvl = oplvl, prv_opdir = 1, reduce_zero = sub_reduce_zero)
+        z2 = sub_reduce_zero[0]
+        if z1:
+            hid_opd2 = ctx['buf'].hold_tok()
+        else:
+            hid_opd2 = None
+        if reduce_zero:
+            reduce_zero[0] = True
+        if z1 or z2:
+            if z1 and z2 and not reduce_zero:
+                ctx['buf'].write('0')
+            ctx['buf'].reput_tok(hid_op, None)
+            if needb:
+                ctx['buf'].reput_tok(hid_b1, None)
+        else:
+            ctx['buf'].reput_tok(hid_op, f' {op} ')
+            if needb:
+                ctx['buf'].reput_tok(hid_b1, ')')
+                ctx['buf'].write(')')
 
-    def _gen_anode_act_calc_add(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('+', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_add(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('+', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_sub(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('-', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_sub(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('-', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_mul(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('*', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_mul(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('*', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_div(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('//', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_div(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('//', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_mod(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('%', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_mod(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('%', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_neg(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_1('-', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_neg(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_1('-', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_eq(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('==', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_eq(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('==', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_gt(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('>', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_gt(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('>', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_ge(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('>=', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_ge(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('>=', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_lt(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('<', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_lt(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('<', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_le(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('<=', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_le(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('<=', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_ne(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('!=', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_ne(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('!=', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_and(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('&&', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_and(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('&&', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_or(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('||', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_or(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('||', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_band(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('&', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_band(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('&', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_bor(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('|', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_bor(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('|', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_bxor(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('^', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_bxor(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('^', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_shl(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('<<', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_shl(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('<<', *nd.subs, ctx, **ka)
 
-    def _gen_anode_act_calc_shr(self, nd, ctx, **kargs):
-        self._gen_vnode_act_calc_2('>>', *nd.subs, ctx, **kargs)
+    def _gen_anode_act_calc_shr(self, nd, ctx, **ka):
+        self._gen_vnode_act_calc_2('>>', *nd.subs, ctx, **ka)
 
     # ref
 
@@ -925,10 +993,14 @@ class c_scode_program:
     def _gen_anode_parm(self, nd, ctx):
         ctx['buf'].write(str(nd))
 
-    def _gen_anode_inst(self, nd, ctx):
+    def _gen_anode_inst(self, nd, ctx, **ka):
         val = nd.val
         if val & 0x4000000:
             val -= 0x8000000
+        if ka.get('reduce_zero', None):
+            if val == 0:
+                ka['reduce_zero'][0] = True
+                return
         ctx['buf'].write(hex(val))
 
     def gen_code(self):
@@ -950,7 +1022,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             cd = c_scode_program(ast, c_scode_buf_null())
             #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
