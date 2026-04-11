@@ -21,6 +21,9 @@ class c_scode_buf:
     def sub(self, idt = 1):
         return c_scode_buf(self, False, idt)
 
+    def sub_inline(self):
+        return c_scode_buf_inline(self, False)
+
     def indent(self, val):
         self.idt += val
         if self.idt < 0:
@@ -599,9 +602,9 @@ class c_scode_program:
         ctx['buf'].write(';')
         ctx['buf'].newline()
 
-    def _gen_anode_act_push(self, nd, ctx):
+    def _gen_anode_act_push(self, nd, ctx, **ka):
         snd = self._getone(self._getone(nd))
-        self._gen_anode(snd, None, ctx)
+        self._gen_optkargs_anode(snd, None, ctx, **ka)
 
     def _gen_anode_act_setrval__prim(self, nd, ctx):
         ridx, sub = (self._getone(i) for i in nd.subs)
@@ -937,27 +940,38 @@ class c_scode_program:
             prv_oplvl = 0, prv_opdir = 0):
         oplvl = self.CALC_OPLVL[op]
         needb = (prv_oplvl == oplvl and prv_opdir == 0 or prv_oplvl > oplvl)
-        if needb:
-            ctx['buf'].write('(')
-        ctx['buf'].write(op[:-1])
+        pbuf = ctx['buf']
+        sbuf = ctx['buf'] = pbuf.sub_inline()
+        opdv_cntn = [None]
         self._gen_optkargs_anode(self._getone(nd), None, ctx,
-            prv_oplvl = oplvl, prv_opdir = 1)
+            prv_oplvl = oplvl, prv_opdir = 1, calc_value = opdv_cntn)
         if needb:
-            ctx['buf'].write(')')
+            pbuf.write('(')
+        pbuf.write(op[:-1])
+        sbuf.touch()
+        if needb:
+            pbuf.write(')')
+        ctx['buf'] = pbuf
 
     def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx, *,
             prv_oplvl = 0, prv_opdir = 0):
         oplvl = self.CALC_OPLVL[op]
         needb = (prv_oplvl == oplvl and prv_opdir == 1 or prv_oplvl > oplvl)
-        if needb:
-            ctx['buf'].write('(')
+        pbuf = ctx['buf']
+        sbuf1 = ctx['buf'] = pbuf.sub_inline()
         self._gen_optkargs_anode(self._getone(nd1), None, ctx,
             prv_oplvl = oplvl, prv_opdir = 0)
-        ctx['buf'].write(f' {op} ')
+        sbuf2 = ctx['buf'] = pbuf.sub_inline()
         self._gen_optkargs_anode(self._getone(nd2), None, ctx,
             prv_oplvl = oplvl, prv_opdir = 1)
         if needb:
-            ctx['buf'].write(')')
+            pbuf.write('(')
+        sbuf1.touch()
+        pbuf.write(f' {op} ')
+        sbuf2.touch()
+        if needb:
+            pbuf.write(')')
+        ctx['buf'] = pbuf
 
     # ref
 
@@ -970,10 +984,12 @@ class c_scode_program:
     def _gen_anode_parm(self, nd, ctx):
         ctx['buf'].write(str(nd))
 
-    def _gen_anode_inst(self, nd, ctx):
+    def _gen_anode_inst(self, nd, ctx, *, calc_value = None, **ka):
         val = nd.val
         if val & 0x4000000:
             val -= 0x8000000
+        if calc_value:
+            calc_value[0] = val
         ctx['buf'].write(hex(val))
 
     def gen_code(self):
@@ -995,7 +1011,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             cd = c_scode_program(ast, c_scode_buf_null())
             #cd = c_scode_program(ast, c_scode_buf_std())
             cd.gen_code()
