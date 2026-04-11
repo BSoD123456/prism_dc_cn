@@ -882,26 +882,26 @@ class c_scode_program:
 
     # calc
 
-    CALC_OPSYM = {
-        'add':  ('+',  2),
-        'sub':  ('-',  2),
-        'mul':  ('*',  2),
-        'div':  ('//', 2),
-        'mod':  ('%',  2),
-        'neg':  ('-',  1),
-        'eq':   ('==', 2),
-        'gt':   ('>',  2),
-        'ge':   ('>=', 2),
-        'lt':   ('<',  2),
-        'le':   ('<=', 2),
-        'ne':   ('!=', 2),
-        'and':  ('&&', 2),
-        'or':   ('||', 2),
-        'band': ('&',  2),
-        'bor':  ('|',  2),
-        'bxor': ('^',  2),
-        'shl':  ('<<', 2),
-        'shr':  ('>>', 2),
+    CALC_OPDESC = {
+        '+' : ('add' , 2),
+        '-' : ('sub' , 2),
+        '*' : ('mul' , 2),
+        '//': ('div' , 2),
+        '%' : ('mod' , 2),
+        '-1': ('neg' , 1),
+        '==': ('eq'  , 2),
+        '>' : ('gt'  , 2),
+        '>=': ('ge'  , 2),
+        '<' : ('lt'  , 2),
+        '<=': ('le'  , 2),
+        '!=': ('ne'  , 2),
+        '&&': ('and' , 2),
+        '||': ('or'  , 2),
+        '&' : ('band', 2),
+        '|' : ('bor' , 2),
+        '^' : ('bxor', 2),
+        '<<': ('shl' , 2),
+        '>>': ('shr' , 2),
     }
 
     CALC_OPLVL = (lambda lst: {
@@ -921,7 +921,7 @@ class c_scode_program:
         ])
 
     locals().update(d
-        for name, (sym, opnum) in CALC_OPSYM.items()
+        for sym, (name, opnum) in CALC_OPDESC.items()
         for d in [(
             f'_gen_anode_act_calc_{name}',
             (lambda dsym: (
@@ -935,11 +935,11 @@ class c_scode_program:
 
     def _gen_vnode_act_calc_1(self, op, nd, ctx, *,
             prv_oplvl = 0, prv_opdir = 0):
-        oplvl = self.CALC_OPLVL[f'{op}1']
+        oplvl = self.CALC_OPLVL[op]
         needb = (prv_oplvl == oplvl and prv_opdir == 0 or prv_oplvl > oplvl)
         if needb:
             ctx['buf'].write('(')
-        ctx['buf'].write(op)
+        ctx['buf'].write(op[:-1])
         self._gen_optkargs_anode(self._getone(nd), None, ctx,
             prv_oplvl = oplvl, prv_opdir = 1)
         if needb:
