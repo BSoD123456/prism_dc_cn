@@ -937,7 +937,7 @@ class c_scode_program:
         )])
 
     def _gen_vnode_act_calc_1(self, op, nd, ctx, *,
-            prv_oplvl = 0, prv_opdir = 0):
+            prv_oplvl = 0, prv_opdir = 0, calc_value = None, **ka):
         oplvl = self.CALC_OPLVL[op]
         needb = (prv_oplvl == oplvl and prv_opdir == 0 or prv_oplvl > oplvl)
         pbuf = ctx['buf']
@@ -945,6 +945,7 @@ class c_scode_program:
         opdv_cntn = [None]
         self._gen_optkargs_anode(self._getone(nd), None, ctx,
             prv_oplvl = oplvl, prv_opdir = 1, calc_value = opdv_cntn)
+        opdv = opdv_cntn[0]
         if needb:
             pbuf.write('(')
         pbuf.write(op[:-1])
@@ -954,16 +955,20 @@ class c_scode_program:
         ctx['buf'] = pbuf
 
     def _gen_vnode_act_calc_2(self, op, nd1, nd2, ctx, *,
-            prv_oplvl = 0, prv_opdir = 0):
+            prv_oplvl = 0, prv_opdir = 0, calc_value = None, **ka):
         oplvl = self.CALC_OPLVL[op]
         needb = (prv_oplvl == oplvl and prv_opdir == 1 or prv_oplvl > oplvl)
         pbuf = ctx['buf']
         sbuf1 = ctx['buf'] = pbuf.sub_inline()
+        opdv_cntn = [None]
         self._gen_optkargs_anode(self._getone(nd1), None, ctx,
-            prv_oplvl = oplvl, prv_opdir = 0)
+            prv_oplvl = oplvl, prv_opdir = 0, calc_value = opdv_cntn)
+        opdv1 = opdv_cntn[0]
         sbuf2 = ctx['buf'] = pbuf.sub_inline()
+        opdv_cntn = [None]
         self._gen_optkargs_anode(self._getone(nd2), None, ctx,
-            prv_oplvl = oplvl, prv_opdir = 1)
+            prv_oplvl = oplvl, prv_opdir = 1, calc_value = opdv_cntn)
+        opdv2 = opdv_cntn[0]
         if needb:
             pbuf.write('(')
         sbuf1.touch()
