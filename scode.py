@@ -886,11 +886,11 @@ class c_scode_program:
     # calc
 
     CALC_OPDESC = {
-        '+' : ('add' , 2, (1, 2), (0, 0)),
-        '-' : ('sub' , 2, (0, 2), (0, 0)),
-        '*' : ('mul' , 2, (3, 3), (0, 0)),
-        '//': ('div' , 2, (3, 1), (0, 1)),
-        '%' : ('mod' , 2, (3, 2), (0, 1)),
+        '+' : ('add' , 2, (1, 1), (0, 0)),
+        '-' : ('sub' , 2, (0, 1), (0, 0)),
+        '*' : ('mul' , 2, (2, 2), (0, 0)),
+        '//': ('div' , 2, (2, 1), (0, 1)),
+        '%' : ('mod' , 2, (2, 2), (0, 1)),
         '-1': ('neg' , 1, (0,  ), (0,  )),
         '==': ('eq'  , 2, (0, 0), (0, 0)),
         '>' : ('gt'  , 2, (0, 0), (0, 0)),
@@ -898,13 +898,13 @@ class c_scode_program:
         '<' : ('lt'  , 2, (0, 0), (0, 0)),
         '<=': ('le'  , 2, (0, 0), (0, 0)),
         '!=': ('ne'  , 2, (0, 0), (0, 0)),
-        '&&': ('and' , 2, (2, 0), (0, 0)),
-        '||': ('or'  , 2, (2, 0), (2, 2)),
-        '&' : ('band', 2, (3, 3), (0, 0)),
-        '|' : ('bor' , 2, (1, 2), (0, 0)),
+        '&&': ('and' , 2, (2, 2), (0, 0)),
+        '||': ('or'  , 2, (2, 2), (2, 2)),
+        '&' : ('band', 2, (2, 2), (0, 0)),
+        '|' : ('bor' , 2, (1, 1), (0, 0)),
         '^' : ('bxor', 2, (0, 0), (0, 0)),
-        '<<': ('shl' , 2, (3, 2), (0, 0)),
-        '>>': ('shr' , 2, (3, 2), (0, 0)),
+        '<<': ('shl' , 2, (2, 1), (0, 0)),
+        '>>': ('shr' , 2, (2, 1), (0, 0)),
     }
 
     CALC_OPLVL = (lambda lst: {
@@ -967,24 +967,45 @@ class c_scode_program:
         needb = (prv_oplvl == oplvl and prv_opdir == 1 or prv_oplvl > oplvl)
         pbuf = ctx['buf']
         sbuf1 = ctx['buf'] = pbuf.sub_inline()
+        opdv = []
         opdv_cntn = [None]
         self._gen_optkargs_anode(self._getone(nd1), None, ctx,
             prv_oplvl = oplvl, prv_opdir = 0, calc_value = opdv_cntn)
-        opdv1 = opdv_cntn[0]
+        opdv.append(opdv_cntn[0])
         sbuf2 = ctx['buf'] = pbuf.sub_inline()
         opdv_cntn = [None]
         self._gen_optkargs_anode(self._getone(nd2), None, ctx,
             prv_oplvl = oplvl, prv_opdir = 1, calc_value = opdv_cntn)
-        opdv2 = opdv_cntn[0]
-        if calc_value and not (opdv1 is None or opdv2 is None):
-            calc_value[0] = eval(f'{opdv1}{pyop}{opdv2}')
-        if needb:
-            pbuf.write('(')
-        sbuf1.touch()
-        pbuf.write(f' {op} ')
-        sbuf2.touch()
-        if needb:
-            pbuf.write(')')
+        opdv.append(opdv_cntn[0])
+        skpopd = None
+        hasval = True
+        for i, v in enumerate(opdv):
+            if v is None:
+                hasval = False
+                continue
+            chkskp, chkerr = self.CALC_OPSKPCHK[skptyp[i]]
+            if chkerr and chkerr(v):
+                self._error(nd, f'invalid value {i}: {v}')
+            if chkskp(v):
+                if skplvl[i] > 1:
+                    skpopd = 1 - i # another opd
+                    break
+                elif skplvl[i] > 0:
+                    skpopd = i
+        if skpopd is None:
+            if needb:
+                pbuf.write('(')
+        if skpopd != 0:
+            sbuf1.touch()
+        if skpopd is None:
+            pbuf.write(f' {op} ')
+        if skpopd != 1:
+            sbuf2.touch()
+        if skpopd is None:
+            if needb:
+                pbuf.write(')')
+        if calc_value and hasval:
+            calc_value[0] = eval(f'{opdv[0]}{pyop}{opdv[1]}')
         ctx['buf'] = pbuf
 
     # ref
