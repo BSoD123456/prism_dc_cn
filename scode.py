@@ -40,15 +40,21 @@ class c_scode_buf:
 
     def _mergeltoks(self, ltoks):
         rls = []
+        scnt = 0
         for tok in ltoks:
             if isinstance(tok, tuple):
                 cmd = tok[0]
                 if cmd == 'idt':
                     rls.extend(self._idtsym(tok[1]))
+                elif cmd == 'disline':
+                    if scnt == 0:
+                        return None
                 else:
-                    raise err_scode_syntax(f'unknown meta cmd: {cmd}')
+                    #raise err_scode_syntax(f'unknown meta cmd: {cmd}')
+                    continue
             else:
                 rls.append(tok)
+                scnt += 1
         return ''.join(rls)
 
     def _writeltoks(self, ltoks):
@@ -89,9 +95,10 @@ class c_scode_buf:
                 raise err_scode_syntax('can only hold a newline withou inline')
             self.meta('idt', idt_or_inline)
         c_scode_buf.HDIDX += 1
-        self.meta('hold', c_scode_buf.HDIDX, inline)
+        self.meta('hold', c_scode_buf.HDIDX)
         self.hold_ref[c_scode_buf.HDIDX] = len(self.buf)
         if not inline:
+            self.meta('disline')
             self.newline()
         return c_scode_buf.HDIDX
 
@@ -107,28 +114,19 @@ class c_scode_buf:
             ltoks = self.lbuf
         else:
             ltoks = self.buf[bi]
-        for li in range(1, len(ltoks) + 1):
-            ttok = ltoks[-li]
+        for li in range(len(ltoks)-1, -1, -1):
+            ttok = ltoks[li]
             if not isinstance(ttok, tuple) or ttok[0] != 'hold':
                 continue
-            _, thid, tinline = ttok
-            if thid == hid:
+            if ttok[1] == hid:
                 break
         else:
             raise err_scode_syntax(f'hold ref unmatched: {hid}')
         self.hold_ref.pop(hid)
         if tok is None:
-            if tinline:
-                ltoks.pop(-li)
-            else:
-                assert not bi is None
-                self.buf.pop(bi)
-                for thid, trval in self.hold_ref.items():
-                    assert trval != bi
-                    if trval > bi:
-                        self.hold_ref[thid] -= 1
+            ltoks.pop(li)
         else:
-            ltoks[-li] = tok
+            ltoks[li] = tok
 
     def touch(self):
         if self.tch:
@@ -197,7 +195,9 @@ class c_scode_buf_std(c_scode_buf):
         super().__init__(None, True, 0)
 
     def _writeltoks(self, ltoks):
-        print(self._mergeltoks(ltoks))
+        line = self._mergeltoks(ltoks)
+        if not line is None:
+            print(line)
 
 class c_scode_buf_fd(c_scode_buf):
 
@@ -206,7 +206,9 @@ class c_scode_buf_fd(c_scode_buf):
         self.fd = fd
 
     def _writeltoks(self, ltoks):
-        self.fd.write(self._mergeltoks(ltoks) + '\n')
+        line = self._mergeltoks(ltoks)
+        if not line is None:
+            self.fd.write(line + '\n')
 
 def with_anode(*stricts):
     def _deco(cls):
@@ -415,6 +417,9 @@ class c_scode_program:
         pbuf.write(' {')
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
+        buf.meta('block', 'func')
+        buf.meta('disline')
+        buf.newline()
         ctx['bstack'] = []
         ctx['lbhld'] = {}
         self._gen_anode(nd.sub, 'prim', ctx)
@@ -838,6 +843,9 @@ class c_scode_program:
                 ctx['bstack'].append((
                     'el', ctx['prv_addr'], nd.addr, lb.addr, buf))
                 ctx['buf'] = buf.sub()
+                ctx['buf'].meta('block', 'else')
+                ctx['buf'].meta('disline')
+                ctx['buf'].newline()
                 return
         if bsinfo:
             btyp, paddr, saddr, daddr, pbuf = bsinfo
@@ -900,6 +908,9 @@ class c_scode_program:
             self._error(nd, f'block out of bounds: {lb}')
         bstack.append((btyp, ctx['prv_addr'], nd.addr, lb.addr, buf))
         ctx['buf'] = buf.sub()
+        ctx['buf'].meta('block', 'while' if btyp == 'lp' else btyp)
+        ctx['buf'].meta('disline')
+        ctx['buf'].newline()
 
     def _gen_anode_act_jump_if__prim(self, nd, ctx):
         self._gen_vnode_if(False, nd, ctx)
