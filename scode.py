@@ -64,19 +64,20 @@ class c_scode_buf:
         self.lbuf.append(s)
 
     def newline(self):
-        ltoks = []
-        if self.lbuf:
+        sltoks = self.lbuf
+        self.lbuf = []
+        if sltoks:
             nidt = self.idt
-            for i in range(len(self.lbuf)):
-                tok = self.lbuf[i]
+            for i in range(len(sltoks)):
+                tok = sltoks[i]
                 if isinstance(tok, tuple) and tok[0] == 'idt':
                     nidt += tok[1]
                 else:
                     break
-            ltoks.append(('idt', nidt))
-            ltoks.extend(self.lbuf[i:])
+            self.meta('idt', nidt)
+            self.lbuf.extend(sltoks[i:])
+        self._writeltoks(self.lbuf)
         self.lbuf = []
-        self._writeltoks(ltoks)
 
     HDIDX = 0
     def hold(self, inline = True, noidt = False):
@@ -143,7 +144,10 @@ class c_scode_buf:
             for hid, hbi in self.hold_ref.items())
         for ltoks in self.buf:
             for tok in ltoks:
-                self.par.write(tok)
+                if isinstance(tok, tuple):
+                    self.par.meta(*tok)
+                else:
+                    self.par.write(tok)
             self.par.newline()
         self.buf = []
         return self
@@ -172,7 +176,10 @@ class c_scode_buf_inline(c_scode_buf):
         if not self.par:
             return self
         for tok in self.lbuf:
-            self.par.write(tok)
+            if isinstance(tok, tuple):
+                self.par.meta(*tok)
+            else:
+                self.par.write(tok)
         self.lbuf = []
         return self
 
