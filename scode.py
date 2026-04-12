@@ -66,6 +66,13 @@ class c_scode_buf:
     def meta(self, cmd, *args):
         self.lbuf.append((cmd, *args))
 
+    def meta_line(self, *args):
+        if self.lbuf:
+            raise err_scode_syntax('meta_line should be with newline')
+        self.meta(*args)
+        self.meta('disline')
+        self.newline()
+
     def write(self, s):
         self.lbuf.append(s)
 
@@ -90,16 +97,15 @@ class c_scode_buf:
         if self.tch:
             raise err_scode_syntax('touched buf unholdable')
         inline = (idt_or_inline is None)
+        c_scode_buf.HDIDX += 1
         if not inline:
             if self.lbuf:
                 raise err_scode_syntax('can only hold a newline withou inline')
             self.meta('idt', idt_or_inline)
-        c_scode_buf.HDIDX += 1
-        self.meta('hold', c_scode_buf.HDIDX)
+            self.meta_line('hold', c_scode_buf.HDIDX)
+        else:
+            self.meta('hold', c_scode_buf.HDIDX)
         self.hold_ref[c_scode_buf.HDIDX] = len(self.buf)
-        if not inline:
-            self.meta('disline')
-            self.newline()
         return c_scode_buf.HDIDX
 
     def reput(self, hid, tok):
@@ -419,9 +425,7 @@ class c_scode_program:
         pbuf.write(' {')
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
-        buf.meta('block', 'func')
-        buf.meta('disline')
-        buf.newline()
+        buf.meta_line('block', 'func')
         ctx['bstack'] = []
         ctx['lbhld'] = {}
         self._gen_anode(nd.sub, 'prim', ctx)
@@ -448,10 +452,8 @@ class c_scode_program:
         if sus_lhld:
             for slhid, slbv in sus_lhld:
                 buf.reput(slhid, None)
+        buf.meta_line('block_done')
         buf.touch()
-        buf.meta('block_done')
-        buf.meta('disline')
-        buf.newline()
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
@@ -804,10 +806,8 @@ class c_scode_program:
             if mbsinfo:
                 btyp, paddr, saddr, daddr, pbuf = mbsinfo
                 assert btyp != 'lp'
+                buf.meta_line('block_done')
                 buf.touch()
-                buf.meta('block_done')
-                buf.meta('disline')
-                buf.newline()
                 ctx['bstack'].pop()
                 buf = ctx['buf'] = pbuf
                 buf.write('}')
@@ -838,20 +838,16 @@ class c_scode_program:
             btyp, paddr, saddr, daddr, pbuf = mbsinfo
             if btyp == 'lp':
                 assert lb.addr == paddr
+                buf.meta_line('block_done')
                 buf.touch()
-                buf.meta('block_done')
-                buf.meta('disline')
-                buf.newline()
                 ctx['bstack'].pop()
                 buf = ctx['buf'] = pbuf
                 buf.write('}')
                 buf.newline()
                 return
             elif btyp == 'if' and self._check_bstack_bound(lb.addr, 1, ctx):
+                buf.meta_line('block_done')
                 buf.touch()
-                buf.meta('block_done')
-                buf.meta('disline')
-                buf.newline()
                 ctx['bstack'].pop()
                 buf = ctx['buf'] = pbuf
                 buf.write('} else {')
@@ -859,9 +855,7 @@ class c_scode_program:
                 ctx['bstack'].append((
                     'el', ctx['prv_addr'], nd.addr, lb.addr, buf))
                 ctx['buf'] = buf.sub()
-                ctx['buf'].meta('block', 'else')
-                ctx['buf'].meta('disline')
-                ctx['buf'].newline()
+                ctx['buf'].meta_line('block', 'else')
                 return
         if bsinfo:
             btyp, paddr, saddr, daddr, pbuf = bsinfo
@@ -884,9 +878,7 @@ class c_scode_program:
                 ctx['bstack'].append((
                     'vo', ctx['prv_addr'], nd.addr, lb.addr, buf))
                 ctx['buf'] = buf.sub()
-                ctx['buf'].meta('block', 'void')
-                ctx['buf'].meta('disline')
-                ctx['buf'].newline()
+                ctx['buf'].meta_line('block', 'void')
                 return
             self._warn(nd, f'isolated jump: {nd}')
         else:
@@ -927,9 +919,7 @@ class c_scode_program:
             self._error(nd, f'block out of bounds: {lb}')
         bstack.append((btyp, ctx['prv_addr'], nd.addr, lb.addr, buf))
         ctx['buf'] = buf.sub()
-        ctx['buf'].meta('block', 'while' if btyp == 'lp' else btyp)
-        ctx['buf'].meta('disline')
-        ctx['buf'].newline()
+        ctx['buf'].meta_line('block', 'while' if btyp == 'lp' else btyp)
 
     def _gen_anode_act_jump_if__prim(self, nd, ctx):
         self._gen_vnode_if(False, nd, ctx)
