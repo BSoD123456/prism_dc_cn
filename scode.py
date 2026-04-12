@@ -66,17 +66,27 @@ class c_scode_buf:
     def newline(self):
         ltoks = []
         if self.lbuf:
-            ltoks.append(('idt', self.idt))
-            ltoks.extend(self.lbuf)
+            nidt = self.idt
+            for i in range(len(self.lbuf)):
+                tok = self.lbuf[i]
+                if isinstance(tok, tuple) and tok[0] == 'idt':
+                    nidt += tok[1]
+                else:
+                    break
+            ltoks.append(('idt', nidt))
+            ltoks.extend(self.lbuf[i:])
         self.lbuf = []
         self._writeltoks(ltoks)
 
     HDIDX = 0
-    def hold(self, inline):
+    def hold(self, inline = True, noidt = False):
         if self.tch:
             raise err_scode_syntax('touched buf unholdable')
-        if not inline and self.lbuf:
-            raise err_scode_syntax('can only hold a newline withou inline')
+        if not inline:
+            if self.lbuf:
+                raise err_scode_syntax('can only hold a newline withou inline')
+            elif noidt:
+                self.meta('idt', -self.idt)
         c_scode_buf.HDIDX += 1
         self.meta('hold', c_scode_buf.HDIDX, inline)
         self.hold_ref[c_scode_buf.HDIDX] = len(self.buf)
@@ -787,14 +797,15 @@ class c_scode_program:
         lbhld = ctx['lbhld']
         if not nd.addr in ctx['lbrvs']:
             assert not nd.addr in lbhld
-            lbhld[nd.addr] = [buf.hold(False), f'@hol.{nd.addr:x}:', 'lookahead']
+            lbhld[nd.addr] = [
+                buf.hold(False, True), f'@hol.{nd.addr:x}:', 'lookahead']
             return
         if nd.addr in lbhld:
             lbhinfo = lbhld[nd.addr]
             assert lbhld[nd.addr][0] is None and lbhinfo[2]
         else:
             lbhinfo = lbhld[nd.addr] = [None, None, False]
-        lbhld[nd.addr][0] = buf.hold(False)
+        lbhld[nd.addr][0] = buf.hold(False, True)
         lbhld[nd.addr][1] = f'@lab.{nd.addr:x}:'
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
