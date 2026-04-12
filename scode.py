@@ -136,6 +136,8 @@ class c_scode_buf:
             return self
         if self.par.lbuf:
             raise err_scode_syntax(f'should touch a parent with newline')
+        elif self.lbuf:
+            raise err_scode_syntax(f'should be touched with newline')
         blen = len(self.par.buf)
         self.par.hold_ref.update(
             (hid, hbi + blen)
@@ -447,6 +449,9 @@ class c_scode_program:
             for slhid, slbv in sus_lhld:
                 buf.reput(slhid, None)
         buf.touch()
+        buf.meta('block_done')
+        buf.meta('disline')
+        buf.newline()
         ctx['buf'] = pbuf
         pbuf.write('}')
         pbuf.newline()
@@ -704,10 +709,12 @@ class c_scode_program:
         assert in_text
         if is_thead:
             ctx['buf'].write(f'text "')
+            ctx['buf'].meta('text')
         return is_ttail
 
     def _gen_vnode_text_post(self, is_ttail, ctx):
         if is_ttail:
+            ctx['buf'].meta('text_done')
             ctx['buf'].write(f'";')
             ctx['buf'].newline()
 
@@ -798,6 +805,9 @@ class c_scode_program:
                 btyp, paddr, saddr, daddr, pbuf = mbsinfo
                 assert btyp != 'lp'
                 buf.touch()
+                buf.meta('block_done')
+                buf.meta('disline')
+                buf.newline()
                 ctx['bstack'].pop()
                 buf = ctx['buf'] = pbuf
                 buf.write('}')
@@ -829,6 +839,9 @@ class c_scode_program:
             if btyp == 'lp':
                 assert lb.addr == paddr
                 buf.touch()
+                buf.meta('block_done')
+                buf.meta('disline')
+                buf.newline()
                 ctx['bstack'].pop()
                 buf = ctx['buf'] = pbuf
                 buf.write('}')
@@ -836,6 +849,9 @@ class c_scode_program:
                 return
             elif btyp == 'if' and self._check_bstack_bound(lb.addr, 1, ctx):
                 buf.touch()
+                buf.meta('block_done')
+                buf.meta('disline')
+                buf.newline()
                 ctx['bstack'].pop()
                 buf = ctx['buf'] = pbuf
                 buf.write('} else {')
@@ -868,6 +884,9 @@ class c_scode_program:
                 ctx['bstack'].append((
                     'vo', ctx['prv_addr'], nd.addr, lb.addr, buf))
                 ctx['buf'] = buf.sub()
+                ctx['buf'].meta('block', 'void')
+                ctx['buf'].meta('disline')
+                ctx['buf'].newline()
                 return
             self._warn(nd, f'isolated jump: {nd}')
         else:
