@@ -17,6 +17,7 @@ class c_scode_buf:
         self.idt = indent
         self.lbuf = []
         self.buf = []
+        self.hold_ref = {}
 
     def sub(self, idt = 1):
         return c_scode_buf(self, False, idt)
@@ -45,7 +46,7 @@ class c_scode_buf:
                 if cmd == 'idt':
                     rls.extend(self._idtsym(tok[1]))
                 else:
-                    continue
+                    raise err_scode_syntax(f'unknown meta cmd: {cmd}')
             else:
                 rls.append(tok)
         return ''.join(rls)
@@ -78,6 +79,7 @@ class c_scode_buf:
             raise err_scode_syntax('can only hold a newline withou inline')
         c_scode_buf.HDIDX += 1
         self.meta('hold', c_scode_buf.HDIDX, inline)
+        self.hold_ref[c_scode_buf.HDIDX] = len(self.buf)
         if not inline:
             self.newline()
         return c_scode_buf.HDIDX
@@ -85,29 +87,35 @@ class c_scode_buf:
     def reput(self, hid, tok):
         if self.tch:
             raise err_scode_syntax('touched buf unchangable')
-        for bi in range(len(self.buf) + 1):
-            if bi == 0:
-                ltoks = self.lbuf
-            else:
-                ltoks = self.buf[-bi]
-            for li in range(1, len(ltoks) + 1):
-                tok = ltoks[-li]
-                if not isinstance(tok, tuple) or tok[0] != 'hold':
-                    continue
-                _, thid, tinline = tok
-                if thid == hid:
-                    assert bi > 0 or tinline
-                    break
-            else:
-                continue
-            break
-        else:
+        if not hid in self.hold_ref:
             raise err_scode_syntax(f'invalid hid: {hid}')
+        bi = self.hold_ref[hid]
+        if bi >= len(self.buf):
+            assert bi == len(self.buf)
+            bi = None
+            ltoks = self.lbuf
+        else:
+            ltoks = self.buf[bi]
+        for li in range(1, len(ltoks) + 1):
+            ttok = ltoks[-li]
+            if not isinstance(ttok, tuple) or ttok[0] != 'hold':
+                continue
+            _, thid, tinline = ttok
+            if thid == hid:
+                break
+        else:
+            raise err_scode_syntax(f'hold ref unmatched: {hid}')
+        self.hold_ref.pop(hid)
         if tok is None:
-            if inline:
+            if tinline:
                 ltoks.pop(-li)
             else:
-                self.buf.pop(-bi)
+                assert not bi is None
+                self.buf.pop(bi)
+                for thid, trval in self.hold_ref.items():
+                    assert trval != bi
+                    if trval > bi:
+                        self.hold_ref[thid] -= 1
         else:
             ltoks[-li] = tok
 
@@ -119,8 +127,14 @@ class c_scode_buf:
             return self
         if self.par.lbuf:
             raise err_scode_syntax(f'should touch a parent with newline')
+        blen = len(self.par.buf)
+        self.par.hold_ref.update(
+            (hid, hbi + blen)
+            for hid, hbi in self.hold_ref.items())
         for ltoks in self.buf:
-            self.par._writeltoks(ltoks)
+            for tok in ltoks:
+                self.par.write(tok)
+            self.par.newline()
         self.buf = []
         return self
 
@@ -774,7 +788,6 @@ class c_scode_program:
         if not nd.addr in ctx['lbrvs']:
             assert not nd.addr in lbhld
             lbhld[nd.addr] = [buf.hold(False), f'@hol.{nd.addr:x}:', 'lookahead']
-            buf.newline()
             return
         if nd.addr in lbhld:
             lbhinfo = lbhld[nd.addr]
@@ -783,7 +796,6 @@ class c_scode_program:
             lbhinfo = lbhld[nd.addr] = [None, None, False]
         lbhld[nd.addr][0] = buf.hold(False)
         lbhld[nd.addr][1] = f'@lab.{nd.addr:x}:'
-        buf.newline()
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
         lb = self._getone(self._getone(nd))
