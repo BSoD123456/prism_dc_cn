@@ -80,14 +80,14 @@ class c_scode_buf:
         self.lbuf = []
 
     HDIDX = 0
-    def hold(self, inline = True, noidt = False):
+    def hold(self, idt_or_inline):
         if self.tch:
             raise err_scode_syntax('touched buf unholdable')
+        inline = (idt_or_inline is None)
         if not inline:
             if self.lbuf:
                 raise err_scode_syntax('can only hold a newline withou inline')
-            elif noidt:
-                self.meta('idt', -self.idt)
+            self.meta('idt', idt_or_inline)
         c_scode_buf.HDIDX += 1
         self.meta('hold', c_scode_buf.HDIDX, inline)
         self.hold_ref[c_scode_buf.HDIDX] = len(self.buf)
@@ -805,14 +805,14 @@ class c_scode_program:
         if not nd.addr in ctx['lbrvs']:
             assert not nd.addr in lbhld
             lbhld[nd.addr] = [
-                buf.hold(False, True), f'@hol.{nd.addr:x}:', 'lookahead']
+                buf.hold(-1), f'@hol.{nd.addr:x}:', 'lookahead']
             return
         if nd.addr in lbhld:
             lbhinfo = lbhld[nd.addr]
             assert lbhld[nd.addr][0] is None and lbhinfo[2]
         else:
             lbhinfo = lbhld[nd.addr] = [None, None, False]
-        lbhld[nd.addr][0] = buf.hold(False, True)
+        lbhld[nd.addr][0] = buf.hold(-1)
         lbhld[nd.addr][1] = f'@lab.{nd.addr:x}:'
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
