@@ -37,80 +37,79 @@ class c_scode_buf:
     def _idtsym(self, idt):
         return (self.IDTSYM for _ in range(idt))
 
-    def _writeline(self, line):
+    def _mergeltoks(self, ltoks):
+        rls = []
+        for tok in ltoks:
+            if isinstance(tok, tuple):
+                cmd = tok[0]
+                if cmd == 'idt':
+                    rls.extend(self._idtsym(tok[1]))
+                else:
+                    continue
+            else:
+                rls.append(tok)
+        return ''.join(rls)
+
+    def _writeltoks(self, ltoks):
         if self.tch:
-            self.par.write(line)
-            self.par.newline()
+            self.par._writeltoks(ltoks)
         else:
-            self.buf.append(line)
+            self.buf.append(ltoks)
+
+    def meta(self, cmd, *args):
+        self.lbuf.append((cmd, *args))
 
     def write(self, s):
         self.lbuf.append(s)
 
     def newline(self):
+        ltoks = []
         if self.lbuf:
-            ltoks = [*self._idtsym(self.idt)]
-            for tok in self.lbuf:
-                if isinstance(tok, tuple):
-                    raise err_scode_syntax('held line unput')
-                else:
-                    ltoks.append(tok)
-            line = ''.join(ltoks)
-            self.lbuf = []
-        else:
-            line = ''
-        self._writeline(line)
+            ltoks.append(('idt', self.idt))
+            ltoks.extend(self.lbuf)
+        self.lbuf = []
+        self._writeltoks(ltoks)
 
     HDIDX = 0
-    def hold(self):
+    def hold(self, inline):
         if self.tch:
             raise err_scode_syntax('touched buf unholdable')
-        elif self.lbuf:
-            raise err_scode_syntax('can only hold a newline')
+        if not inline and self.lbuf:
+            raise err_scode_syntax('can only hold a newline withou inline')
         c_scode_buf.HDIDX += 1
-        self._writeline((c_scode_buf.HDIDX, self.idt))
+        self.meta('hold', c_scode_buf.HDIDX, inline)
+        if not inline:
+            self.newline()
         return c_scode_buf.HDIDX
 
-    def reput(self, hid, line, idt_shft = 0, idt = None):
+    def reput(self, hid, tok):
         if self.tch:
             raise err_scode_syntax('touched buf unchangable')
-        for i, v in enumerate(self.buf):
-            if not isinstance(v, tuple):
+        for bi in range(len(self.buf) + 1):
+            if bi == 0:
+                ltoks = self.lbuf
+            else:
+                ltoks = self.buf[-bi]
+            for li in range(1, len(ltoks) + 1):
+                tok = ltoks[-li]
+                if not isinstance(tok, tuple) or tok[0] != 'hold':
+                    continue
+                _, thid, tinline = tok
+                if thid == hid:
+                    assert bi > 0 or tinline
+                    break
+            else:
                 continue
-            dhid, didt = v
-            if dhid == hid:
-                break
-        else:
-            raise err_scode_syntax(f'invalid hid: {hid}')
-        if line is None:
-            self.buf.pop(i)
-        else:
-            self.buf[i] = ''.join((*self._idtsym(
-                max(0, didt + idt_shft) if idt is None else idt
-            ), line))
-
-    def hold_tok(self):
-        if self.tch:
-            raise err_scode_syntax('touched buf unholdable')
-        c_scode_buf.HDIDX += 1
-        self.write((c_scode_buf.HDIDX,))
-        return c_scode_buf.HDIDX
-
-    def reput_tok(self, hid, tok):
-        if self.tch:
-            raise err_scode_syntax('touched buf unchangable')
-        for i, v in enumerate(self.lbuf):
-            if not isinstance(v, tuple):
-                continue
-            dhid, = v
-            if dhid == hid:
-                break
+            break
         else:
             raise err_scode_syntax(f'invalid hid: {hid}')
         if tok is None:
-            self.lbuf.pop(i)
+            if inline:
+                ltoks.pop(-li)
+            else:
+                self.buf.pop(-bi)
         else:
-            self.lbuf[i] = tok
+            ltoks[-li] = tok
 
     def touch(self):
         if self.tch:
@@ -118,15 +117,10 @@ class c_scode_buf:
         self.tch = True
         if not self.par:
             return self
-        for line in self.buf:
-            if isinstance(line, tuple):
-                if self.par.tch:
-                    raise err_scode_syntax('touched parbuf unholdable')
-                hid, hidt = line
-                self.par._writeline((hid, self.par.idt + hidt))
-            else:
-                self.par.write(line)
-                self.par.newline()
+        if self.par.lbuf:
+            raise err_scode_syntax(f'should touch a parent with newline')
+        for ltoks in self.buf:
+            self.par._writeltoks(ltoks)
         self.buf = []
         return self
 
@@ -154,13 +148,7 @@ class c_scode_buf_inline(c_scode_buf):
         if not self.par:
             return self
         for tok in self.lbuf:
-            if isinstance(tok, tuple):
-                if self.par.tch:
-                    raise err_scode_syntax('touched parbuf unholdable')
-                hid, = tok
-                self.par.write((hid,))
-            else:
-                self.par.write(tok)
+            self.par.write(tok)
         self.lbuf = []
         return self
 
@@ -169,7 +157,7 @@ class c_scode_buf_null(c_scode_buf):
     def __init__(self):
         super().__init__(None, True, 0)
 
-    def _writeline(self, line):
+    def _writeltoks(self, ltoks):
         pass
 
 class c_scode_buf_std(c_scode_buf):
@@ -177,8 +165,8 @@ class c_scode_buf_std(c_scode_buf):
     def __init__(self):
         super().__init__(None, True, 0)
 
-    def _writeline(self, line):
-        print(line)
+    def _writeltoks(self, ltoks):
+        print(self._mergeltoks(ltoks))
 
 class c_scode_buf_fd(c_scode_buf):
 
@@ -186,8 +174,8 @@ class c_scode_buf_fd(c_scode_buf):
         super().__init__(None, True, 0)
         self.fd = fd
 
-    def _writeline(self, line):
-        self.fd.write(line + '\n')
+    def _writeltoks(self, ltoks):
+        self.fd.write(self._mergeltoks(ltoks) + '\n')
 
 def with_anode(*stricts):
     def _deco(cls):
@@ -410,9 +398,9 @@ class c_scode_program:
             elif lkp:
                 if sus_lhld:
                     for slhid, slbv in sus_lhld:
-                        buf.reput(slhid, slbv, None, 0)
+                        buf.reput(slhid, slbv)
                     sus_lhld.clear()
-                buf.reput(lhid, lbv, None, 0)
+                buf.reput(lhid, lbv)
             else:
                 if sus_lhld:
                     for slhid, slbv in sus_lhld:
@@ -785,15 +773,17 @@ class c_scode_program:
         lbhld = ctx['lbhld']
         if not nd.addr in ctx['lbrvs']:
             assert not nd.addr in lbhld
-            lbhld[nd.addr] = [buf.hold(), f'@hol.{nd.addr:x}:', 'lookahead']
+            lbhld[nd.addr] = [buf.hold(False), f'@hol.{nd.addr:x}:', 'lookahead']
+            buf.newline()
             return
         if nd.addr in lbhld:
             lbhinfo = lbhld[nd.addr]
             assert lbhld[nd.addr][0] is None and lbhinfo[2]
         else:
             lbhinfo = lbhld[nd.addr] = [None, None, False]
-        lbhld[nd.addr][0] = buf.hold()
+        lbhld[nd.addr][0] = buf.hold(False)
         lbhld[nd.addr][1] = f'@lab.{nd.addr:x}:'
+        buf.newline()
 
     def _gen_anode_act_jump__prim(self, nd, ctx):
         lb = self._getone(self._getone(nd))
