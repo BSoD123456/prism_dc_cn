@@ -291,10 +291,11 @@ class c_scode_program:
             mth(nd, ctx)
         return mn
 
-    SC_TXT_INLINE = {'get_name'}
+    SC_TXT_INLINE = {
+        'get_name', 'get_ctrl', }
     SC_TXT_DONE = {
         'set_name',
-        'print_text', 'print_text_choose', 'print_text_continue'}
+        'print_text', 'print_text_choose', 'print_text_continue', }
 
     # program
 

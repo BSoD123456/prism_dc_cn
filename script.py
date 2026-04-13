@@ -204,7 +204,7 @@ class c_script_program:
         # 0x0
         ('set_name', 1, 1),
         ('get_name', 1, 1),
-        ('2', 1, 1),
+        ('get_ctrl', 1, 1),
         ('3', 0, 1),
         ('4_i1', 0, 1), #i1
         ('5_e', 0, 1), #e
