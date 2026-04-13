@@ -34,10 +34,6 @@ class c_sdialog_buf_mixin:
             super().newline()
             super().write('====================')
             super().newline()
-        elif cmd == 'idt':
-            pass
-        elif self.intext:
-            super().meta(cmd, *args)
 
     def write(self, s):
         if self.intext:
