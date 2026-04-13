@@ -17,6 +17,7 @@ class c_sdialog_buf_mixin:
         self.blkstack = []
         self.blkvdeep = 0
         self.intext = False
+        self.lst_lf = False
 
     def _cur_func_name(self):
         for i in range(self.blkvdeep-1, -1, -1):
@@ -80,13 +81,19 @@ class c_sdialog_buf_mixin:
             self.intext = False
         elif cmd == 'text_print':
             assert not self.intext
+            sfname, = args
             skptp = False
             if not self.blkvdeep == len(self.blkstack):
                 self._warn(f'print before text: {args[0]}')
                 skptp = True
-            elif not (self.lbuf and self.lbuf[-1] == '\n'):
-                self._warn(f'print without LF: {args[0]}')
-                skptp = True
+            elif self.lst_lf == False:
+                if sfname == 'set_name':
+                    pass
+                elif sfname == 'print_text':
+                    self._error('abc')
+                else:
+                    self._warn(f'print without LF: {args[0]}')
+                #skptp = True
             if not skptp:
                 super().newline()
         elif cmd == 'block':
@@ -95,7 +102,12 @@ class c_sdialog_buf_mixin:
             self._blk_out()
 
     def _rplc_ctrl(self, txt):
-        return re.sub(r'\[LF\]', '\n', txt)
+        rtxt = re.sub(r'\[LF\]', '\n', txt)
+        if rtxt and rtxt[-1] == '\n':
+            self.lst_lf = True
+        else:
+            self.lst_lf = False
+        return rtxt
 
     def write(self, s):
         if self.intext:
