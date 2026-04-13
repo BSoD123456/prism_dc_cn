@@ -247,7 +247,8 @@ class c_scode_program:
         self.buf = buf
         self.chrset = c_charset_jp()
         self.conf = {
-            'reduce_calc': True, }
+            'reduce_calc': True,
+            'output_restab': False, }
         if conf:
             self.conf = {**self.conf, **conf}
 
@@ -302,15 +303,17 @@ class c_scode_program:
         ctx['restab'] = {
             'func': {},
             'text': {},}
-        ctx['buf'] = c_scode_buf_null()
+        rtbuf = ctx['buf'] = self.buf.sub(0)
         for snd in nd.subs:
             self._gen_anode(snd, 'restab', ctx)
+        buf = ctx['buf'] = self.buf
         ctx['ftxt'] = {}
         self._gen_anode(nd, 'ivkscan', ctx)
-        buf = ctx['buf'] = self.buf
         for snd in nd.subs:
             if self._gen_anode(snd, None, ctx) == 'func':
                 buf.newline()
+        if self.conf['output_restab']:
+            rtbuf.touch()
 
     # resource tab
 
