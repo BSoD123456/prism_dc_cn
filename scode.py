@@ -667,6 +667,9 @@ class c_scode_program:
         self._gen_vnode_call('fun', nd, ctx)
 
     def _gen_anode_act_call_syscall(self, nd, ctx):
+        fname = self._getone(nd.subs[-1]).name
+        if fname in self.SC_TXT_DONE:
+            ctx['buf'].meta('text_print', fname)
         self._gen_vnode_call('sys', nd, ctx)
 
     def _gen_vnode_call(self, prfx, nd, ctx):

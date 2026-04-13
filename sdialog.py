@@ -63,6 +63,13 @@ class c_sdialog_buf_mixin:
         elif cmd == 'text_done':
             assert self.intext
             self.intext = False
+        elif cmd == 'text_print':
+            assert not self.intext
+            if self.blkvdeep == len(self.blkstack):
+                super().newline()
+            else:
+                report('warn', f'print before text: {args}')
+                #raise err_sdialog_syntax('print before text')
         elif cmd == 'block':
             self._blk_in(args)
         elif cmd == 'block_done':
