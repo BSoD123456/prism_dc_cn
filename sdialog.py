@@ -36,7 +36,7 @@ class c_sdialog_buf_mixin:
             super().newline()
         elif cmd == 'idt':
             pass
-        else:
+        elif self.intext:
             super().meta(cmd, *args)
 
     def write(self, s):
@@ -44,7 +44,7 @@ class c_sdialog_buf_mixin:
             super().write(s)
 
     def newline(self):
-        self.meta('disline')
+        super().meta('disline')
         super().newline()
 
 def make_sdialog_buf_class(bcls):
