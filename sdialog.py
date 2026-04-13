@@ -55,23 +55,33 @@ class c_sdialog_buf_mixin:
             fname, = args
             super().write('====================')
             super().newline()
-            super().write(f'>>> Scene: {fname}')
+            super().write(f'[Scene: {fname}]')
             super().newline()
             super().write('--------------------')
+            super().newline()
         else:
-            super().write(f'-------------------> b1')
+            super().write('-------------------')
+            super().newline()
+            super().write('[id: ?]')
+            super().newline()
+            if btyp == 'if':
+                super().write('[goto: ?]')
+                super().newline()
+        super().write('[text]')
         super().newline()
 
     def _write_blk_out(self, btyp, *args):
+        super().write('[/text]')
+        super().newline()
         if btyp == 'func':
             fname, = args
             super().write('--------------------')
             super().newline()
-            super().write(f'<<< Scene: {fname}')
+            super().write(f'[/Scene: {fname}]')
             super().newline()
             super().write('====================')
         else:
-            super().write('f1 <--------------------')
+            super().write('--------------------')
         super().newline()
         super().newline()
 
