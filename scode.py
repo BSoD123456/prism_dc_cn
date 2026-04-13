@@ -56,7 +56,12 @@ class c_scode_buf:
 
     def _writeltoks(self, ltoks):
         if self.tch:
-            self.par._writeltoks(ltoks)
+            for tok in ltoks:
+                if isinstance(tok, tuple):
+                    self.par.meta(*tok)
+                else:
+                    self.par.write(tok)
+            self.par.newline()
         else:
             self.buf.append(ltoks)
 
@@ -144,12 +149,7 @@ class c_scode_buf:
             (hid, hbi + blen)
             for hid, hbi in self.hold_ref.items())
         for ltoks in self.buf:
-            for tok in ltoks:
-                if isinstance(tok, tuple):
-                    self.par.meta(*tok)
-                else:
-                    self.par.write(tok)
-            self.par.newline()
+            self._writeltoks(ltoks)
         self.buf = []
         return self
 
@@ -454,7 +454,7 @@ class c_scode_program:
             for slhid, slbv in sus_lhld:
                 buf.reput(slhid, None)
         buf.touch()
-        buf.meta('block_done')
+        buf.meta('block_done', 'here')
         buf.meta('disline')
         buf.newline()
         ctx['buf'] = pbuf
