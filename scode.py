@@ -49,9 +49,6 @@ class c_scode_buf:
                 elif cmd == 'disline':
                     if scnt == 0:
                         return None
-                else:
-                    #raise err_scode_syntax(f'unknown meta cmd: {cmd}')
-                    continue
             else:
                 rls.append(tok)
                 scnt += 1
@@ -423,7 +420,7 @@ class c_scode_program:
         pbuf.write(' {')
         pbuf.newline()
         buf = ctx['buf'] = pbuf.sub()
-        buf.meta('block', 'func')
+        buf.meta('block', 'func', nd.name)
         buf.meta('disline')
         buf.newline()
         ctx['bstack'] = []
