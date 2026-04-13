@@ -33,16 +33,14 @@ class c_sdialog_buf_mixin:
             self._write_blk_out(*binfo)
         self.blkvdeep = min(self.blkvdeep, blen - 1)
 
-    def _write_blk_in(btyp, *args):
-        super().newline()
+    def _write_blk_in(self, btyp, *args):
         super().newline()
         super().write('====================')
         super().newline()
         super().write('--------------------')
         super().newline()
 
-    def _write_blk_out(btyp, *args):
-        super().newline()
+    def _write_blk_out(self, btyp, *args):
         super().write('--------------------')
         super().newline()
         super().write('====================')
