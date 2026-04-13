@@ -55,7 +55,7 @@ class c_sdialog_buf_mixin:
             fname, = args
             super().write('====================')
             super().newline()
-            super().write(f'Scene: {fname}')
+            super().write(f'>>> Scene: {fname}')
             super().newline()
             super().write('--------------------')
         else:
@@ -64,7 +64,10 @@ class c_sdialog_buf_mixin:
 
     def _write_blk_out(self, btyp, *args):
         if btyp == 'func':
+            fname, = args
             super().write('--------------------')
+            super().newline()
+            super().write(f'<<< Scene: {fname}')
             super().newline()
             super().write('====================')
         else:
