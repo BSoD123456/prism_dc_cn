@@ -99,7 +99,7 @@ class c_scode_buf:
             self.newline()
         return c_scode_buf.HDIDX
 
-    def reput(self, hid, tok):
+    def reput(self, hid, tok, strict = False):
         if self.tch:
             raise err_scode_syntax('touched buf unchangable')
         if not hid in self.hold_ref:
@@ -118,7 +118,11 @@ class c_scode_buf:
             if ttok[1] == hid:
                 break
         else:
-            raise err_scode_syntax(f'hold ref unmatched: {hid}')
+            if strict:
+                raise err_scode_syntax(f'hold ref unmatched: {hid}')
+            else:
+                self.hold_ref.pop(hid)
+                return
         self.hold_ref.pop(hid)
         if tok is None:
             ltoks.pop(li)
@@ -128,13 +132,13 @@ class c_scode_buf:
     def touch(self):
         if self.tch:
             return self
-        self.tch = True
         if not self.par:
             return self
         if self.par.lbuf:
             raise err_scode_syntax(f'should touch a parent with newline')
         elif self.lbuf:
             raise err_scode_syntax(f'should be touched with newline')
+        self.tch = True
         blen = len(self.par.buf)
         self.par.hold_ref.update(
             (hid, hbi + blen)
