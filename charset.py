@@ -51,6 +51,14 @@ class c_charset_jp:
         *'顰騙遙',
     ]
 
+    CTRLS = [
+        ('LF', 0),
+        None,
+        ('CLR', [{0: 'white', 3: 'pink', 4: 'grey', 5: 'yellow'}]),
+        ('BLINK', 1),
+        ('SEL', 1),
+    ]
+
     def __init__(self):
         self.charset = self._expand_charset()
 
@@ -82,11 +90,54 @@ class c_charset_jp:
                     idx += 1
         return chrset
 
-    def enc(self, char):
+    def encode(self, txt):
         pass
 
-    def dec(self, code):
-        return self.charset.get(code, f'[{code:x}]')
+    def decode(self, seq):
+        txts = []
+        slen = len(seq)
+        si = 0
+        while si < slen:
+            code = seq[si]
+            if code in self.charset:
+                c = self.charset[code]
+            elif code & 0x2000:
+                cc = (code & 0x1fff)
+                if cc >= len(self.CTRLS) or self.CTRLS[cc] is None:
+                    raise ValueError(f'unknown ctrl code: {cc:x}')
+                cmd, cfeed = self.CTRLS[cc]
+                crs = [cmd]
+                if isinstance(cfeed, list):
+                    cflen = len(cfeed)
+                    cflst = cfeed
+                else:
+                    cflen = cfeed
+                    cflst = None
+                if cflen > 0:
+                    subs = []
+                    for ci in range(cflen):
+                        si += 1
+                        if si >= slen:
+                            subs.append('+')
+                            continue
+                        scc = (seq[si] & 0x1fff)
+                        if cflst and not cflst[ci] is None:
+                            if not scc in cflst[ci]:
+                                raise ValueError(
+                                    f'unknown sub ctrl code: {cmd}/{ci}:{scc:x}')
+                            sr = cflst[ci][scc]
+                        else:
+                            sr = f'{scc:x}'
+                        subs.append(sr)
+                    subr = ','.join(subs)
+                    crs.append(subr)
+                cr = ':'.join(crs)
+                c = f'[{cr}]'
+            else:
+                raise ValueError(f'unknown char code: {code:x}')
+            si += 1
+            txts.append(c)
+        return ''.join(txts)
 
 if __name__ == '__main__':
     import pdb

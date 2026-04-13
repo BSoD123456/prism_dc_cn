@@ -330,10 +330,10 @@ class c_scode_program:
         ttab = ctx['restab']['text']
         if nd.name in ttab:
             self._error(nd, f'duplicated text name: {nd.name}')
-        txts = []
-        for c in nd.text:
-            txts.append(self.chrset.dec(c))
-        txt = ''.join(txts)
+        try:
+            txt = self.chrset.decode(nd.text)
+        except Exception as ex:
+            self._error(nd, ex.args[0])
         ttab[nd.name] = txt
         ctx['buf'].write(f'txt.{nd.name} = "{txt}";')
         ctx['buf'].newline()
