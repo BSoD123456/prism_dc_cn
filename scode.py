@@ -877,9 +877,15 @@ class c_scode_program:
             if lb.addr == daddr:
                 buf.write('break;')
                 buf.newline()
+                buf.meta('lpflow', 'break')
+                buf.meta('disline')
+                buf.newline()
                 return
             elif lb.addr == daddr - 2:
                 buf.write('continue;')
+                buf.newline()
+                buf.meta('lpflow', 'continue')
+                buf.meta('disline')
                 buf.newline()
                 return
             else:
