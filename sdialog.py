@@ -16,6 +16,19 @@ class c_sdialog_buf_mixin:
         self.blkvdeep = 0
         self.intext = False
 
+    def _cur_func_name(self):
+        for i in range(self.blkvdeep-1, -1, -1):
+            btyp, *bargs = self.blkstack[i]
+            if btyp == 'func':
+                return bargs[0]
+
+    def _error(self, msg):
+        report('err', f'({self._cur_func_name()}) {msg}')
+        raise err_sdialog_syntax(msg)
+
+    def _warn(self, msg):
+        report('war', f'({self._cur_func_name()}) {msg}')
+
     def _blk_in(self, binfo):
         self.blkstack.append(binfo)
 
@@ -27,7 +40,7 @@ class c_sdialog_buf_mixin:
     def _blk_out(self):
         blen = len(self.blkstack)
         if blen < 1:
-            raise err_sdialog_syntax('unbalance block')
+            self._error('unbalance block')
         binfo = self.blkstack.pop()
         if self.blkvdeep == blen:
             self._write_blk_out(*binfo)
@@ -68,7 +81,7 @@ class c_sdialog_buf_mixin:
             if self.blkvdeep == len(self.blkstack):
                 super().newline()
             else:
-                report('warn', f'print before text: {args}')
+                self._warn(f'print before text: {args[0]}')
                 #raise err_sdialog_syntax('print before text')
         elif cmd == 'block':
             self._blk_in(args)
