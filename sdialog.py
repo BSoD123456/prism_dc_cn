@@ -13,7 +13,41 @@ class c_sdialog_buf_mixin:
     def __init__(self, *na, **ka):
         super().__init__(*na, **ka)
         self.blkstack = []
+        self.blkvdeep = 0
         self.intext = False
+
+    def _blk_in(self, binfo):
+        self.blkstack.append(binfo)
+
+    def _txt_in(self):
+        for i in range(self.blkvdeep, len(self.blkstack)):
+            self._write_blk_in(*self.blkstack[i])
+        self.blkvdeep = len(self.blkstack)
+
+    def _blk_out(self):
+        blen = len(self.blkstack)
+        if blen < 1:
+            raise err_sdialog_syntax('unbalance block')
+        binfo = self.blkstack.pop()
+        if self.blkvdeep == blen:
+            self._write_blk_out(*binfo)
+        self.blkvdeep = min(self.blkvdeep, blen - 1)
+
+    def _write_blk_in(btyp, *args):
+        super().newline()
+        super().newline()
+        super().write('====================')
+        super().newline()
+        super().write('--------------------')
+        super().newline()
+
+    def _write_blk_out(btyp, *args):
+        super().newline()
+        super().write('--------------------')
+        super().newline()
+        super().write('====================')
+        super().newline()
+        super().newline()
 
     def meta(self, cmd, *args):
         if cmd == 'text':
@@ -23,20 +57,13 @@ class c_sdialog_buf_mixin:
             assert self.intext
             self.intext = False
         elif cmd == 'block':
-            super().newline()
-            super().write('====================')
-            super().newline()
-            super().write('--------------------')
-            super().newline()
+            self._blk_in(args)
         elif cmd == 'block_done':
-            super().newline()
-            super().write('--------------------')
-            super().newline()
-            super().write('====================')
-            super().newline()
+            self._blk_out()
 
     def write(self, s):
         if self.intext:
+            self._txt_in()
             super().write(s)
 
     def newline(self):
