@@ -35,15 +35,24 @@ class c_sdialog_buf_mixin:
 
     def _write_blk_in(self, btyp, *args):
         super().newline()
-        super().write('====================')
-        super().newline()
-        super().write('--------------------')
+        if btyp == 'func':
+            fname, = args
+            super().write('====================')
+            super().newline()
+            super().write(f'Scene: {fname}')
+            super().newline()
+            super().write('--------------------')
+        else:
+            super().write(f'-------------------> b1')
         super().newline()
 
     def _write_blk_out(self, btyp, *args):
-        super().write('--------------------')
-        super().newline()
-        super().write('====================')
+        if btyp == 'func':
+            super().write('--------------------')
+            super().newline()
+            super().write('====================')
+        else:
+            super().write('f1 <--------------------')
         super().newline()
         super().newline()
 
@@ -99,7 +108,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             #cd = c_scode_program(ast, c_scode_buf_null())
             cd = c_scode_program(ast, c_sdialog_buf_std())
             cd.gen_code()
