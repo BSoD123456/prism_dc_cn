@@ -5,6 +5,8 @@ from scode import (
     c_scode_program, c_scode_buf_null, c_scode_buf_std, c_scode_buf_fd)
 from report import report
 
+import re
+
 class err_sdialog_syntax(ValueError):
     pass
 
@@ -82,16 +84,18 @@ class c_sdialog_buf_mixin:
                 super().newline()
             else:
                 self._warn(f'print before text: {args[0]}')
-                #raise err_sdialog_syntax('print before text')
         elif cmd == 'block':
             self._blk_in(args)
         elif cmd == 'block_done':
             self._blk_out()
 
+    def _rplc_ctrl(self, txt):
+        return re.sub(r'\[LF\]', '\n', txt)
+
     def write(self, s):
         if self.intext:
             self._txt_in()
-            super().write(s)
+            super().write(self._rplc_ctrl(s))
 
     def newline(self):
         super().meta('disline')
