@@ -454,7 +454,7 @@ class c_scode_program:
             for slhid, slbv in sus_lhld:
                 buf.reput(slhid, None)
         buf.touch()
-        buf.meta('block_done', 'here')
+        buf.meta('block_done')
         buf.meta('disline')
         buf.newline()
         ctx['buf'] = pbuf
