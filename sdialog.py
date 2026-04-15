@@ -15,7 +15,6 @@ class c_sdialog_buf_mixin:
     def __init__(self, *na, **ka):
         super().__init__(*na, **ka)
         self.blkstack = []
-        self.blkvdeep = 0
         self.gflags = {}
 
     def _getflag(self, key):
@@ -24,35 +23,57 @@ class c_sdialog_buf_mixin:
     def _setflag(self, key, val):
         self.gflags[key] = not not val
 
-    def _cur_func_name(self):
-        for i in range(self.blkvdeep-1, -1, -1):
-            btyp, *bargs = self.blkstack[i]
-            if btyp == 'func':
-                return bargs[0]
+    def _cur_path(self):
+        cpath = []
+        lst_para_idx = 0
+        for bsi in self.blkstack:
+            (btyp, *_), bname, para_idx, has_content, has_text = bsi
+            if has_content:
+                cpath.append(bname.format(lst_para_idx))
+                lst_para_idx = para_idx
+        return '/'.join(cpath)
 
     def _error(self, msg):
-        report('err', f'({self._cur_func_name()}) {msg}')
+        report('err', f'({self._cur_path()}) {msg}')
         raise err_sdialog_syntax(msg)
 
     def _warn(self, msg):
-        report('war', f'({self._cur_func_name()}) {msg}')
+        report('war', f'({self._cur_path()}) {msg}')
 
     def _blk_in(self, binfo):
-        self.blkstack.append(binfo)
+        btyp, *bargs = binfo
+        has_text = False
+        has_content = False
+        if btyp == 'func':
+            bname = f'Scene-{bargs[0]}'
+            has_content = True
+        elif btyp == 'lp':
+            bname = 'Choose@{}'
+        elif btyp == 'if':
+            bname = 'Case@{}'
+        elif btyp == 'el':
+            bname = 'Case@{}B'
+        else:
+            self._error(f'unknown block: {btyp}')
+        self.blkstack.append([
+            binfo, bname, 0, has_content, has_text])
 
     def _txt_in(self):
-        for i in range(self.blkvdeep, len(self.blkstack)):
-            self._write_blk_in(*self.blkstack[i])
-        self.blkvdeep = len(self.blkstack)
+        bs = self.blkstack
+        assert len(bs) > 0
+        for bsi in bs[:-1]:
+            if bsi[0][0] == 'lp':
+                bsi[3] = True
+        bs[-1][3] = True
+        bs[-1][4] = True
+        self._write_blk_in(self._cur_path())
 
     def _blk_out(self):
-        blen = len(self.blkstack)
-        if blen < 1:
+        if not self.blkstack:
             self._error('unbalance block')
-        binfo = self.blkstack.pop()
-        if self.blkvdeep == blen:
-            self._write_blk_out(*binfo)
-        self.blkvdeep = min(self.blkvdeep, blen - 1)
+        (btyp, *_), bname, para_idx, has_content, has_text = self.blkstack.pop()
+        if has_text:
+            self._write_blk_out(btyp, bname)
 
     def _write_blk_in(self, btyp, *args):
         super().newline()
@@ -75,14 +96,13 @@ class c_sdialog_buf_mixin:
         super().write('[text]')
         super().newline()
 
-    def _write_blk_out(self, btyp, *args):
+    def _write_blk_out(self, btyp, bname):
         super().write('[/text]')
         super().newline()
         if btyp == 'func':
-            fname, = args
             super().write('--------------------')
             super().newline()
-            super().write(f'[/Scene: {fname}]')
+            super().write(f'[/Scene: {bname}]')
             super().newline()
             super().write('====================')
         else:
@@ -100,7 +120,7 @@ class c_sdialog_buf_mixin:
             self._setflag('intext', False)
         elif cmd == 'text_print':
             sfname, = args
-            if not self.blkvdeep == len(self.blkstack):
+            if not self.blkstack[-1][3]:
                 self._warn(f'print before text: {args[0]}')
             elif not self._getflag('lastlf'):
                 if sfname != 'set_name':
