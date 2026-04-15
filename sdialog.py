@@ -16,8 +16,13 @@ class c_sdialog_buf_mixin:
         super().__init__(*na, **ka)
         self.blkstack = []
         self.blkvdeep = 0
-        self.intext = False
-        self.lst_lf = False
+        self.gflags = {}
+
+    def _getflag(self, key):
+        return self.gflags.get(key, False)
+
+    def _setflag(self, key, val):
+        self.gflags[key] = not not val
 
     def _cur_func_name(self):
         for i in range(self.blkvdeep-1, -1, -1):
@@ -86,18 +91,18 @@ class c_sdialog_buf_mixin:
         super().newline()
 
     def meta(self, cmd, *args):
-        assert not self.intext or cmd == 'text_done'
+        assert not self._getflag('intext') or cmd == 'text_done'
         if cmd == 'text':
             self._txt_in()
-            self.intext = True
+            self._setflag('intext', True)
         elif cmd == 'text_done':
-            assert self.intext
-            self.intext = False
+            assert self._getflag('intext')
+            self._setflag('intext', False)
         elif cmd == 'text_print':
             sfname, = args
             if not self.blkvdeep == len(self.blkstack):
                 self._warn(f'print before text: {args[0]}')
-            elif self.lst_lf == False:
+            elif not self._getflag('lst_lf'):
                 if sfname != 'set_name':
                     #self._warn(f'print without LF: {args[0]}')
                     super().newline()
@@ -111,13 +116,13 @@ class c_sdialog_buf_mixin:
     def _rplc_ctrl(self, txt):
         rtxt = re.sub(r'\[LF\]', '\n', txt)
         if rtxt and rtxt[-1] == '\n':
-            self.lst_lf = True
+            self._setflag('lst_lf', True)
         else:
-            self.lst_lf = False
+            self._setflag('lst_lf', False)
         return rtxt
 
     def write(self, s):
-        if self.intext:
+        if self._getflag('intext'):
             super().write(self._rplc_ctrl(s))
 
     def newline(self):
