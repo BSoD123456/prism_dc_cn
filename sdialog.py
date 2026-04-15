@@ -86,14 +86,14 @@ class c_sdialog_buf_mixin:
         super().newline()
 
     def meta(self, cmd, *args):
+        assert not self.intext or cmd == 'text_done'
         if cmd == 'text':
-            assert not self.intext
+            self._txt_in()
             self.intext = True
         elif cmd == 'text_done':
             assert self.intext
             self.intext = False
         elif cmd == 'text_print':
-            assert not self.intext
             sfname, = args
             if not self.blkvdeep == len(self.blkstack):
                 self._warn(f'print before text: {args[0]}')
@@ -105,6 +105,8 @@ class c_sdialog_buf_mixin:
             self._blk_in(args)
         elif cmd == 'block_done':
             self._blk_out()
+        elif cmd == 'lpflow':
+            pass
 
     def _rplc_ctrl(self, txt):
         rtxt = re.sub(r'\[LF\]', '\n', txt)
@@ -116,7 +118,6 @@ class c_sdialog_buf_mixin:
 
     def write(self, s):
         if self.intext:
-            self._txt_in()
             super().write(self._rplc_ctrl(s))
 
     def newline(self):
