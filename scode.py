@@ -454,7 +454,7 @@ class c_scode_program:
             for slhid, slbv in sus_lhld:
                 buf.reput(slhid, None)
         buf.touch()
-        buf.meta('block_done')
+        buf.meta('block_done', 'func', nd.name)
         buf.meta('disline')
         buf.newline()
         ctx['buf'] = pbuf
@@ -813,7 +813,7 @@ class c_scode_program:
                 btyp, paddr, saddr, daddr, pbuf = mbsinfo
                 assert btyp != 'lp'
                 buf.touch()
-                buf.meta('block_done')
+                buf.meta('block_done', btyp)
                 buf.meta('disline')
                 buf.newline()
                 ctx['bstack'].pop()
@@ -847,7 +847,7 @@ class c_scode_program:
             if btyp == 'lp':
                 assert lb.addr == paddr
                 buf.touch()
-                buf.meta('block_done')
+                buf.meta('block_done', btyp)
                 buf.meta('disline')
                 buf.newline()
                 ctx['bstack'].pop()
@@ -857,7 +857,7 @@ class c_scode_program:
                 return
             elif btyp == 'if' and self._check_bstack_bound(lb.addr, 1, ctx):
                 buf.touch()
-                buf.meta('block_done')
+                buf.meta('block_done', btyp)
                 buf.meta('disline')
                 buf.newline()
                 ctx['bstack'].pop()
@@ -867,7 +867,7 @@ class c_scode_program:
                 ctx['bstack'].append((
                     'el', ctx['prv_addr'], nd.addr, lb.addr, buf))
                 ctx['buf'] = buf.sub()
-                ctx['buf'].meta('block', 'else')
+                ctx['buf'].meta('block', 'el')
                 ctx['buf'].meta('disline')
                 ctx['buf'].newline()
                 return
@@ -898,7 +898,7 @@ class c_scode_program:
                 ctx['bstack'].append((
                     'vo', ctx['prv_addr'], nd.addr, lb.addr, buf))
                 ctx['buf'] = buf.sub()
-                ctx['buf'].meta('block', 'void')
+                ctx['buf'].meta('block', 'vo')
                 ctx['buf'].meta('disline')
                 ctx['buf'].newline()
                 return
@@ -941,7 +941,7 @@ class c_scode_program:
             self._error(nd, f'block out of bounds: {lb}')
         bstack.append((btyp, ctx['prv_addr'], nd.addr, lb.addr, buf))
         ctx['buf'] = buf.sub()
-        ctx['buf'].meta('block', 'while' if btyp == 'lp' else btyp)
+        ctx['buf'].meta('block', btyp)
         ctx['buf'].meta('disline')
         ctx['buf'].newline()
 

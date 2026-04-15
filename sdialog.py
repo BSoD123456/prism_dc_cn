@@ -107,10 +107,12 @@ class c_sdialog_buf_mixin:
                     #self._warn(f'print without LF: {args[0]}')
                     super().newline()
         elif cmd == 'block':
-            self._blk_in(args)
+            if not args[0] == 'vo':
+                self._blk_in(args)
         elif cmd == 'block_done':
             self._setflag('afterjump', False)
-            self._blk_out()
+            if not args[0] == 'vo':
+                self._blk_out()
         elif cmd == 'lpflow':
             self._setflag('afterjump', True)
 
