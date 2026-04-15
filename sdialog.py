@@ -102,27 +102,30 @@ class c_sdialog_buf_mixin:
             sfname, = args
             if not self.blkvdeep == len(self.blkstack):
                 self._warn(f'print before text: {args[0]}')
-            elif not self._getflag('lst_lf'):
+            elif not self._getflag('lastlf'):
                 if sfname != 'set_name':
                     #self._warn(f'print without LF: {args[0]}')
                     super().newline()
         elif cmd == 'block':
             self._blk_in(args)
         elif cmd == 'block_done':
+            self._setflag('afterjump', False)
             self._blk_out()
         elif cmd == 'lpflow':
-            pass
+            self._setflag('afterjump', True)
 
     def _rplc_ctrl(self, txt):
         rtxt = re.sub(r'\[LF\]', '\n', txt)
         if rtxt and rtxt[-1] == '\n':
-            self._setflag('lst_lf', True)
+            self._setflag('lastlf', True)
         else:
-            self._setflag('lst_lf', False)
+            self._setflag('lastlf', False)
         return rtxt
 
     def write(self, s):
         if self._getflag('intext'):
+            if self._getflag('afterjump'):
+                self._error('texts should not after jump')
             super().write(self._rplc_ctrl(s))
 
     def newline(self):
