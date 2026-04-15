@@ -66,7 +66,7 @@ class c_sdialog_buf_mixin:
                 bsi[3] = True
         bs[-1][3] = True
         bs[-1][4] = True
-        self._write_blk_in(self._cur_path())
+        self._write_blk_in(bs[-1][0][0], self._cur_path())
 
     def _blk_out(self):
         if not self.blkstack:
@@ -74,6 +74,8 @@ class c_sdialog_buf_mixin:
         (btyp, *_), bname, para_idx, has_content, has_text = self.blkstack.pop()
         if has_text:
             self._write_blk_out(btyp, bname)
+            if self.blkstack:
+                self.blkstack[-1][4] = True
 
     def _write_blk_in(self, btyp, *args):
         super().newline()
@@ -120,7 +122,7 @@ class c_sdialog_buf_mixin:
             self._setflag('intext', False)
         elif cmd == 'text_print':
             sfname, = args
-            if not self.blkstack[-1][3]:
+            if not self.blkstack[-1][4]:
                 self._warn(f'print before text: {args[0]}')
             elif not self._getflag('lastlf'):
                 if sfname != 'set_name':
