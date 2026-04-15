@@ -17,22 +17,6 @@ class c_sdialog_buf_mixin:
         self.blkstack = []
         self.gflags = {}
 
-    def _getflag(self, key):
-        return self.gflags.get(key, False)
-
-    def _setflag(self, key, val):
-        self.gflags[key] = not not val
-
-    def _cur_path(self):
-        cpath = []
-        lst_para_idx = 0
-        for bsi in self.blkstack:
-            (btyp, *_), bname, para_idx, has_content, has_text = bsi
-            if has_content:
-                cpath.append(bname.format(lst_para_idx))
-                lst_para_idx = para_idx
-        return '/'.join(cpath)
-
     def _error(self, msg):
         report('err', f'({self._cur_path()}) {msg}')
         raise err_sdialog_syntax(msg)
@@ -40,9 +24,40 @@ class c_sdialog_buf_mixin:
     def _warn(self, msg):
         report('war', f'({self._cur_path()}) {msg}')
 
+    def _getgflag(self, key):
+        return self.gflags.get(key, False)
+
+    def _setgflag(self, key, val):
+        self.gflags[key] = not not val
+
+    def _getblk(self, idx):
+        if len(self.blkstack) > idx:
+            return self.blkstack[-idx-1]
+        else:
+            self._error('empty block stack')
+
+    def _getlflag(self, key, lflags = None):
+        if lflags is None:
+            lflags = self._getblk(0)[3]
+        return lflags.get(key, False)
+
+    def _setlflag(self, key, val, lflags = None):
+        if lflags is None:
+            lflags = self._getblk(0)[3]
+        lflags[key] = not not val
+
+    def _cur_path(self):
+        cpath = []
+        lst_para_idx = 0
+        for bsi in self.blkstack:
+            (btyp, *_), bname, para_idx, lflags = bsi
+            if self._getlflag('has_content', lflags):
+                cpath.append(bname.format(lst_para_idx))
+                lst_para_idx = para_idx
+        return '/'.join(cpath)
+
     def _blk_in(self, binfo):
         btyp, *bargs = binfo
-        has_text = False
         has_content = False
         if btyp == 'func':
             bname = f'Scene-{bargs[0]}'
@@ -55,27 +70,30 @@ class c_sdialog_buf_mixin:
             bname = 'Case@{}B'
         else:
             self._error(f'unknown block: {btyp}')
-        self.blkstack.append([
-            binfo, bname, 0, has_content, has_text])
+        self.blkstack.append([binfo, bname, 0, {}])
+        self._setlflag('has_content', has_content)
+        self._setlflag('has_text', False)
 
     def _txt_in(self):
         bs = self.blkstack
         assert len(bs) > 0
         for bsi in bs[:-1]:
-            if bsi[0][0] == 'lp':
-                bsi[3] = True
-        bs[-1][3] = True
-        bs[-1][4] = True
-        self._write_blk_in(bs[-1][0][0], self._cur_path())
+            (btyp, *_), bname, para_idx, lflags = bsi
+            if btyp == 'lp':
+                self._setlflag('has_content', True, lflags)
+        (btyp, *_), bname, para_idx, lflags = self._getblk(0)
+        self._setlflag('has_content', True, lflags)
+        self._setlflag('has_text', True, lflags)
+        self._write_blk_in(btyp, self._cur_path())
 
     def _blk_out(self):
         if not self.blkstack:
             self._error('unbalance block')
-        (btyp, *_), bname, para_idx, has_content, has_text = self.blkstack.pop()
-        if has_text:
+        (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
+        if self._getlflag('has_text', lflags):
             self._write_blk_out(btyp, bname)
             if self.blkstack:
-                self.blkstack[-1][4] = True
+                self._setlflag('has_text', True)
 
     def _write_blk_in(self, btyp, *args):
         super().newline()
@@ -113,18 +131,18 @@ class c_sdialog_buf_mixin:
         super().newline()
 
     def meta(self, cmd, *args):
-        assert not self._getflag('intext') or cmd == 'text_done'
+        assert not self._getgflag('intext') or cmd == 'text_done'
         if cmd == 'text':
             self._txt_in()
-            self._setflag('intext', True)
+            self._setgflag('intext', True)
         elif cmd == 'text_done':
-            assert self._getflag('intext')
-            self._setflag('intext', False)
+            assert self._getgflag('intext')
+            self._setgflag('intext', False)
         elif cmd == 'text_print':
             sfname, = args
-            if not self.blkstack[-1][4]:
+            if not self._getlflag('has_text'):
                 self._warn(f'print before text: {args[0]}')
-            elif not self._getflag('lastlf'):
+            elif not self._getgflag('lastlf'):
                 if sfname != 'set_name':
                     #self._warn(f'print without LF: {args[0]}')
                     super().newline()
@@ -132,23 +150,23 @@ class c_sdialog_buf_mixin:
             if not args[0] == 'vo':
                 self._blk_in(args)
         elif cmd == 'block_done':
-            self._setflag('afterjump', False)
+            self._setgflag('afterjump', False)
             if not args[0] == 'vo':
                 self._blk_out()
         elif cmd == 'lpflow':
-            self._setflag('afterjump', True)
+            self._setgflag('afterjump', True)
 
     def _rplc_ctrl(self, txt):
         rtxt = re.sub(r'\[LF\]', '\n', txt)
         if rtxt and rtxt[-1] == '\n':
-            self._setflag('lastlf', True)
+            self._setgflag('lastlf', True)
         else:
-            self._setflag('lastlf', False)
+            self._setgflag('lastlf', False)
         return rtxt
 
     def write(self, s):
-        if self._getflag('intext'):
-            if self._getflag('afterjump'):
+        if self._getgflag('intext'):
+            if self._getgflag('afterjump'):
                 self._error('texts should not after jump')
             super().write(self._rplc_ctrl(s))
 
