@@ -83,7 +83,7 @@ class c_sdialog_buf_mixin:
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            self._write_blk_out(self.blkstack[0][0], self._cur_path())
+            self._write_para_out(self.blkstack[0][0], self._cur_path())
         if self._getlflag('has_content'):
             self._blk_step()
         self.blkstack.append((binfo, bname, 0, {}))
@@ -102,18 +102,18 @@ class c_sdialog_buf_mixin:
             (sbtyp, *_), _, _, slflags = bsi
             if sbtyp == 'lp':
                 self._setlflag('has_content', True, slflags)
-        self._write_blk_in(btyp, self._cur_path())
+        self._write_para_in(btyp, self._cur_path())
 
     def _blk_out(self):
         if not self.blkstack:
             self._error('unbalance block')
         (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
         if self._getlflag('has_text', lflags):
-            self._write_blk_out(btyp, self._cur_path())
+            self._write_para_out(btyp, self._cur_path())
         if self.blkstack:
             self._blk_step()
 
-    def _write_blk_in(self, btyp, cpath):
+    def _write_para_in(self, btyp, cpath):
         super().newline()
         if btyp == 'func':
             super().write('====================')
@@ -133,7 +133,7 @@ class c_sdialog_buf_mixin:
         super().write('[text]')
         super().newline()
 
-    def _write_blk_out(self, btyp, cpath):
+    def _write_para_out(self, btyp, cpath):
         super().write('[/text]')
         super().newline()
         if btyp == 'func':
