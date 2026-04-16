@@ -34,16 +34,22 @@ class c_sdialog_buf_mixin:
         if len(self.blkstack) > idx:
             return self.blkstack[-idx-1]
         else:
-            self._error('empty block stack')
+            return None
 
     def _getlflag(self, key, lflags = None):
         if lflags is None:
-            lflags = self._getblk(0)[3]
+            blk = self._getblk(0)
+            if blk is None:
+                return False
+            lflags = blk[3]
         return lflags.get(key, False)
 
     def _setlflag(self, key, val, lflags = None):
         if lflags is None:
-            lflags = self._getblk(0)[3]
+            blk = self._getblk(0)
+            if blk is None:
+                self._error('empty block stack')
+            lflags = blk[3]
         lflags[key] = not not val
 
     def _cur_path(self):
