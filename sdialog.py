@@ -83,11 +83,13 @@ class c_sdialog_buf_mixin:
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            self._write_para_out(self.blkstack[-1][0][0], self._cur_path())
+            self._write_para_out(self.blkstack[-1][0][0])
         if self._getlflag('has_content'):
             self._blk_step()
         self.blkstack.append((binfo, bname, 0, {}))
         self._setlflag('has_content', has_content)
+        if btyp == 'func':
+            self._write_func_in()
 
     def _txt_in(self):
         bs = self.blkstack
@@ -101,48 +103,52 @@ class c_sdialog_buf_mixin:
             (sbtyp, *_), _, _, slflags = bsi
             if sbtyp == 'lp':
                 self._setlflag('has_content', True, slflags)
-        self._write_para_in(btyp, self._cur_path())
+        self._write_para_in(btyp)
 
     def _blk_out(self):
         if not self.blkstack:
             self._error('unbalance block')
         (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
         if self._getlflag('has_text', lflags):
-            self._write_para_out(btyp, self._cur_path())
+            self._write_para_out(btyp)
+        if btyp == 'func':
+            self._write_func_out()
         if self.blkstack:
             self._blk_step()
 
-    def _write_para_in(self, btyp, cpath):
+    def _write_func_in(self):
+        cpath = self._cur_path()
         super().newline()
-        if btyp == 'func':
-            super().write('====================')
+        super().write('====================')
+        super().newline()
+        super().write(f'[Scene: {cpath}]')
+        super().newline()
+
+    def _write_func_out(self):
+        cpath = self._cur_path()
+        super().write(f'[/Scene: {cpath}]')
+        super().newline()
+        super().write('====================')
+        super().newline()
+        super().newline()
+
+    def _write_para_in(self, btyp):
+        cpath = self._cur_path()
+        super().newline()
+        super().write('-------------------')
+        super().newline()
+        super().write(f'[id: {cpath}]')
+        super().newline()
+        if btyp == 'if':
+            super().write('[goto: ?]')
             super().newline()
-            super().write(f'[Scene: {cpath}]')
-            super().newline()
-            super().write('--------------------')
-            super().newline()
-        else:
-            super().write('-------------------')
-            super().newline()
-            super().write(f'[id: {cpath}]')
-            super().newline()
-            if btyp == 'if':
-                super().write('[goto: ?]')
-                super().newline()
         super().write('[text]')
         super().newline()
 
-    def _write_para_out(self, btyp, cpath):
+    def _write_para_out(self, btyp):
         super().write('[/text]')
         super().newline()
-        if btyp == 'func':
-            super().write('--------------------')
-            super().newline()
-            super().write(f'[/Scene: {cpath}]')
-            super().newline()
-            super().write('====================')
-        else:
-            super().write('--------------------')
+        super().write('--------------------')
         super().newline()
         super().newline()
 
