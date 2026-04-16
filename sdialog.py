@@ -52,6 +52,12 @@ class c_sdialog_buf_mixin:
             lflags = blk[3]
         lflags[key] = not not val
 
+    def _getanylflag(self, keys, lflags = None):
+        for key in keys:
+            if self._getlflag(key, lflags):
+                return True
+        return False
+
     def _cur_path(self, nxt = False):
         cpath = []
         lst_para_idx = 0
@@ -72,8 +78,7 @@ class c_sdialog_buf_mixin:
         if not nostep:
             para_idx += 1
         self.blkstack.append((binfo, bname, para_idx, {}))
-        if (self._getlflag('has_content', lflags)
-                or self._getlflag('has_content_prv', lflags)):
+        if self._getanylflag(('has_content', 'has_content_prv'), lflags):
             self._setlflag('has_content_prv', True)
 
     def _blk_in(self, binfo):
@@ -103,8 +108,7 @@ class c_sdialog_buf_mixin:
             return
         for bsi in bs:
             (sbtyp, *_), sbname, _, slflags = bsi
-            if (self._getlflag('has_content', slflags)
-                    or self._getlflag('has_content_prv', slflags)):
+            if self._getanylflag(('has_content', 'has_content_prv'), slflags):
                 continue
             self._setlflag('has_content', True, slflags)
             if sbtyp == 'func':
@@ -119,9 +123,8 @@ class c_sdialog_buf_mixin:
         (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
         if self._getlflag('has_text', lflags):
             self._write_para_out(btyp)
-        has_content = (
-            self._getlflag('has_content', lflags)
-            or self._getlflag('has_content_prv', lflags))
+        has_content = self._getanylflag(
+            ('has_content', 'has_content_prv'), lflags)
         if has_content and btyp == 'func':
             self._write_func_out(bname)
         self._blk_step(not has_content or with_el)
