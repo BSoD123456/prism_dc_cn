@@ -97,12 +97,9 @@ class c_sdialog_buf_mixin:
             (sbtyp, *_), sbname, _, slflags = bsi
             if self._getlflag('has_content', slflags):
                 continue
-            if sbtyp == 'lp':
-                self._setlflag('has_content', True, slflags)
-            elif sbtyp == 'func':
-                self._setlflag('has_content', True, slflags)
+            self._setlflag('has_content', True, slflags)
+            if sbtyp == 'func':
                 self._write_func_in(sbname)
-        self._setlflag('has_content', True, lflags)
         self._setlflag('has_text', True, lflags)
         self._write_para_in(btyp)
 
