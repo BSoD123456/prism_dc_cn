@@ -73,7 +73,6 @@ class c_sdialog_buf_mixin:
         has_content = False
         if btyp == 'func':
             bname = f'Scene-{bargs[0]}'
-            has_content = True
         elif btyp == 'lp':
             bname = 'Choose@{}'
         elif btyp == 'if':
@@ -87,9 +86,6 @@ class c_sdialog_buf_mixin:
         if self._getlflag('has_content'):
             self._blk_step()
         self.blkstack.append((binfo, bname, 0, {}))
-        self._setlflag('has_content', has_content)
-        if btyp == 'func':
-            self._write_func_in()
 
     def _txt_in(self):
         bs = self.blkstack
@@ -97,12 +93,17 @@ class c_sdialog_buf_mixin:
         (btyp, *_), bname, para_idx, lflags = self._getblk(0)
         if self._getlflag('has_text', lflags):
             return
-        self._setlflag('has_content', True, lflags)
-        self._setlflag('has_text', True, lflags)
-        for bsi in bs[:-1]:
-            (sbtyp, *_), _, _, slflags = bsi
+        for bsi in bs:
+            (sbtyp, *_), sbname, _, slflags = bsi
+            if self._getlflag('has_content', slflags):
+                continue
             if sbtyp == 'lp':
                 self._setlflag('has_content', True, slflags)
+            elif sbtyp == 'func':
+                self._setlflag('has_content', True, slflags)
+                self._write_func_in(sbname)
+        self._setlflag('has_content', True, lflags)
+        self._setlflag('has_text', True, lflags)
         self._write_para_in(btyp)
 
     def _blk_out(self):
@@ -111,22 +112,21 @@ class c_sdialog_buf_mixin:
         (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
         if self._getlflag('has_text', lflags):
             self._write_para_out(btyp)
-        if btyp == 'func':
-            self._write_func_out()
+        if btyp == 'func' and self._getlflag('has_content', lflags):
+            self._write_func_out(bname)
         if self.blkstack:
             self._blk_step()
 
-    def _write_func_in(self):
+    def _write_func_in(self, bname):
         cpath = self._cur_path()
         super().newline()
         super().write('====================')
         super().newline()
-        super().write(f'[Scene: {cpath}]')
+        super().write(f'[Scene: {bname}]')
         super().newline()
 
-    def _write_func_out(self):
-        cpath = self._cur_path()
-        super().write(f'[/Scene: {cpath}]')
+    def _write_func_out(self, bname):
+        super().write(f'[/Scene: {bname}]')
         super().newline()
         super().write('====================')
         super().newline()
@@ -137,7 +137,7 @@ class c_sdialog_buf_mixin:
         super().newline()
         super().write('-------------------')
         super().newline()
-        super().write(f'[id: {cpath}]')
+        super().write(f'[path: {cpath}]')
         super().newline()
         if btyp == 'if':
             super().write('[goto: ?]')
