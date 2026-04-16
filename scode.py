@@ -314,8 +314,14 @@ class c_scode_program:
         for snd in nd.subs:
             if self._gen_anode(snd, None, ctx) == 'func':
                 buf.newline()
+        buf.meta('end', 'prog')
+        buf.meta('disline')
+        buf.newline()
         if self.conf['output_restab']:
             rtbuf.touch()
+        buf.meta('end', 'restab')
+        buf.meta('disline')
+        buf.newline()
 
     # resource tab
 

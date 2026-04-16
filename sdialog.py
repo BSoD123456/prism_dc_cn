@@ -261,6 +261,10 @@ class c_sdialog_buf_mixin:
             ajchk = False
         elif cmd == 'lpflow':
             self._setgflag('after_jump', True)
+        elif cmd == 'end':
+            ename, = args
+            if ename == 'prog':
+                self._emit_para_out()
         else:
             ajchk = False
         if ajchk:
