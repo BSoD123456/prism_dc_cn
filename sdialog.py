@@ -61,7 +61,7 @@ class c_sdialog_buf_mixin:
                 cpath.append(bname.format(lst_para_idx + 1))
                 lst_para_idx = para_idx
         if nxt:
-            cpath.append(str(lst_para_idx + 2) + '*')
+            cpath.append(str(lst_para_idx + 2))
         else:
             cpath.append(str(lst_para_idx + 1))
         return  '/'.join(cpath)
@@ -69,12 +69,12 @@ class c_sdialog_buf_mixin:
     def _blk_step(self):
         binfo, bname, para_idx, lflags = self.blkstack.pop()
         self.blkstack.append((binfo, bname, para_idx + 1, {}))
-        if self._getlflag('has_content', lflags):
-            self._setlflag('has_content', True)
+        if (self._getlflag('has_content', lflags)
+                or self._getlflag('has_content_prv', lflags)):
+            self._setlflag('has_content_prv', True)
 
     def _blk_in(self, binfo):
         btyp, *bargs = binfo
-        has_content = False
         if btyp == 'func':
             bname = f'Scene-{bargs[0]}'
         elif btyp == 'lp':
@@ -113,7 +113,9 @@ class c_sdialog_buf_mixin:
         (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
         if self._getlflag('has_text', lflags):
             self._write_para_out(btyp)
-        if btyp == 'func' and self._getlflag('has_content', lflags):
+        if btyp == 'func' and (
+                self._getlflag('has_content', lflags)
+                or self._getlflag('has_content_prv', lflags)):
             self._write_func_out(bname)
         if self.blkstack:
             if not with_el:
