@@ -234,6 +234,8 @@ class c_sdialog_buf_mixin:
             self._setgflag('after_jump', False)
             ajchk = False
         elif cmd == 'lpflow':
+            if self._getanylflag(('has_content', 'has_content_prv')):
+                self._txt_in()
             self._setgflag('after_jump', True)
         else:
             ajchk = False
