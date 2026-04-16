@@ -857,7 +857,7 @@ class c_scode_program:
                 return
             elif btyp == 'if' and self._check_bstack_bound(lb.addr, 1, ctx):
                 buf.touch()
-                buf.meta('block_done', btyp)
+                buf.meta('block_done', btyp, 'el')
                 buf.meta('disline')
                 buf.newline()
                 ctx['bstack'].pop()

@@ -83,7 +83,7 @@ class c_sdialog_buf_mixin:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
             self._write_para_out(self.blkstack[-1][0][0])
-        if self._getlflag('has_content'):
+        if self._getlflag('has_content') and btyp != 'el':
             self._blk_step()
         self.blkstack.append((binfo, bname, 0, {}))
 
@@ -103,7 +103,7 @@ class c_sdialog_buf_mixin:
         self._setlflag('has_text', True, lflags)
         self._write_para_in(btyp)
 
-    def _blk_out(self):
+    def _blk_out(self, with_el):
         if not self.blkstack:
             self._error('unbalance block')
         (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
@@ -112,7 +112,8 @@ class c_sdialog_buf_mixin:
         if btyp == 'func' and self._getlflag('has_content', lflags):
             self._write_func_out(bname)
         if self.blkstack:
-            self._blk_step()
+            if not with_el:
+                self._blk_step()
 
     def _write_func_in(self, bname):
         cpath = self._cur_path()
@@ -174,7 +175,7 @@ class c_sdialog_buf_mixin:
         elif cmd == 'block_done':
             self._setgflag('after_jump', False)
             if not args[0] == 'vo':
-                self._blk_out()
+                self._blk_out(len(args) > 1 and args[1] == 'el')
         elif cmd == 'lpflow':
             self._setgflag('after_jump', True)
 
