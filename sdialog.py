@@ -52,15 +52,19 @@ class c_sdialog_buf_mixin:
             lflags = blk[3]
         lflags[key] = not not val
 
-    def _cur_path(self):
+    def _cur_path(self, nxt = False):
         cpath = []
         lst_para_idx = 0
         for bsi in self.blkstack:
             (btyp, *_), bname, para_idx, lflags = bsi
             if self._getlflag('has_content', lflags):
-                cpath.append(bname.format(lst_para_idx))
+                cpath.append(bname.format(lst_para_idx + 1))
                 lst_para_idx = para_idx
-        return  f'{"/".join(cpath)}@{lst_para_idx}'
+        if nxt:
+            cpath.append(str(lst_para_idx + 2) + '*')
+        else:
+            cpath.append(str(lst_para_idx + 1))
+        return  '/'.join(cpath)
 
     def _blk_step(self):
         binfo, bname, para_idx, lflags = self.blkstack.pop()
@@ -74,11 +78,11 @@ class c_sdialog_buf_mixin:
         if btyp == 'func':
             bname = f'Scene-{bargs[0]}'
         elif btyp == 'lp':
-            bname = 'Choose-{}'
+            bname = '{}-Pack'
         elif btyp == 'if':
-            bname = 'Case-{}'
+            bname = '{}-Then'
         elif btyp == 'el':
-            bname = 'Case-{}B'
+            bname = '{}-Else'
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
@@ -120,11 +124,11 @@ class c_sdialog_buf_mixin:
         super().newline()
         super().write('====================')
         super().newline()
-        super().write(f'[Scene: {bname}]')
+        super().write(f'[scene: {bname}]')
         super().newline()
 
     def _write_func_out(self, bname):
-        super().write(f'[/Scene: {bname}]')
+        super().write(f'[/scene: {bname}]')
         super().newline()
         super().write('====================')
         super().newline()
@@ -137,14 +141,14 @@ class c_sdialog_buf_mixin:
         super().newline()
         super().write(f'[path: {cpath}]')
         super().newline()
-        if btyp == 'if':
-            super().write('[goto: ?]')
-            super().newline()
         super().write('[text]')
         super().newline()
 
     def _write_para_out(self, btyp):
+        cpath = self._cur_path(True)
         super().write('[/text]')
+        super().newline()
+        super().write(f'[next: {cpath}]')
         super().newline()
         super().write('--------------------')
         super().newline()
