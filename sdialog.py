@@ -60,7 +60,7 @@ class c_sdialog_buf_mixin:
             if self._getlflag('has_content', lflags):
                 cpath.append(bname.format(lst_para_idx))
                 lst_para_idx = para_idx
-        return '/'.join(cpath)
+        return  f'{"/".join(cpath)}@{lst_para_idx}'
 
     def _blk_step(self):
         binfo, bname, para_idx, lflags = self.blkstack.pop()
@@ -74,11 +74,11 @@ class c_sdialog_buf_mixin:
         if btyp == 'func':
             bname = f'Scene-{bargs[0]}'
         elif btyp == 'lp':
-            bname = 'Choose@{}'
+            bname = 'Choose-{}'
         elif btyp == 'if':
-            bname = 'Case@{}'
+            bname = 'Case-{}'
         elif btyp == 'el':
-            bname = 'Case@{}B'
+            bname = 'Case-{}B'
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
