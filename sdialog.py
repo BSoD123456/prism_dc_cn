@@ -166,6 +166,7 @@ class c_sdialog_buf_mixin:
 
     def meta(self, cmd, *args):
         assert not self._getgflag('in_text') or cmd == 'text_done'
+        ajchk = self._getgflag('after_jump')
         if cmd == 'text':
             self._txt_in()
             self._setgflag('in_text', True)
@@ -190,8 +191,13 @@ class c_sdialog_buf_mixin:
             self._setgflag('after_jump', False)
             if not args[0] == 'vo':
                 self._blk_out(len(args) > 1 and args[1] == 'el')
+            ajchk = False
         elif cmd == 'lpflow':
             self._setgflag('after_jump', True)
+        else:
+            ajchk = False
+        if ajchk:
+            self._error('something after jump')
 
     def _rplc_ctrl(self, txt):
         rtxt = re.sub(r'\[LF\]', '\n', txt)
@@ -203,8 +209,6 @@ class c_sdialog_buf_mixin:
 
     def write(self, s):
         if self._getgflag('in_text'):
-            if self._getgflag('after_jump'):
-                self._error('texts should not after jump')
             super().write(self._rplc_ctrl(s))
 
     def newline(self):
