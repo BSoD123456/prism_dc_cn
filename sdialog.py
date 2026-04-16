@@ -83,7 +83,7 @@ class c_sdialog_buf_mixin:
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            self._write_para_out(self.blkstack[-1][0], self._cur_path())
+            self._write_para_out(self.blkstack[-1][0][0], self._cur_path())
         if self._getlflag('has_content'):
             self._blk_step()
         self.blkstack.append((binfo, bname, 0, {}))
