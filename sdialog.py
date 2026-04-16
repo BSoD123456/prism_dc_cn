@@ -62,6 +62,11 @@ class c_sdialog_buf_mixin:
                 lst_para_idx = para_idx
         return '/'.join(cpath)
 
+    def _blk_step(self):
+        if self._getlflag('has_content'):
+            binfo, bname, para_idx, lflags = self.blkstack.pop()
+            self.blkstack.append((binfo, bname, para_idx + 1, {}))
+
     def _blk_in(self, binfo):
         btyp, *bargs = binfo
         has_content = False
@@ -76,7 +81,8 @@ class c_sdialog_buf_mixin:
             bname = 'Case@{}B'
         else:
             self._error(f'unknown block: {btyp}')
-        self.blkstack.append([binfo, bname, 0, {}])
+        self._blk_step()
+        self.blkstack.append((binfo, bname, 0, {}))
         self._setlflag('has_content', has_content)
         self._setlflag('has_text', False)
 
