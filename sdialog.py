@@ -65,6 +65,8 @@ class c_sdialog_buf_mixin:
     def _blk_step(self):
         binfo, bname, para_idx, lflags = self.blkstack.pop()
         self.blkstack.append((binfo, bname, para_idx + 1, {}))
+        if self._getlflag('has_content', lflags):
+            self._setlflag('has_content', True)
 
     def _blk_in(self, binfo):
         btyp, *bargs = binfo
@@ -102,26 +104,24 @@ class c_sdialog_buf_mixin:
         if not self.blkstack:
             self._error('unbalance block')
         (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
-        if self._getlflag('has_content', lflags):
-            self._write_blk_out(btyp, bname)
-            if self.blkstack:
-                self._blk_step()
-                self._setlflag('has_content', True)
+        if self._getlflag('has_text', lflags):
+            self._write_blk_out(btyp, self._cur_path())
+        if self.blkstack:
+            self._blk_step()
 
-    def _write_blk_in(self, btyp, *args):
+    def _write_blk_in(self, btyp, cpath):
         super().newline()
         if btyp == 'func':
-            fname, = args
             super().write('====================')
             super().newline()
-            super().write(f'[Scene: {fname}]')
+            super().write(f'[Scene: {cpath}]')
             super().newline()
             super().write('--------------------')
             super().newline()
         else:
             super().write('-------------------')
             super().newline()
-            super().write('[id: ?]')
+            super().write(f'[id: {cpath}]')
             super().newline()
             if btyp == 'if':
                 super().write('[goto: ?]')
@@ -129,13 +129,13 @@ class c_sdialog_buf_mixin:
         super().write('[text]')
         super().newline()
 
-    def _write_blk_out(self, btyp, bname):
+    def _write_blk_out(self, btyp, cpath):
         super().write('[/text]')
         super().newline()
         if btyp == 'func':
             super().write('--------------------')
             super().newline()
-            super().write(f'[/Scene: {bname}]')
+            super().write(f'[/Scene: {cpath}]')
             super().newline()
             super().write('====================')
         else:
@@ -221,7 +221,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             cd = c_scode_program(ast, c_sdialog_buf_null())
             #cd = c_scode_program(ast, c_sdialog_buf_std())
             cd.gen_code()
