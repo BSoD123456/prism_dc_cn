@@ -82,6 +82,8 @@ class c_sdialog_buf_mixin:
             bname = 'Case@{}B'
         else:
             self._error(f'unknown block: {btyp}')
+        if self._getlflag('has_text'):
+            self._write_blk_out(self.blkstack[0][0], self._cur_path())
         if self._getlflag('has_content'):
             self._blk_step()
         self.blkstack.append((binfo, bname, 0, {}))
@@ -91,13 +93,15 @@ class c_sdialog_buf_mixin:
     def _txt_in(self):
         bs = self.blkstack
         assert len(bs) > 0
-        for bsi in bs[:-1]:
-            (btyp, *_), bname, para_idx, lflags = bsi
-            if btyp == 'lp':
-                self._setlflag('has_content', True, lflags)
         (btyp, *_), bname, para_idx, lflags = self._getblk(0)
+        if self._getlflag('has_text', lflags):
+            return
         self._setlflag('has_content', True, lflags)
         self._setlflag('has_text', True, lflags)
+        for bsi in bs[:-1]:
+            (sbtyp, *_), _, _, slflags = bsi
+            if sbtyp == 'lp':
+                self._setlflag('has_content', True, slflags)
         self._write_blk_in(btyp, self._cur_path())
 
     def _blk_out(self):
