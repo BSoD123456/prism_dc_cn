@@ -164,7 +164,8 @@ class c_sdialog_buf_mixin:
         elif cmd == 'text_print':
             sfname, = args
             if not self._getlflag('after_text'):
-                self._warn(f'print before text: {args[0]}')
+                if self._getlflag('has_text'):
+                    self._warn(f'print before text: {args[0]}')
             elif not self._getgflag('last_lf'):
                 if sfname != 'set_name':
                     #self._warn(f'print without LF: {args[0]}')
