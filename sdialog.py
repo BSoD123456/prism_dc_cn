@@ -137,42 +137,44 @@ class c_sdialog_buf_mixin:
         super().newline()
 
     def meta(self, cmd, *args):
-        assert not self._getgflag('intext') or cmd == 'text_done'
+        assert not self._getgflag('in_text') or cmd == 'text_done'
         if cmd == 'text':
             self._txt_in()
-            self._setgflag('intext', True)
+            self._setgflag('in_text', True)
         elif cmd == 'text_done':
-            assert self._getgflag('intext')
-            self._setgflag('intext', False)
+            assert self._getgflag('in_text')
+            self._setgflag('in_text', False)
+            self._setlflag('after_text', True)
         elif cmd == 'text_print':
             sfname, = args
-            if not self._getlflag('has_text'):
+            if not self._getlflag('after_text'):
                 self._warn(f'print before text: {args[0]}')
-            elif not self._getgflag('lastlf'):
+            elif not self._getgflag('last_lf'):
                 if sfname != 'set_name':
                     #self._warn(f'print without LF: {args[0]}')
                     super().newline()
+            self._setlflag('after_text', False)
         elif cmd == 'block':
             if not args[0] == 'vo':
                 self._blk_in(args)
         elif cmd == 'block_done':
-            self._setgflag('afterjump', False)
+            self._setgflag('after_jump', False)
             if not args[0] == 'vo':
                 self._blk_out()
         elif cmd == 'lpflow':
-            self._setgflag('afterjump', True)
+            self._setgflag('after_jump', True)
 
     def _rplc_ctrl(self, txt):
         rtxt = re.sub(r'\[LF\]', '\n', txt)
         if rtxt and rtxt[-1] == '\n':
-            self._setgflag('lastlf', True)
+            self._setgflag('last_lf', True)
         else:
-            self._setgflag('lastlf', False)
+            self._setgflag('last_lf', False)
         return rtxt
 
     def write(self, s):
-        if self._getgflag('intext'):
-            if self._getgflag('afterjump'):
+        if self._getgflag('in_text'):
+            if self._getgflag('after_jump'):
                 self._error('texts should not after jump')
             super().write(self._rplc_ctrl(s))
 
