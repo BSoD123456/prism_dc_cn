@@ -63,9 +63,8 @@ class c_sdialog_buf_mixin:
         return '/'.join(cpath)
 
     def _blk_step(self):
-        if self._getlflag('has_content'):
-            binfo, bname, para_idx, lflags = self.blkstack.pop()
-            self.blkstack.append((binfo, bname, para_idx + 1, {}))
+        binfo, bname, para_idx, lflags = self.blkstack.pop()
+        self.blkstack.append((binfo, bname, para_idx + 1, {}))
 
     def _blk_in(self, binfo):
         btyp, *bargs = binfo
@@ -81,7 +80,8 @@ class c_sdialog_buf_mixin:
             bname = 'Case@{}B'
         else:
             self._error(f'unknown block: {btyp}')
-        self._blk_step()
+        if self._getlflag('has_content'):
+            self._blk_step()
         self.blkstack.append((binfo, bname, 0, {}))
         self._setlflag('has_content', has_content)
         self._setlflag('has_text', False)
@@ -102,10 +102,11 @@ class c_sdialog_buf_mixin:
         if not self.blkstack:
             self._error('unbalance block')
         (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
-        if self._getlflag('has_text', lflags):
+        if self._getlflag('has_content', lflags):
             self._write_blk_out(btyp, bname)
             if self.blkstack:
-                self._setlflag('has_text', True)
+                self._blk_step()
+                self._setlflag('has_content', True)
 
     def _write_blk_in(self, btyp, *args):
         super().newline()
@@ -200,6 +201,7 @@ def make_sdialog_buf_class(bcls):
         pass
     return c_sdialog_buf
 
+c_sdialog_buf_null = make_sdialog_buf_class(c_scode_buf_null)
 c_sdialog_buf_std = make_sdialog_buf_class(c_scode_buf_std)
 c_sdialog_buf_fd = make_sdialog_buf_class(c_scode_buf_fd)
 
@@ -219,9 +221,9 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
-            #cd = c_scode_program(ast, c_scode_buf_null())
-            cd = c_scode_program(ast, c_sdialog_buf_std())
+        if 1:
+            cd = c_scode_program(ast, c_sdialog_buf_null())
+            #cd = c_scode_program(ast, c_sdialog_buf_std())
             cd.gen_code()
         else:
             with open(r'wktab\dialog.txt', 'w', encoding = 'utf-8') as fd:
