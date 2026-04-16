@@ -180,7 +180,7 @@ class c_sdialog_buf_mixin:
             _, _, opout, ofout, _ = odinfo
             pout = (pout or opout)
             fout = (fout or ofout)
-        if self._getgflag('after_jump'):
+        if self._getgflag('after_jump') and btyp != 'lp':
             cpath = self._brk_path()
         else:
             cpath = self._cur_path(True)
