@@ -16,6 +16,7 @@ class c_sdialog_buf_mixin:
         super().__init__(*na, **ka)
         self.blkstack = []
         self.gflags = {}
+        self.gvars = {}
 
     def _error(self, msg):
         report('err', f'({self._cur_path()}) {msg}')
@@ -65,10 +66,13 @@ class c_sdialog_buf_mixin:
             (btyp, *_), bname, para_idx, lflags = bsi
             cpath.append(bname.format(lst_para_idx + 1))
             lst_para_idx = para_idx
-        if nxt:
-            cpath.append(str(lst_para_idx + 2))
+        if cpath:
+            if nxt:
+                cpath.append(str(lst_para_idx + 2))
+            else:
+                cpath.append(str(lst_para_idx + 1))
         else:
-            cpath.append(str(lst_para_idx + 1))
+            cpath.append('ret')
         return  '/'.join(cpath)
 
     def _brk_path(self):
@@ -132,11 +136,25 @@ class c_sdialog_buf_mixin:
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            self._write_para_out(self.blkstack[-1][0][0])
+            (pbtyp, *_), pbname, *_ = self.blkstack[-1]
+            self._defer_para_out(pbtyp, pbname, True, False)
         self._blk_step(
             not self._getlflag('has_content')
             or btyp == 'el')
         self.blkstack.append((binfo, bname, 0, {}))
+
+    def _blk_out(self, with_el):
+        if not self.blkstack:
+            self._error('unbalance block')
+        (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
+        has_text = self._getlflag('has_text', lflags)
+        has_content = self._getanylflag(
+            ('has_content', 'has_content_prv'), lflags)
+        if has_content:
+            self._defer_para_out(
+                btyp, bname,
+                has_text, has_content and btyp == 'func')
+        self._blk_step(not has_content or with_el)
 
     def _txt_in(self):
         bs = self.blkstack
@@ -144,6 +162,7 @@ class c_sdialog_buf_mixin:
         (btyp, *_), bname, para_idx, lflags = self._getblk(0)
         if self._getlflag('has_text', lflags):
             return
+        self._emit_para_out()
         for bsi in bs:
             (sbtyp, *_), sbname, _, slflags = bsi
             if self._getanylflag(('has_content', 'has_content_prv'), slflags):
@@ -155,17 +174,28 @@ class c_sdialog_buf_mixin:
         self._setlflag('has_text', True, lflags)
         self._write_para_in(btyp)
 
-    def _blk_out(self, with_el):
-        if not self.blkstack:
-            self._error('unbalance block')
-        (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
-        if self._getlflag('has_text', lflags):
-            self._write_para_out(btyp, self._getgflag('after_jump'))
-        has_content = self._getanylflag(
-            ('has_content', 'has_content_prv'), lflags)
-        if has_content and btyp == 'func':
+    def _defer_para_out(self, btyp, bname, pout, fout):
+        odinfo = self.gvars.get('defer_pout', None)
+        if not odinfo is None:
+            _, _, opout, ofout, _ = odinfo
+            pout = (pout or opout)
+            fout = (fout or ofout)
+        if self._getgflag('after_jump'):
+            cpath = self._brk_path()
+        else:
+            cpath = self._cur_path(True)
+        self.gvars['defer_pout'] = (btyp, bname, pout, fout, cpath)
+
+    def _emit_para_out(self):
+        dinfo = self.gvars.get('defer_pout', None)
+        if dinfo is None:
+            return
+        btyp, bname, pout, fout, cpath = dinfo
+        if pout:
+            self._write_para_out(btyp, cpath)
+        if fout:
             self._write_func_out(bname)
-        self._blk_step(not has_content or with_el)
+        self.gvars['defer_pout'] = None
 
     def _write_func_in(self, bname):
         cpath = self._cur_path()
@@ -192,11 +222,7 @@ class c_sdialog_buf_mixin:
         super().write('[text]')
         super().newline()
 
-    def _write_para_out(self, btyp, broken = False):
-        if broken:
-            cpath = self._brk_path()
-        else:
-            cpath = self._cur_path(True)
+    def _write_para_out(self, btyp, cpath):
         super().write('[/text]')
         super().newline()
         super().write(f'[next: {cpath}]')
@@ -234,8 +260,6 @@ class c_sdialog_buf_mixin:
             self._setgflag('after_jump', False)
             ajchk = False
         elif cmd == 'lpflow':
-            if self._getanylflag(('has_content', 'has_content_prv')):
-                self._txt_in()
             self._setgflag('after_jump', True)
         else:
             ajchk = False
