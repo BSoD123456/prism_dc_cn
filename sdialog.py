@@ -14,6 +14,7 @@ class c_sdialog_buf(c_scode_buf):
     def __init__(self, *na, **ka):
         super().__init__(*na, **ka)
         self.blkstack = []
+        self.pthseq = []
         self.gflags = {}
         self.gvars = {}
 
@@ -196,6 +197,17 @@ class c_sdialog_buf(c_scode_buf):
             self._write_func_out(bname)
         self.gvars['defer_pout'] = None
 
+    def _feed_path(self, path, fmt):
+        super().write(fmt.format(path))
+        super().newline()
+
+    def _need_path(self, path, fmt):
+        super().write(fmt.format(path))
+        super().newline()
+
+    def _flush_path(self):
+        pass
+
     def _write_func_in(self, bname):
         cpath = self._cur_path()
         super().newline()
@@ -210,6 +222,7 @@ class c_sdialog_buf(c_scode_buf):
         super().write('====================')
         super().newline()
         super().newline()
+        self._flush_path()
         self.flush()
 
     def _write_para_in(self, btyp):
@@ -217,16 +230,14 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         super().write('-------------------')
         super().newline()
-        super().write(f'[path: {cpath}]')
-        super().newline()
+        self._feed_path(cpath, '[path: {}]')
         super().write('[text]')
         super().newline()
 
     def _write_para_out(self, btyp, cpath):
         super().write('[/text]')
         super().newline()
-        super().write(f'[next: {cpath}]')
-        super().newline()
+        self._need_path(cpath, '[next: {}]')
         super().write('--------------------')
         super().newline()
         super().newline()
