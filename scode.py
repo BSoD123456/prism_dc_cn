@@ -54,17 +54,18 @@ class c_scode_buf:
                 scnt += 1
         return ''.join(rls)
 
-    def _flushltoks(self, ltoks):
+    def _flushltoks(self, ltoks, nl):
         for tok in ltoks:
             if isinstance(tok, tuple):
                 self.par.meta(*tok)
             else:
                 self.par.write(tok)
-        self.par.newline()
+        if nl:
+            self.par.newline()
 
     def _writeltoks(self, ltoks):
         if self.tch:
-            self._flushltoks(ltoks)
+            self._flushltoks(ltoks, True)
         else:
             self.buf.append(ltoks)
 
@@ -151,7 +152,7 @@ class c_scode_buf:
             (hid, hbi + blen)
             for hid, hbi in self.hold_ref.items())
         for ltoks in self.buf:
-            self._flushltoks(ltoks)
+            self._flushltoks(ltoks, True)
         self.buf = []
         return True
 
@@ -177,19 +178,14 @@ class c_scode_buf_inline(c_scode_buf):
     def newline(self):
         raise NotImplementedError('buf inline should not do this')
 
-    def touch(self):
+    def flush(self):
         if self.tch:
-            return self
-        self.tch = True
+            return False
         if not self.par:
-            return self
-        for tok in self.lbuf:
-            if isinstance(tok, tuple):
-                self.par.meta(*tok)
-            else:
-                self.par.write(tok)
+            return True
+        self._flushltoks(self.lbuf, False)
         self.lbuf = []
-        return self
+        return True
 
 class c_scode_buf_null(c_scode_buf):
 
