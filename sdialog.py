@@ -1,8 +1,7 @@
 #! python3
 # coding: utf-8
 
-from scode import (
-    c_scode_program, c_scode_buf_null, c_scode_buf_std, c_scode_buf_fd)
+from scode import c_scode_program, c_scode_buf
 from report import report
 
 import re
@@ -10,13 +9,14 @@ import re
 class err_sdialog_syntax(ValueError):
     pass
 
-class c_sdialog_buf_mixin:
+class c_sdialog_buf(c_scode_buf):
 
     def __init__(self, *na, **ka):
         super().__init__(*na, **ka)
         self.blkstack = []
         self.gflags = {}
         self.gvars = {}
+        self.touch()
 
     def _error(self, msg):
         report('err', f'({self._cur_path()}) {msg}')
@@ -286,21 +286,8 @@ class c_sdialog_buf_mixin:
         super().meta('disline')
         super().newline()
 
-def make_sdialog_buf_class(bcls):
-    class c_sdialog_buf(c_sdialog_buf_mixin, bcls):
-        pass
-    bnms = bcls.__name__.split('_')
-    try:
-        bi = bnms.index('buf')
-        c_sdialog_buf.__name__ = '_'.join((
-            c_sdialog_buf.__name__, *bnms[bi+1:]))
-    except:
-        pass
-    return c_sdialog_buf
-
-c_sdialog_buf_null = make_sdialog_buf_class(c_scode_buf_null)
-c_sdialog_buf_std = make_sdialog_buf_class(c_scode_buf_std)
-c_sdialog_buf_fd = make_sdialog_buf_class(c_scode_buf_fd)
+def bind_sdialog_buf(pbuf):
+    return c_sdialog_buf(pbuf, False, 0)
 
 if __name__ == '__main__':
     import pdb
@@ -314,16 +301,17 @@ if __name__ == '__main__':
             return pickle.load(fd)
 
     from script import *
+    from scode import c_scode_buf_null, c_scode_buf_std, c_scode_buf_fd
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
         if 0:
-            cd = c_scode_program(ast, c_sdialog_buf_null())
-            #cd = c_scode_program(ast, c_sdialog_buf_std())
+            cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
+            #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
         else:
             with open(r'wktab\dialog.txt', 'w', encoding = 'utf-8') as fd:
-                cd = c_scode_program(ast, c_sdialog_buf_fd(fd))
+                cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_fd(fd)))
                 cd.gen_code()
     tst1()
