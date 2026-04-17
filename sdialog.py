@@ -16,7 +16,6 @@ class c_sdialog_buf(c_scode_buf):
         self.blkstack = []
         self.gflags = {}
         self.gvars = {}
-        self.touch()
 
     def _error(self, msg):
         report('err', f'({self._cur_path()}) {msg}')
@@ -211,6 +210,7 @@ class c_sdialog_buf(c_scode_buf):
         super().write('====================')
         super().newline()
         super().newline()
+        self.flush()
 
     def _write_para_in(self, btyp):
         cpath = self._cur_path()
@@ -265,6 +265,7 @@ class c_sdialog_buf(c_scode_buf):
             ename, = args
             if ename == 'prog':
                 self._emit_para_out()
+                self.touch()
         else:
             ajchk = False
         if ajchk:
