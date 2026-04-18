@@ -197,6 +197,32 @@ class c_sdialog_buf(c_scode_buf):
             self._write_func_out(bname)
         self.gvars['defer_pout'] = None
 
+    @staticmethod
+    def _cmp_path(p1, p2):
+        p1s = p1.split('/')
+        p2s = p2.split('/')
+        p1len = len(p1s)
+        p2len = len(p2s)
+        plen = min(p1len, p2len)
+        assert plen > 0
+        rcmp = 0
+        for i in range(plen):
+            k1 = p1s[i]
+            k2 = p2s[i]
+            if i == 0:
+                assert k1 == k2
+                continue
+            v1 = int(k1.split('-')[0])
+            v2 = int(k2.split('-')[0])
+            if v1 > v2:
+                rcmp = -1
+            elif v1 < v2:
+                rcmp = 1
+            else:
+                continue
+            break
+        return rcmp, i + 1 < p1len
+
     def _feed_path(self, path, fmt):
         super().write(fmt.format(path))
         super().newline()
