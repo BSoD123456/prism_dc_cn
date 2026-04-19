@@ -15,7 +15,6 @@ class c_sdialog_buf(c_scode_buf):
         super().__init__(*na, **ka)
         self.blkstack = []
         self.pthseq = []
-        self.gflags = {}
         self.gvars = {}
 
     def _error(self, msg):
@@ -26,10 +25,10 @@ class c_sdialog_buf(c_scode_buf):
         report('war', f'({self._cur_path()}) {msg}')
 
     def _getgflag(self, key):
-        return self.gflags.get(key, False)
+        return self.gvars.get(key, False)
 
     def _setgflag(self, key, val):
-        self.gflags[key] = not not val
+        self.gvars[key] = not not val
 
     def _getblk(self, idx):
         if len(self.blkstack) > idx:
@@ -63,7 +62,7 @@ class c_sdialog_buf(c_scode_buf):
         cpath = []
         lst_para_idx = 0
         for bsi in self.blkstack:
-            (btyp, *_), bname, para_idx, lflags = bsi
+            (btyp, *_), bname, para_idx, _ = bsi
             cpath.append(bname.format(lst_para_idx + 1))
             lst_para_idx = para_idx
         if cpath:
@@ -81,7 +80,7 @@ class c_sdialog_buf(c_scode_buf):
         lst_para_idx = 0
         lst_cpara_idx = 0
         for bsi in self.blkstack:
-            (btyp, *_), bname, para_idx, lflags = bsi
+            (btyp, *_), bname, para_idx, _ = bsi
             if btyp == 'lp':
                 cpath.extend(tpath)
                 lst_cpara_idx = lst_para_idx
@@ -100,7 +99,7 @@ class c_sdialog_buf(c_scode_buf):
         lst_para_idx = 0
         lst_cpara_idx = 0
         for bsi in self.blkstack:
-            (btyp, *_), bname, para_idx, lflags = bsi
+            (btyp, *_), bname, para_idx, _ = bsi
             tpath.append(bname.format(lst_para_idx + 1))
             lst_para_idx = para_idx
             if btyp == 'lp':
@@ -136,7 +135,7 @@ class c_sdialog_buf(c_scode_buf):
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            (pbtyp, *_), pbname, *_ = self.blkstack[-1]
+            (pbtyp, *_), pbname, _, _ = self._getblk(0)
             self._defer_para_out(pbtyp, pbname, True, False)
         self._blk_step(
             not self._getlflag('has_content')
@@ -146,7 +145,7 @@ class c_sdialog_buf(c_scode_buf):
     def _blk_out(self, with_el):
         if not self.blkstack:
             self._error('unbalance block')
-        (btyp, *_), bname, para_idx, lflags = self.blkstack.pop()
+        (btyp, *_), bname, _, lflags = self.blkstack.pop()
         has_text = self._getlflag('has_text', lflags)
         has_content = self._getanylflag(
             ('has_content', 'has_content_prv'), lflags)
@@ -157,13 +156,12 @@ class c_sdialog_buf(c_scode_buf):
         self._blk_step(not has_content or with_el)
 
     def _txt_in(self):
-        bs = self.blkstack
-        assert len(bs) > 0
-        (btyp, *_), bname, para_idx, lflags = self._getblk(0)
+        assert self.blkstack
+        (btyp, *_), bname, _, lflags = self._getblk(0)
         if self._getlflag('has_text', lflags):
             return
         self._emit_para_out()
-        for bsi in bs:
+        for bsi in self.blkstack:
             (sbtyp, *_), sbname, _, slflags = bsi
             if self._getanylflag(('has_content', 'has_content_prv'), slflags):
                 continue
