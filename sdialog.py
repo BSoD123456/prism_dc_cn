@@ -112,11 +112,11 @@ class c_sdialog_buf(c_scode_buf):
             cpath.append('ret')
         return  '/'.join(cpath)
 
-    def _blk_step(self, nostep = False):
+    def _blk_step(self, step, half):
         if not self.blkstack:
             return
         binfo, bname, para_idx, lflags = self.blkstack.pop()
-        if not nostep:
+        if step and not half:
             para_idx += 1
         self.blkstack.append((binfo, bname, para_idx, {}))
         if self._getanylflag(('has_content', 'has_content_prv'), lflags):
@@ -137,9 +137,7 @@ class c_sdialog_buf(c_scode_buf):
         if self._getlflag('has_text'):
             (pbtyp, *_), pbname, _, _ = self._getblk(0)
             self._defer_para_out(pbtyp, pbname, True, False)
-        self._blk_step(
-            not self._getlflag('has_content')
-            or btyp == 'el')
+        self._blk_step(self._getlflag('has_content'), btyp == 'el')
         self.blkstack.append((binfo, bname, 0, {}))
 
     def _blk_out(self, with_el):
@@ -153,7 +151,7 @@ class c_sdialog_buf(c_scode_buf):
             self._defer_para_out(
                 btyp, bname,
                 has_text, has_content and btyp == 'func')
-        self._blk_step(not has_content or with_el)
+        self._blk_step(has_content, with_el)
 
     def _txt_in(self):
         assert self.blkstack
