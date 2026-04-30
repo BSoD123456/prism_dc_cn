@@ -230,6 +230,42 @@ class c_sdialog_buf(c_scode_buf):
     def _flush_path(self):
         pass
 
+    def _npath_gettab(self, lvars, new):
+        if 'req_path' in lvars:
+            return lvars['npath_req']
+        elif new:
+            if dft is True:
+                dft = {}
+            lvars['npath_req'] = dft
+            return dft
+        else:
+            return None
+
+    def _npath_req(self, lvars, half):
+        tab = self._npath_gettab(lvars, True)
+        if half:
+            dkey = 'half'
+        else:
+            dkey = 'next'
+        if not dkey in tab:
+            tab[dkey] = []
+        hid = self.hold(None)
+        tab[dkey].append(hid)
+
+    def _npath_blk_step(self, slvars, dlvars, step, half):
+        stab = self._npath_gettab(slvars, False)
+        if tab is None:
+            return
+        if not step:
+            self._npath_gettab(dlvars, stab)
+        #TODO
+
+    def _npath_blk_in(self):
+        pass
+
+    def _npath_blk_out(self):
+        pass
+
     def _write_func_in(self, bname):
         cpath = self._cur_path()
         super().newline()
