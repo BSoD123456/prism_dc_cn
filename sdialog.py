@@ -116,11 +116,19 @@ class c_sdialog_buf(c_scode_buf):
         if not self.blkstack:
             return
         binfo, bname, para_idx, lflags = self.blkstack.pop()
-        if step and not half:
-            para_idx += 1
-        self.blkstack.append((binfo, bname, para_idx, {}))
+        if step:
+            if half:
+                stpv = 1
+            else:
+                stpv = 2
+                para_idx += 1
+        else:
+            stpv = 0
+        nlflags = {}
+        self.blkstack.append((binfo, bname, para_idx, nlflags))
         if self._getanylflag(('has_content', 'has_content_prv'), lflags):
-            self._setlflag('has_content_prv', True)
+            self._setlflag('has_content_prv', True, nlflags)
+        self._npath_blk_step(lflags, nlflags, stpv)
 
     def _blk_in(self, binfo):
         btyp, *bargs = binfo
@@ -151,6 +159,9 @@ class c_sdialog_buf(c_scode_buf):
             self._defer_para_out(
                 btyp, bname,
                 has_text, has_content and btyp == 'func')
+        nblk = self._getblk(0)
+        if nblk:
+            self._npath_blk_out(lflags, nblk[3])
         self._blk_step(has_content, with_el)
 
     def _txt_in(self):
@@ -234,37 +245,59 @@ class c_sdialog_buf(c_scode_buf):
         if 'req_path' in lvars:
             return lvars['npath_req']
         elif new:
-            if dft is True:
-                dft = {}
-            lvars['npath_req'] = dft
+            dft = lvars['npath_req'] = {}
             return dft
         else:
             return None
 
-    def _npath_req(self, lvars, half):
+    def _npath_newtab(self, lvars, tab):
+        assert not 'req_path' in lvars
+        lvars['npath_req'] = tab
+
+    def _npath_req(self, lvars, step):
         tab = self._npath_gettab(lvars, True)
-        if half:
-            dkey = 'half'
-        else:
-            dkey = 'next'
-        if not dkey in tab:
-            tab[dkey] = []
+        if not step in tab:
+            tab[step] = []
         hid = self.hold(None)
-        tab[dkey].append(hid)
+        tab[step].append(hid)
 
-    def _npath_blk_step(self, slvars, dlvars, step, half):
+    def _npath_blk_step(self, slvars, dlvars, step):
         stab = self._npath_gettab(slvars, False)
-        if tab is None:
+        if stab is None:
             return
-        if not step:
-            self._npath_gettab(dlvars, stab)
-        #TODO
+        if step == 0:
+            self._npath_newtab(dlvars, stab)
+            return
+        dtab = {}
+        for si in range(2, 0, -1):
+            sreqs = stab.get(si, None)
+            if not sreqs:
+                continue
+            di = si - step
+            if di > 0:
+                dtab[di] = sreqs
+            else:
+                if di in dtab:
+                    dreqs = dtab[di]
+                else:
+                    dreqs = dtab[di] = {}
+                dreqs.extend(sreqs)
+        self._npath_newtab(dlvars, dtab)
 
-    def _npath_blk_in(self):
-        pass
+    def _npath_blk_out(self, slvars, dlvars):
+        stab = self._npath_gettab(slvars, False)
+        if stab is None:
+            return
+        self._npath_newtab(dlvars, stab)
 
-    def _npath_blk_out(self):
-        pass
+    def _npath_rslv(self):
+        cpath = self._cur_path()
+        for bsi in self.blkstack:
+            tab = self._npath_gettab(bsi[3], False)
+            if tab is None or not 0 in tab:
+                continue
+            for hid in tab.pop(0):
+                self.reput(hid, cpath, True)
 
     def _write_func_in(self, bname):
         cpath = self._cur_path()
