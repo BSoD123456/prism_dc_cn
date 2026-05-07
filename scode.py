@@ -314,10 +314,16 @@ class c_scode_program:
         buf = ctx['buf'] = self.buf
         ctx['ftxt'] = {}
         self._gen_anode(nd, 'ivkscan', ctx)
+        buf.meta('start', 'prog')
+        buf.meta('disline')
+        buf.newline()
         for snd in nd.subs:
             if self._gen_anode(snd, None, ctx) == 'func':
                 buf.newline()
         buf.meta('end', 'prog')
+        buf.meta('disline')
+        buf.newline()
+        buf.meta('start', 'restab')
         buf.meta('disline')
         buf.newline()
         if self.conf['output_restab']:
