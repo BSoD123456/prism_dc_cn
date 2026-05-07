@@ -172,7 +172,7 @@ class c_sdialog_buf(c_scode_buf):
         (btyp, *_), bname, _, lflags = self._getblk(0)
         if self._getlflag('has_text', lflags):
             return
-        self._npath_rslv('next')
+        self._npath_rslv()
         for bsi in self.blkstack:
             (sbtyp, *_), sbname, _, slflags = bsi
             if self._getanylflag(('has_content', 'has_content_prv'), slflags):
@@ -268,12 +268,12 @@ class c_sdialog_buf(c_scode_buf):
             else:
                 lvars['npath_req'] = tab
 
-    def _npath_req(self, lvars, step):
+    def _npath_req(self, lvars, step, prompt):
         tab = self._npath_gettab(lvars, True)
         if not step in tab:
             tab[step] = []
         hid = self.hold(0)
-        tab[step].append(hid)
+        tab[step].append((hid, prompt))
 
     def _npath_blk_step(self, slvars, dlvars, step):
         stab = self._npath_gettab(slvars, False)
@@ -304,15 +304,14 @@ class c_sdialog_buf(c_scode_buf):
             return
         self._npath_settab(dlvars, stab)
 
-    def _npath_rslv(self, prompt):
+    def _npath_rslv(self):
         cpath = self._cur_path()
-        txt = f'[{prompt}: {cpath}]'
         for bsi in self.blkstack:
             tab = self._npath_gettab(bsi[3], False)
             if tab is None or not 0 in tab:
                 continue
-            for hid in tab.pop(0):
-                self.reput(hid, txt, True)
+            for hid, prompt in tab.pop(0):
+                self.reput(hid, f'[{prompt}: {cpath}]', True)
 
     def _npath_flush(self):
         for bsi in self.blkstack:
@@ -320,7 +319,7 @@ class c_sdialog_buf(c_scode_buf):
             if tab is None:
                 continue
             for reqs in tab.values():
-                for hid in reqs:
+                for hid, prompt in reqs:
                     self.reput(hid, None, True)
             self._npath_settab(bsi[3], None)
 
@@ -352,7 +351,7 @@ class c_sdialog_buf(c_scode_buf):
     def _write_para_out(self, btyp, lvars):
         super().write('[/text]')
         super().newline()
-        self._npath_req(lvars, 0)
+        self._npath_req(lvars, 0, 'next')
         super().write('--------------------')
         super().newline()
         super().newline()
