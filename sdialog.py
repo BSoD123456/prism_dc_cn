@@ -185,66 +185,6 @@ class c_sdialog_buf(c_scode_buf):
         self._setlflag('has_text', True, lflags)
         self._write_para_in(btyp)
 
-    def _defer_para_out(self, btyp, bname, pout, fout):
-        odinfo = self.gvars.get('defer_pout', None)
-        if not odinfo is None:
-            _, _, opout, ofout, _ = odinfo
-            pout = (pout or opout)
-            fout = (fout or ofout)
-        if self._getgflag('after_jump') and btyp != 'lp':
-            cpath = self._brk_path()
-        else:
-            cpath = self._cur_path(True)
-        self.gvars['defer_pout'] = (btyp, bname, pout, fout, cpath)
-
-    def _emit_para_out(self):
-        dinfo = self.gvars.get('defer_pout', None)
-        if dinfo is None:
-            return
-        btyp, bname, pout, fout, cpath = dinfo
-        if pout:
-            self._write_para_out(btyp, cpath)
-        if fout:
-            self._write_func_out(bname)
-        self.gvars['defer_pout'] = None
-
-    @staticmethod
-    def _cmp_path(p1, p2):
-        p1s = p1.split('/')
-        p2s = p2.split('/')
-        p1len = len(p1s)
-        p2len = len(p2s)
-        plen = min(p1len, p2len)
-        assert plen > 0
-        rcmp = 0
-        for i in range(plen):
-            k1 = p1s[i]
-            k2 = p2s[i]
-            if i == 0:
-                assert k1 == k2
-                continue
-            v1 = int(k1.split('-')[0])
-            v2 = int(k2.split('-')[0])
-            if v1 > v2:
-                rcmp = -1
-            elif v1 < v2:
-                rcmp = 1
-            else:
-                continue
-            break
-        return rcmp, i + 1 < p1len
-
-    def _feed_path(self, path, fmt):
-        super().write(fmt.format(path))
-        super().newline()
-
-    def _need_path(self, path, fmt):
-        super().write(fmt.format(path))
-        super().newline()
-
-    def _flush_path(self):
-        pass
-
     def _npath_gettab(self, lvars, new):
         if 'npath_req' in lvars:
             return lvars['npath_req']
@@ -345,7 +285,8 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         super().write('-------------------')
         super().newline()
-        self._feed_path(cpath, '[path: {}]')
+        super().write(f'[path: {cpath}]')
+        super().newline()
         super().write('[text]')
         super().newline()
 
