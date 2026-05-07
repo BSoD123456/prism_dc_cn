@@ -155,6 +155,8 @@ class c_sdialog_buf(c_scode_buf):
     def _blk_out(self, with_el):
         if not self.blkstack:
             self._error('unbalance block')
+        if self._getblk(0)[0][0] == 'func':
+            self._npath_flush()
         (btyp, *_), bname, _, lflags = self.blkstack.pop()
         has_text = self._getlflag('has_text', lflags)
         has_content = self._getanylflag(
@@ -174,7 +176,7 @@ class c_sdialog_buf(c_scode_buf):
         (btyp, *_), bname, _, lflags = self._getblk(0)
         if self._getlflag('has_text', lflags):
             return
-        self._npath_rslv()
+        self._npath_rslv('next')
         for bsi in self.blkstack:
             (sbtyp, *_), sbname, _, slflags = bsi
             if self._getanylflag(('has_content', 'has_content_prv'), slflags):
@@ -247,7 +249,7 @@ class c_sdialog_buf(c_scode_buf):
         pass
 
     def _npath_gettab(self, lvars, new):
-        if 'req_path' in lvars:
+        if 'npath_req' in lvars:
             return lvars['npath_req']
         elif new:
             dft = lvars['npath_req'] = {}
@@ -255,15 +257,26 @@ class c_sdialog_buf(c_scode_buf):
         else:
             return None
 
-    def _npath_newtab(self, lvars, tab):
-        assert not 'req_path' in lvars
-        lvars['npath_req'] = tab
+    def _npath_settab(self, lvars, tab):
+        if tab is None:
+            if 'npath_req' in lvars:
+                lvars.pop('npath_req')
+        else:
+            if 'npath_req' in lvars:
+                dtab = lvars['npath_req']
+                for k, reqs in tab.items():
+                    if k in dtab:
+                        dtab[k].extend(reqs)
+                    else:
+                        dtab[k] = reqs
+            else:
+                lvars['npath_req'] = tab
 
     def _npath_req(self, lvars, step):
         tab = self._npath_gettab(lvars, True)
         if not step in tab:
             tab[step] = []
-        hid = self.hold(None)
+        hid = self.hold(0)
         tab[step].append(hid)
 
     def _npath_blk_step(self, slvars, dlvars, step):
@@ -271,10 +284,10 @@ class c_sdialog_buf(c_scode_buf):
         if stab is None:
             return
         if step == 0:
-            self._npath_newtab(dlvars, stab)
+            self._npath_settab(dlvars, stab)
             return
         dtab = {}
-        for si in range(2, 0, -1):
+        for si in range(2, -1, -1):
             sreqs = stab.get(si, None)
             if not sreqs:
                 continue
@@ -282,27 +295,38 @@ class c_sdialog_buf(c_scode_buf):
             if di > 0:
                 dtab[di] = sreqs
             else:
-                if di in dtab:
-                    dreqs = dtab[di]
+                if 0 in dtab:
+                    dreqs = dtab[0]
                 else:
-                    dreqs = dtab[di] = {}
+                    dreqs = dtab[0] = []
                 dreqs.extend(sreqs)
-        self._npath_newtab(dlvars, dtab)
+        self._npath_settab(dlvars, dtab)
 
     def _npath_blk_out(self, slvars, dlvars):
         stab = self._npath_gettab(slvars, False)
         if stab is None:
             return
-        self._npath_newtab(dlvars, stab)
+        self._npath_settab(dlvars, stab)
 
-    def _npath_rslv(self):
+    def _npath_rslv(self, prompt):
         cpath = self._cur_path()
+        txt = f'[{prompt}: {cpath}]'
         for bsi in self.blkstack:
             tab = self._npath_gettab(bsi[3], False)
             if tab is None or not 0 in tab:
                 continue
             for hid in tab.pop(0):
-                self.reput(hid, cpath, True)
+                self.reput(hid, txt, True)
+
+    def _npath_flush(self):
+        for bsi in self.blkstack:
+            tab = self._npath_gettab(bsi[3], False)
+            if tab is None:
+                continue
+            for reqs in tab.values():
+                for hid in reqs:
+                    self.reput(hid, None, True)
+            self._npath_settab(bsi[3], None)
 
     def _write_func_in(self, bname):
         cpath = self._cur_path()
@@ -318,7 +342,6 @@ class c_sdialog_buf(c_scode_buf):
         super().write('====================')
         super().newline()
         super().newline()
-        self._flush_path()
         self.flush()
 
     def _write_para_in(self, btyp):
@@ -333,10 +356,7 @@ class c_sdialog_buf(c_scode_buf):
     def _write_para_out(self, btyp, lvars):
         super().write('[/text]')
         super().newline()
-        super().write('[next: ')
         self._npath_req(lvars, 0)
-        super().write(']')
-        super().newline()
         super().write('--------------------')
         super().newline()
         super().newline()
@@ -374,13 +394,16 @@ class c_sdialog_buf(c_scode_buf):
         elif cmd == 'start':
             ename, = args
             if ename == 'prog':
-                self._blk_in(args)
+                #self._blk_in(args)
+                pass
         elif cmd == 'end':
             ename, = args
             if ename == 'prog':
-                self._blk_out(False)
+                #self._blk_out(False)
                 self.touch()
         else:
+            if cmd == 'hold':
+                super().meta(cmd, *args)
             ajchk = False
         if ajchk:
             self._error('something after jump')
