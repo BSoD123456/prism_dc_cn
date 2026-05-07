@@ -151,20 +151,21 @@ class c_sdialog_buf(c_scode_buf):
     def _blk_out(self, with_el):
         if not self.blkstack:
             self._error('unbalance block')
-        if self._getblk(0)[0][0] == 'func':
-            self._npath_flush()
-        (btyp, *_), bname, _, lflags = self.blkstack.pop()
+        (btyp, *_), bname, _, lflags = self._getblk(0)
         has_text = self._getlflag('has_text', lflags)
         has_content = self._getanylflag(
             ('has_content', 'has_content_prv'), lflags)
         if has_content:
             if has_text:
                 self._write_para_out(btyp, lflags)
-            if btyp == 'func':
+        if btyp == 'func':
+            self._npath_flush()
+            if has_content:
                 self._write_func_out(bname)
-        nblk = self._getblk(0)
+        nblk = self._getblk(1)
         if nblk:
             self._npath_blk_out(lflags, nblk[3])
+        self.blkstack.pop()
         self._blk_step(has_content, with_el)
 
     def _txt_in(self):
