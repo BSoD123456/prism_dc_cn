@@ -143,8 +143,8 @@ class c_sdialog_buf(c_scode_buf):
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            (pbtyp, *_), pbname, _, _ = self._getblk(0)
-            self._defer_para_out(pbtyp, pbname, True, False)
+            (pbtyp, *_), _, _, plflags = self._getblk(0)
+            self._write_para_out(pbtyp, plflags)
         self._blk_step(self._getlflag('has_content'), btyp == 'el')
         self.blkstack.append((binfo, bname, 0, {}))
 
@@ -156,9 +156,10 @@ class c_sdialog_buf(c_scode_buf):
         has_content = self._getanylflag(
             ('has_content', 'has_content_prv'), lflags)
         if has_content:
-            self._defer_para_out(
-                btyp, bname,
-                has_text, has_content and btyp == 'func')
+            if has_text:
+                self._write_para_out(btyp, lflags)
+            if btyp == 'func':
+                self._write_func_out(bname)
         nblk = self._getblk(0)
         if nblk:
             self._npath_blk_out(lflags, nblk[3])
@@ -169,7 +170,7 @@ class c_sdialog_buf(c_scode_buf):
         (btyp, *_), bname, _, lflags = self._getblk(0)
         if self._getlflag('has_text', lflags):
             return
-        self._emit_para_out()
+        self._npath_rslv()
         for bsi in self.blkstack:
             (sbtyp, *_), sbname, _, slflags = bsi
             if self._getanylflag(('has_content', 'has_content_prv'), slflags):
@@ -325,10 +326,13 @@ class c_sdialog_buf(c_scode_buf):
         super().write('[text]')
         super().newline()
 
-    def _write_para_out(self, btyp, cpath):
+    def _write_para_out(self, btyp, lvars):
         super().write('[/text]')
         super().newline()
-        self._need_path(cpath, '[next: {}]')
+        super().write('[next: ')
+        self._npath_req(lvars, 0)
+        super().write(']')
+        super().newline()
         super().write('--------------------')
         super().newline()
         super().newline()
@@ -366,7 +370,6 @@ class c_sdialog_buf(c_scode_buf):
         elif cmd == 'end':
             ename, = args
             if ename == 'prog':
-                self._emit_para_out()
                 self.touch()
         else:
             ajchk = False
@@ -409,7 +412,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
+        if 1:
             cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
             #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
