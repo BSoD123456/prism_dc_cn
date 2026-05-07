@@ -63,8 +63,6 @@ class c_sdialog_buf(c_scode_buf):
         lst_para_idx = 0
         for bsi in self.blkstack:
             (btyp, *_), bname, para_idx, _ = bsi
-            if btyp == 'prog':
-                continue
             cpath.append(bname.format(lst_para_idx + 1))
             lst_para_idx = para_idx
         if cpath:
@@ -134,9 +132,7 @@ class c_sdialog_buf(c_scode_buf):
 
     def _blk_in(self, binfo):
         btyp, *bargs = binfo
-        if btyp == 'prog':
-            bname = 'Prog'
-        elif btyp == 'func':
+        if btyp == 'func':
             bname = f'Scene-{bargs[0]}'
         elif btyp == 'lp':
             bname = '{}-Pack'
@@ -394,12 +390,10 @@ class c_sdialog_buf(c_scode_buf):
         elif cmd == 'start':
             ename, = args
             if ename == 'prog':
-                #self._blk_in(args)
                 pass
         elif cmd == 'end':
             ename, = args
             if ename == 'prog':
-                #self._blk_out(False)
                 self.touch()
         else:
             if cmd == 'hold':
