@@ -63,6 +63,8 @@ class c_sdialog_buf(c_scode_buf):
         lst_para_idx = 0
         for bsi in self.blkstack:
             (btyp, *_), bname, para_idx, _ = bsi
+            if btyp == 'prog':
+                continue
             cpath.append(bname.format(lst_para_idx + 1))
             lst_para_idx = para_idx
         if cpath:
@@ -132,7 +134,9 @@ class c_sdialog_buf(c_scode_buf):
 
     def _blk_in(self, binfo):
         btyp, *bargs = binfo
-        if btyp == 'func':
+        if btyp == 'prog':
+            bname = 'Prog'
+        elif btyp == 'func':
             bname = f'Scene-{bargs[0]}'
         elif btyp == 'lp':
             bname = '{}-Pack'
@@ -367,9 +371,14 @@ class c_sdialog_buf(c_scode_buf):
             ajchk = False
         elif cmd == 'lpflow':
             self._setgflag('after_jump', True)
+        elif cmd == 'start':
+            ename, = args
+            if ename == 'prog':
+                self._blk_in(args)
         elif cmd == 'end':
             ename, = args
             if ename == 'prog':
+                self._blk_out(False)
                 self.touch()
         else:
             ajchk = False
@@ -412,7 +421,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
             #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
