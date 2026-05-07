@@ -144,9 +144,9 @@ class c_scode_buf:
         if not self.par:
             return True
         if self.par.lbuf:
-            raise err_scode_syntax(f'should touch a parent with newline')
+            raise err_scode_syntax('should touch a parent with newline')
         elif self.lbuf:
-            raise err_scode_syntax(f'should be touched with newline')
+            raise err_scode_syntax('should be touched with newline')
         blen = len(self.par.buf)
         self.par.hold_ref.update(
             (hid, hbi + blen)
@@ -195,20 +195,22 @@ class c_scode_buf_null(c_scode_buf):
     def _writeltoks(self, ltoks):
         pass
 
-class c_scode_buf_std(c_scode_buf):
+    def meta(self, cmd, *args):
+        if cmd == 'hold':
+            raise err_scode_syntax(f'unsolved held token: {args[0]}')
+        super().meta(cmd, *args)
 
-    def __init__(self):
-        super().__init__(None, True, 0)
+class c_scode_buf_std(c_scode_buf_null):
 
     def _writeltoks(self, ltoks):
         line = self._mergeltoks(ltoks)
         if not line is None:
             print(line)
 
-class c_scode_buf_fd(c_scode_buf):
+class c_scode_buf_fd(c_scode_buf_null):
 
     def __init__(self, fd):
-        super().__init__(None, True, 0)
+        super().__init__()
         self.fd = fd
 
     def _writeltoks(self, ltoks):
