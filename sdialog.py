@@ -124,11 +124,10 @@ class c_sdialog_buf(c_scode_buf):
                 para_idx += 1
         else:
             stpv = 0
-        nlflags = {}
-        self.blkstack.append((binfo, bname, para_idx, nlflags))
+        self.blkstack.append((binfo, bname, para_idx, {}))
         if self._getanylflag(('has_content', 'has_content_prv'), lflags):
-            self._setlflag('has_content_prv', True, nlflags)
-        self._npath_blk_step(lflags, nlflags, stpv)
+            self._setlflag('has_content_prv', True)
+        self._npath_blk_step(lflags, stpv)
 
     def _blk_in(self, binfo):
         btyp, *bargs = binfo
@@ -143,8 +142,7 @@ class c_sdialog_buf(c_scode_buf):
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            (pbtyp, *_), _, _, plflags = self._getblk(0)
-            self._write_para_out(pbtyp, plflags)
+            self._write_para_out(self._getblk(0)[0][0])
         self._blk_step(self._getlflag('has_content'), btyp == 'el')
         self.blkstack.append((binfo, bname, 0, {}))
 
@@ -157,14 +155,12 @@ class c_sdialog_buf(c_scode_buf):
             ('has_content', 'has_content_prv'), lflags)
         if has_content:
             if has_text:
-                self._write_para_out(btyp, lflags)
+                self._write_para_out(btyp)
         if btyp == 'func':
             self._npath_flush()
             if has_content:
                 self._write_func_out(bname)
-        nblk = self._getblk(1)
-        if nblk:
-            self._npath_blk_out(lflags, nblk[3])
+        self._npath_blk_out()
         self.blkstack.pop()
         self._blk_step(has_content, with_el)
 
@@ -209,19 +205,23 @@ class c_sdialog_buf(c_scode_buf):
             else:
                 lvars['npath_req'] = tab
 
-    def _npath_req(self, lvars, step, prompt):
-        tab = self._npath_gettab(lvars, True)
+    def _npath_req(self, step, prompt):
+        blk = self._getblk(0)
+        assert not blk is None
+        tab = self._npath_gettab(blk[3], True)
         if not step in tab:
             tab[step] = []
         hid = self.hold(0)
         tab[step].append((hid, prompt))
 
-    def _npath_blk_step(self, slvars, dlvars, step):
-        stab = self._npath_gettab(slvars, False)
+    def _npath_blk_step(self, lvars, step):
+        stab = self._npath_gettab(lvars, False)
         if stab is None:
             return
+        dblk = self._getblk(0)
+        assert not dblk is None
         if step == 0:
-            self._npath_settab(dlvars, stab)
+            self._npath_settab(dblk[3], stab)
             return
         dtab = {}
         for si in range(2, -1, -1):
@@ -237,13 +237,18 @@ class c_sdialog_buf(c_scode_buf):
                 else:
                     dreqs = dtab[0] = []
                 dreqs.extend(sreqs)
-        self._npath_settab(dlvars, dtab)
+        self._npath_settab(dblk[3], dtab)
 
-    def _npath_blk_out(self, slvars, dlvars):
-        stab = self._npath_gettab(slvars, False)
+    def _npath_blk_out(self):
+        sblk = self._getblk(0)
+        assert not sblk is None
+        dblk = self._getblk(1)
+        if dblk is None:
+            return
+        stab = self._npath_gettab(sblk[3], False)
         if stab is None:
             return
-        self._npath_settab(dlvars, stab)
+        self._npath_settab(dblk[3], stab)
 
     def _npath_rslv(self):
         cpath = self._cur_path()
@@ -290,10 +295,10 @@ class c_sdialog_buf(c_scode_buf):
         super().write('[text]')
         super().newline()
 
-    def _write_para_out(self, btyp, lvars):
+    def _write_para_out(self, btyp):
         super().write('[/text]')
         super().newline()
-        self._npath_req(lvars, 0, 'next')
+        self._npath_req(0, 'next')
         super().write('--------------------')
         super().newline()
         super().newline()
@@ -324,10 +329,13 @@ class c_sdialog_buf(c_scode_buf):
         elif cmd == 'block_done':
             if not args[0] == 'vo':
                 self._blk_out(len(args) > 1 and args[1] == 'el')
-            self._setgflag('after_jump', False)
-            ajchk = False
+            if ajchk:
+                self._setgflag('after_jump', False)
+                self.gvars.pop('jump_type')
+                ajchk = False
         elif cmd == 'lpflow':
             self._setgflag('after_jump', True)
+            self.gvars['jump_type'] = args[0]
         elif cmd == 'start':
             ename, = args
             if ename == 'prog':
