@@ -58,56 +58,18 @@ class c_sdialog_buf(c_scode_buf):
                 return True
         return False
 
-    def _cur_path(self, nxt = False):
+    def _cur_path(self, bsback = 0):
         cpath = []
+        bsdst = len(self.blkstack) - bsback
         lst_para_idx = 0
-        for bsi in self.blkstack:
+        for bsidx, bsi in enumerate(self.blkstack):
+            if bsidx == bsdst:
+                break
             (btyp, *_), bname, para_idx, _ = bsi
             cpath.append(bname.format(lst_para_idx + 1))
             lst_para_idx = para_idx
         if cpath:
-            if nxt:
-                cpath.append(str(lst_para_idx + 2))
-            else:
-                cpath.append(str(lst_para_idx + 1))
-        else:
-            cpath.append('ret')
-        return  '/'.join(cpath)
-
-    def _brk_path(self):
-        cpath = []
-        tpath = []
-        lst_para_idx = 0
-        lst_cpara_idx = 0
-        for bsi in self.blkstack:
-            (btyp, *_), bname, para_idx, _ = bsi
-            if btyp == 'lp':
-                cpath.extend(tpath)
-                lst_cpara_idx = lst_para_idx
-                tpath = []
-            tpath.append(bname.format(lst_para_idx + 1))
-            lst_para_idx = para_idx
-        if cpath:
-            cpath.append(str(lst_cpara_idx + 2))
-        else:
-            cpath.append('ret')
-        return  '/'.join(cpath)
-
-    def _ctn_path(self):
-        cpath = []
-        tpath = []
-        lst_para_idx = 0
-        lst_cpara_idx = 0
-        for bsi in self.blkstack:
-            (btyp, *_), bname, para_idx, _ = bsi
-            tpath.append(bname.format(lst_para_idx + 1))
-            lst_para_idx = para_idx
-            if btyp == 'lp':
-                cpath.extend(tpath)
-                lst_cpara_idx = lst_para_idx
-                tpath = []
-        if cpath:
-            cpath.append(str(lst_cpara_idx + 1))
+            cpath.append(str(lst_para_idx + 1))
         else:
             cpath.append('ret')
         return  '/'.join(cpath)
@@ -142,7 +104,7 @@ class c_sdialog_buf(c_scode_buf):
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            self._write_para_out(self._getblk(0)[0][0])
+            self._write_para_out(self._getblk(0)[0][0], False)
         self._blk_step(self._getlflag('has_content'), btyp == 'el')
         self.blkstack.append((binfo, bname, 0, {}))
 
@@ -155,7 +117,7 @@ class c_sdialog_buf(c_scode_buf):
             ('has_content', 'has_content_prv'), lflags)
         if has_content:
             if has_text:
-                self._write_para_out(btyp)
+                self._write_para_out(btyp, True)
         if btyp == 'func':
             self._npath_flush()
             if has_content:
@@ -205,10 +167,8 @@ class c_sdialog_buf(c_scode_buf):
             else:
                 lvars['npath_req'] = tab
 
-    def _npath_req(self, step, prompt):
-        blk = self._getblk(0)
-        assert not blk is None
-        tab = self._npath_gettab(blk[3], True)
+    def _npath_req(self, lvars, step, prompt):
+        tab = self._npath_gettab(lvars, True)
         if not step in tab:
             tab[step] = []
         hid = self.hold(0)
@@ -269,6 +229,39 @@ class c_sdialog_buf(c_scode_buf):
                     self.reput(hid, None, True)
             self._npath_settab(bsi[3], None)
 
+    def _npath_write(self, ntyp, prompt):
+        if self._getgflag('after_jump'):
+            jtyp = self.gvars['jump_type']
+            for bsback, bsi in enumerate(reversed(self.blkstack)):
+                (btyp, *_), _, _, lvars = bsi
+                if btyp != 'lp':
+                    continue
+                break
+            else:
+                self._error(f'{jtyp} without loop')
+            if jtyp == 'continue':
+                step = -bsback - 1
+            else:
+                step = 2
+        else:
+            blk = self._getblk(0)
+            assert not blk is None
+            lvars = blk[3]
+            if ntyp == 'lp':
+                step = -1
+            elif ntyp == 'if':
+                breakpoint() #TODO
+            elif ntyp == 'fi':
+                step = 1
+            else:
+                step = 0
+        if step < 0:
+            npath = self._cur_path(-step - 1)
+            super().write(f'[{prompt}: {npath}]')
+            super().newline()
+        else:
+            self._npath_req(lvars, step, prompt)
+
     def _write_func_in(self, bname):
         cpath = self._cur_path()
         super().newline()
@@ -292,13 +285,21 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         super().write(f'[path: {cpath}]')
         super().newline()
+        #if btyp == 'if':
+        #    self._npath_write('if', 'branch')
         super().write('[text]')
         super().newline()
 
-    def _write_para_out(self, btyp):
+    def _write_para_out(self, btyp, islast):
         super().write('[/text]')
         super().newline()
-        self._npath_req(0, 'next')
+        ntyp = 'ed'
+        if islast:
+            if btyp == 'lp':
+                ntyp = 'lp'
+            elif btyp == 'if':
+                ntyp = 'fi'
+        self._npath_write(ntyp, 'next')
         super().write('--------------------')
         super().newline()
         super().newline()
