@@ -248,9 +248,11 @@ class c_sdialog_buf(c_scode_buf):
             assert not blk is None
             lvars = blk[3]
             if ntyp == 'lp':
-                step = -1
+                breakpoint() #TODO
             elif ntyp == 'if':
                 breakpoint() #TODO
+            elif ntyp == 'pl':
+                step = -1
             elif ntyp == 'fi':
                 step = 2
             else:
@@ -296,7 +298,7 @@ class c_sdialog_buf(c_scode_buf):
         ntyp = 'ed'
         if islast:
             if btyp == 'lp':
-                ntyp = 'lp'
+                ntyp = 'pl'
             elif btyp == 'if':
                 ntyp = 'fi'
         self._npath_write(ntyp, 'next')
