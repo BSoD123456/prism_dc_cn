@@ -118,11 +118,13 @@ class c_scode_buf:
             self.newline()
         return c_scode_buf.HDIDX
 
-    def reput(self, hid, tok, strict = False):
+    def reput(self, hid, tok, strict = False, rehold = False):
         if self.tch:
             raise err_scode_syntax('touched buf unchangable')
         if not hid in self.hold_ref:
             raise err_scode_syntax(f'invalid hid: {hid}')
+        if rehold and tok is None:
+            return
         bi = self.hold_ref[hid]
         if bi >= len(self.buf):
             assert bi == len(self.buf)
@@ -142,13 +144,19 @@ class c_scode_buf:
             else:
                 self.hold_ref.pop(hid)
                 return
-        self.hold_ref.pop(hid)
+        if not rehold:
+            self.hold_ref.pop(hid)
         if tok is None:
+            assert not rehold
             ltoks.pop(li)
         elif isinstance(tok, str):
-            ltoks[li] = tok
+            if rehold:
+                ltoks.insert(li, tok)
+            else:
+                ltoks[li] = tok
         else:
-            ltoks.pop(li)
+            if not rehold:
+                ltoks.pop(li)
             for i, stok in enumerate(tok):
                 ltoks.insert(li + i * 2, stok)
                 ltoks.insert(li + i * 2 + 1, ('__sepline',))
