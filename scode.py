@@ -40,7 +40,7 @@ class c_scode_buf:
 
     def _mergeltoks(self, ltoks):
         arls = []
-        rls = ['__head']
+        rls = []
         scnt = 0
         idt = 0
         for tok in ltoks:
@@ -62,7 +62,7 @@ class c_scode_buf:
                 scnt += 1
         else:
             arls.extend(rls)
-        return ''.join(arls[1:]) if arls else None
+        return ''.join(arls) if arls else None
 
     def _flushltoks(self, ltoks, nl):
         for tok in ltoks:
