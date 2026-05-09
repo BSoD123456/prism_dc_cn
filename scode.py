@@ -39,20 +39,30 @@ class c_scode_buf:
         return (self.IDTSYM for _ in range(idt))
 
     def _mergeltoks(self, ltoks):
-        rls = []
+        arls = []
+        rls = ['__head__']
         scnt = 0
+        idt = 0
         for tok in ltoks:
             if isinstance(tok, tuple):
                 cmd = tok[0]
                 if cmd == 'idt':
+                    idt += tok[1]
                     rls.extend(self._idtsym(tok[1]))
                 elif cmd == 'disline':
                     if scnt == 0:
-                        return None
+                        break
+                elif cmd == '__sepline':
+                    arls.extend(rls)
+                    rls = ['\n']
+                    scnt = 0
+                    rls.extend(self._idtsym(idt))
             else:
                 rls.append(tok)
                 scnt += 1
-        return ''.join(rls)
+        else:
+            arls.extend(rls)
+        return ''.join(arls[1:]) if arls else None
 
     def _flushltoks(self, ltoks, nl):
         for tok in ltoks:
@@ -135,8 +145,13 @@ class c_scode_buf:
         self.hold_ref.pop(hid)
         if tok is None:
             ltoks.pop(li)
-        else:
+        elif isinstance(tok, str):
             ltoks[li] = tok
+        else:
+            ltoks.pop(li)
+            for i, stok in enumerate(tok):
+                ltoks.insert(li + i * 2, stok)
+                ltoks.insert(li + i * 2 + 1, ('__sepline',))
 
     def flush(self):
         if self.tch:
