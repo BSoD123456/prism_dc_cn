@@ -74,7 +74,7 @@ class c_sdialog_buf(c_scode_buf):
             cpath.append('ret')
         return  '/'.join(cpath)
 
-    def _blk_step(self, step, half):
+    def _blk_step(self, step, half = False):
         if not self.blkstack:
             return
         binfo, bname, para_idx, lflags = self.blkstack.pop()
@@ -105,7 +105,7 @@ class c_sdialog_buf(c_scode_buf):
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
             self._write_para_out(self._getblk(0)[0][0], False)
-        self._blk_step(self._getlflag('has_content'), btyp == 'el')
+        self._blk_step(self._getlflag('has_content'))
         self.blkstack.append((binfo, bname, 0, {}))
 
     def _blk_out(self, with_el):
@@ -252,9 +252,9 @@ class c_sdialog_buf(c_scode_buf):
             elif ntyp == 'if':
                 breakpoint() #TODO
             elif ntyp == 'fi':
-                step = 1
+                step = 2
             else:
-                step = 0
+                step = 1
         if step < 0:
             npath = self._cur_path(-step - 1)
             super().write(f'[{prompt}: {npath}]')
