@@ -173,6 +173,8 @@ class c_sdialog_buf(c_scode_buf):
             tab[step] = []
         hid = self.hold(0)
         tab[step].append((hid, prompt))
+        rcnt = self.gvars['npath_rcnt'].get(hid, 0)
+        self.gvars['npath_rcnt'][hid] = rcnt + 1
 
     def _npath_blk_step(self, lvars, step):
         stab = self._npath_gettab(lvars, False)
@@ -217,7 +219,10 @@ class c_sdialog_buf(c_scode_buf):
             if tab is None or not 0 in tab:
                 continue
             for hid, prompt in tab.pop(0):
-                self.reput(hid, f'[{prompt}: {cpath}]', True)
+                rcnt = self.gvars['npath_rcnt'].get(hid, 0)
+                assert rcnt > 0
+                self.reput(hid, f'[{prompt}: {cpath}]', True, rcnt > 1)
+                self.gvars['npath_rcnt'][hid] = rcnt - 1
 
     def _npath_flush(self):
         for bsi in self.blkstack:
@@ -342,7 +347,7 @@ class c_sdialog_buf(c_scode_buf):
         elif cmd == 'start':
             ename, = args
             if ename == 'prog':
-                pass
+                self.gvars['npath_rcnt'] = {}
         elif cmd == 'end':
             ename, = args
             if ename == 'prog':
