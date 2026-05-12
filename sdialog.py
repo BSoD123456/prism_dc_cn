@@ -237,10 +237,18 @@ class c_sdialog_buf(c_scode_buf):
         stab = self._npath_gettab(sblk[3], False)
         if stab is None:
             return
-        if isback and 0 in stab:
-            npath = self._cur_path(bbck)
-            for rinfo in stab.pop(0):
-                self._npath_reput(rinfo, npath)
+        if 0 in stab:
+            if isback:
+                npath = self._cur_path(bbck)
+                for rinfo in stab.pop(0):
+                    self._npath_reput(rinfo, npath)
+            else:
+                if 2 in stab:
+                    reqs = stab[2]
+                else:
+                    reqs = stab[2] = []
+                for rinfo in stab.pop(0):
+                    reqs.append(rinfo)
         if not dblk is None:
             self._npath_settab(dblk[3], stab)
 
