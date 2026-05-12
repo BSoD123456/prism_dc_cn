@@ -122,7 +122,7 @@ class c_sdialog_buf(c_scode_buf):
             self._npath_flush()
             if has_content:
                 self._write_func_out(bname)
-        self._npath_blk_out()
+        self._npath_blk_out(btyp)
         self.blkstack.pop()
         self._blk_step(has_content, with_el)
 
@@ -142,6 +142,14 @@ class c_sdialog_buf(c_scode_buf):
         self._setlflag('has_content', True, lflags)
         self._setlflag('has_text', True, lflags)
         self._write_para_in(btyp)
+
+    def _getlpblk(self):
+        for bsback, bsi in enumerate(reversed(self.blkstack)):
+            (btyp, *_), _, _, lvars = bsi
+            if btyp == 'lp':
+                return bsback, bsi
+        else:
+            self._error('no loop')
 
     def _npath_gettab(self, lvars, new):
         if 'npath_req' in lvars:
@@ -201,16 +209,40 @@ class c_sdialog_buf(c_scode_buf):
                 dreqs.extend(sreqs)
         self._npath_settab(dblk[3], dtab)
 
-    def _npath_blk_out(self):
+    def _npath_reput(self, rinfo, cpath):
+        hid, prompt = rinfo
+        rcnt = self.gvars['npath_rcnt'].get(hid, 0)
+        assert rcnt > 0
+        self.reput(hid, f'[{prompt}: {cpath}]', True, rcnt > 1)
+        self.gvars['npath_rcnt'][hid] = rcnt - 1
+
+    def _npath_blk_out(self, btyp):
         sblk = self._getblk(0)
         assert not sblk is None
-        dblk = self._getblk(1)
-        if dblk is None:
+        isback = False
+        if self._getgflag('after_jump'):
+            jtyp = self.gvars['jump_type']
+            bbck, dblk = self._getlpblk()
+            if jtyp == 'continue':
+                isback = True
+            elif jtyp != 'break':
+                self._error(f'unknown jump type: {jtyp}')
+        else:
+            if btyp == 'lp':
+                isback = True
+                bbck = 0
+            dblk = self._getblk(1)
+        if not isback and dblk is None:
             return
         stab = self._npath_gettab(sblk[3], False)
         if stab is None:
             return
-        self._npath_settab(dblk[3], stab)
+        if isback and 0 in stab:
+            npath = self._cur_path(bbck)
+            for rinfo in stab.pop(0):
+                self._npath_reput(rinfo, npath)
+        if not dblk is None:
+            self._npath_settab(dblk[3], stab)
 
     def _npath_rslv(self):
         cpath = self._cur_path()
@@ -218,11 +250,8 @@ class c_sdialog_buf(c_scode_buf):
             tab = self._npath_gettab(bsi[3], False)
             if tab is None or not 0 in tab:
                 continue
-            for hid, prompt in tab.pop(0):
-                rcnt = self.gvars['npath_rcnt'].get(hid, 0)
-                assert rcnt > 0
-                self.reput(hid, f'[{prompt}: {cpath}]', True, rcnt > 1)
-                self.gvars['npath_rcnt'][hid] = rcnt - 1
+            for rinfo in tab.pop(0):
+                self._npath_reput(rinfo, cpath)
 
     def _npath_flush(self):
         for bsi in self.blkstack:
@@ -268,6 +297,10 @@ class c_sdialog_buf(c_scode_buf):
             super().newline()
         else:
             self._npath_req(lvars, step, prompt)
+
+    def _npath_write(self, ntyp, prompt):
+        blk = self._getblk(0)
+        self._npath_req(blk[3], 2, prompt)
 
     def _write_func_in(self, bname):
         cpath = self._cur_path()
