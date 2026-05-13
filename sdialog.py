@@ -107,6 +107,7 @@ class c_sdialog_buf(c_scode_buf):
             self._write_para_out(self._getblk(0)[0][0])
         self._blk_step(self._getlflag('has_content'))
         self.blkstack.append((binfo, bname, 0, {}))
+        self._npath_blk_in(btyp)
 
     def _blk_out(self, with_el):
         if not self.blkstack:
@@ -174,7 +175,7 @@ class c_sdialog_buf(c_scode_buf):
             else:
                 lvars['npath_req'] = tab
 
-    def _npath_req(self, lvars, prompt):
+    def _npath_req(self, hid, lvars, prompt):
         if lvars is None:
             reqs = self.gvars['npath_rcur']
         else:
@@ -184,10 +185,18 @@ class c_sdialog_buf(c_scode_buf):
                 reqs = tab[step]
             else:
                 reqs = tab[step] = []
-        hid = self.hold(0)
         reqs.append((hid, prompt))
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         self.gvars['npath_rcnt'][hid] = rcnt + 1
+
+    def _npath_nxt(self, prompt):
+        hid = self.hold(0)
+        self._npath_req(hid, None, prompt)
+
+    def _npath_bra(self, lvars, prompt):
+        creqs = self.gvars['npath_rcur']
+        for hid, *_ in creqs:
+            self._npath_req(hid, lvars, prompt)
 
     def _npath_blk_step(self, lvars, step):
         stab = self._npath_gettab(lvars, False)
@@ -212,14 +221,26 @@ class c_sdialog_buf(c_scode_buf):
         if dtab:
             self._npath_settab(dblk[3], dtab)
 
+    def _npath_blk_in(self, btyp):
+        if btyp != 'lp' and btyp != 'if':
+            return
+        sblk = self._getblk(1)
+        if sblk is None:
+            return
+        self._npath_bra(sblk[3], 'branch')
+
     def _npath_reput(self, rinfo, cpath):
         hid, prompt = rinfo
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         assert rcnt > 0
-        if cpath is None:
-            self.reput(hid, None, True, rcnt > 1)
+        if rcnt > 1:
+            if not cpath is None:
+                self.reput(hid, (f'[{prompt}: {cpath}]',), True, True)
         else:
-            self.reput(hid, f'[{prompt}: {cpath}]', True, rcnt > 1)
+            if cpath is None:
+                self.reput(hid, None, True, False)
+            else:
+                self.reput(hid, f'[{prompt}: {cpath}]', True, False)
         if rcnt - 1 > 0:
             self.gvars['npath_rcnt'][hid] = rcnt - 1
         else:
@@ -315,15 +336,13 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         super().write(f'[path: {cpath}]')
         super().newline()
-        #if btyp == 'if':
-        #    self._npath_write('if', 'branch')
         super().write('[text]')
         super().newline()
 
     def _write_para_out(self, btyp):
         super().write('[/text]')
         super().newline()
-        self._npath_req(None, 'next')
+        self._npath_nxt('next')
         super().write('--------------------')
         super().newline()
         super().newline()
