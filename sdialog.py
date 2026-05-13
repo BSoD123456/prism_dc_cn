@@ -174,15 +174,16 @@ class c_sdialog_buf(c_scode_buf):
             else:
                 lvars['npath_req'] = tab
 
-    def _npath_req(self, lvars, step, prompt):
-        if step > 0:
+    def _npath_req(self, lvars, prompt):
+        if lvars is None:
+            reqs = self.gvars['npath_rcur']
+        else:
+            step = 2
             tab = self._npath_gettab(lvars, True)
             if step in tab:
                 reqs = tab[step]
             else:
                 reqs = tab[step] = []
-        else:
-            reqs = self.gvars['npath_rcur']
         hid = self.hold(0)
         reqs.append((hid, prompt))
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
@@ -291,10 +292,6 @@ class c_sdialog_buf(c_scode_buf):
             self._npath_reput(rinfo, None)
         creqs.clear()
 
-    def _npath_write(self, prompt):
-        blk = self._getblk(0)
-        self._npath_req(blk[3], 0, prompt)
-
     def _write_func_in(self, bname):
         cpath = self._cur_path()
         super().newline()
@@ -326,7 +323,7 @@ class c_sdialog_buf(c_scode_buf):
     def _write_para_out(self, btyp):
         super().write('[/text]')
         super().newline()
-        self._npath_write('next')
+        self._npath_req(None, 'next')
         super().write('--------------------')
         super().newline()
         super().newline()
