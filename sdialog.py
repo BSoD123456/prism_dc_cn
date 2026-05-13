@@ -143,11 +143,10 @@ class c_sdialog_buf(c_scode_buf):
         self._setlflag('has_text', True, lflags)
         self._write_para_in(btyp)
 
-    def _getlpblk(self):
+    def _getlpblkidx(self):
         for bsback, bsi in enumerate(reversed(self.blkstack)):
-            (btyp, *_), _, _, lvars = bsi
-            if btyp == 'lp':
-                return bsback, bsi
+            if bsi[0][0] == 'lp':
+                return bsback
         else:
             self._error('no loop')
 
@@ -222,16 +221,16 @@ class c_sdialog_buf(c_scode_buf):
         isback = False
         if self._getgflag('after_jump'):
             jtyp = self.gvars['jump_type']
-            bbck, dblk = self._getlpblk()
+            bbck = self._getlpblkidx()
             if jtyp == 'continue':
                 isback = True
             elif jtyp != 'break':
                 self._error(f'unknown jump type: {jtyp}')
         else:
+            bbck = 0
             if btyp == 'lp':
                 isback = True
-                bbck = 0
-            dblk = self._getblk(1)
+        dblk = self._getblk(bbck + 1)
         if not isback and dblk is None:
             return
         stab = self._npath_gettab(sblk[3], False)
