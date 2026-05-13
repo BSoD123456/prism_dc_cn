@@ -219,10 +219,22 @@ class c_sdialog_buf(c_scode_buf):
             self.reput(hid, None, True, rcnt > 1)
         else:
             self.reput(hid, f'[{prompt}: {cpath}]', True, rcnt > 1)
-        self.gvars['npath_rcnt'][hid] = rcnt - 1
+        if rcnt - 1 > 0:
+            self.gvars['npath_rcnt'][hid] = rcnt - 1
+        else:
+            self.gvars['npath_rcnt'].pop(hid)
 
     def _npath_blk_out(self, btyp):
         creqs = self.gvars['npath_rcur']
+        sblk = self._getblk(0)
+        assert not sblk is None
+        stab = self._npath_gettab(sblk[3], False)
+        if not stab is None:
+            for si in range(2, -1, -1):
+                sreqs = stab.get(si, None)
+                if not sreqs:
+                    continue
+                creqs.extend(sreqs)
         if len(creqs) == 0:
             return
         isback = False
