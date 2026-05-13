@@ -104,7 +104,7 @@ class c_sdialog_buf(c_scode_buf):
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            self._write_para_out(self._getblk(0)[0][0], False)
+            self._write_para_out(self._getblk(0)[0][0])
         self._blk_step(self._getlflag('has_content'))
         self.blkstack.append((binfo, bname, 0, {}))
 
@@ -117,7 +117,7 @@ class c_sdialog_buf(c_scode_buf):
             ('has_content', 'has_content_prv'), lflags)
         if has_content:
             if has_text:
-                self._write_para_out(btyp, True)
+                self._write_para_out(btyp)
         if btyp == 'func':
             self._npath_flush()
             if has_content:
@@ -279,42 +279,7 @@ class c_sdialog_buf(c_scode_buf):
             self._npath_reput(rinfo, None)
         creqs.clear()
 
-    def _npath_write(self, ntyp, prompt):
-        if self._getgflag('after_jump'):
-            jtyp = self.gvars['jump_type']
-            for bsback, bsi in enumerate(reversed(self.blkstack)):
-                (btyp, *_), _, _, lvars = bsi
-                if btyp != 'lp':
-                    continue
-                break
-            else:
-                self._error(f'{jtyp} without loop')
-            if jtyp == 'continue':
-                step = -bsback - 1
-            else:
-                step = 2
-        else:
-            blk = self._getblk(0)
-            assert not blk is None
-            lvars = blk[3]
-            if ntyp == 'lp':
-                breakpoint() #TODO
-            elif ntyp == 'if':
-                breakpoint() #TODO
-            elif ntyp == 'pl':
-                step = -1
-            elif ntyp == 'fi':
-                step = 2
-            else:
-                step = 1
-        if step < 0:
-            npath = self._cur_path(-step - 1)
-            super().write(f'[{prompt}: {npath}]')
-            super().newline()
-        else:
-            self._npath_req(lvars, step, prompt)
-
-    def _npath_write(self, ntyp, prompt):
+    def _npath_write(self, prompt):
         blk = self._getblk(0)
         self._npath_req(blk[3], 0, prompt)
 
@@ -346,16 +311,10 @@ class c_sdialog_buf(c_scode_buf):
         super().write('[text]')
         super().newline()
 
-    def _write_para_out(self, btyp, islast):
+    def _write_para_out(self, btyp):
         super().write('[/text]')
         super().newline()
-        ntyp = 'ed'
-        if islast:
-            if btyp == 'lp':
-                ntyp = 'pl'
-            elif btyp == 'if':
-                ntyp = 'fi'
-        self._npath_write(ntyp, 'next')
+        self._npath_write('next')
         super().write('--------------------')
         super().newline()
         super().newline()
