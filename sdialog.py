@@ -175,11 +175,16 @@ class c_sdialog_buf(c_scode_buf):
                 lvars['npath_req'] = tab
 
     def _npath_req(self, lvars, step, prompt):
-        tab = self._npath_gettab(lvars, True)
-        if not step in tab:
-            tab[step] = []
+        if step > 0:
+            tab = self._npath_gettab(lvars, True)
+            if step in tab:
+                reqs = tab[step]
+            else:
+                reqs = tab[step] = []
+        else:
+            reqs = self.gvars['npath_rcur']
         hid = self.hold(0)
-        tab[step].append((hid, prompt))
+        reqs.append((hid, prompt))
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         self.gvars['npath_rcnt'][hid] = rcnt + 1
 
@@ -192,6 +197,7 @@ class c_sdialog_buf(c_scode_buf):
         if step == 0:
             self._npath_settab(dblk[3], stab)
             return
+        creqs = self.gvars['npath_rcur']
         dtab = {}
         for si in range(2, -1, -1):
             sreqs = stab.get(si, None)
@@ -201,64 +207,63 @@ class c_sdialog_buf(c_scode_buf):
             if di > 0:
                 dtab[di] = sreqs
             else:
-                if 0 in dtab:
-                    dreqs = dtab[0]
-                else:
-                    dreqs = dtab[0] = []
-                dreqs.extend(sreqs)
-        self._npath_settab(dblk[3], dtab)
+                creqs.extend(sreqs)
+        if dtab:
+            self._npath_settab(dblk[3], dtab)
 
     def _npath_reput(self, rinfo, cpath):
         hid, prompt = rinfo
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         assert rcnt > 0
-        self.reput(hid, f'[{prompt}: {cpath}]', True, rcnt > 1)
+        if cpath is None:
+            self.reput(hid, None, True, rcnt > 1)
+        else:
+            self.reput(hid, f'[{prompt}: {cpath}]', True, rcnt > 1)
         self.gvars['npath_rcnt'][hid] = rcnt - 1
 
     def _npath_blk_out(self, btyp):
-        sblk = self._getblk(0)
-        assert not sblk is None
+        creqs = self.gvars['npath_rcur']
+        if len(creqs) == 0:
+            return
         isback = False
+        isbreak = False
         if self._getgflag('after_jump'):
             jtyp = self.gvars['jump_type']
             bbck = self._getlpblkidx()
             if jtyp == 'continue':
                 isback = True
-            elif jtyp != 'break':
+            elif jtyp == 'break':
+                isbreak = True
+            else:
                 self._error(f'unknown jump type: {jtyp}')
         else:
             bbck = 0
             if btyp == 'lp':
                 isback = True
-        dblk = self._getblk(bbck + 1)
-        if not isback and dblk is None:
+        if not (isback or isbreak):
             return
-        stab = self._npath_gettab(sblk[3], False)
-        if stab is None:
-            return
-        if 0 in stab:
-            if isback:
-                npath = self._cur_path(bbck)
-                for rinfo in stab.pop(0):
-                    self._npath_reput(rinfo, npath)
+        elif isback:
+            npath = self._cur_path(bbck)
+            for rinfo in creqs:
+                self._npath_reput(rinfo, npath)
+        elif isbreak:
+            dblk = self._getblk(bbck + 1)
+            if dblk is None:
+                return
+            dtab = self._npath_gettab(dblk[3], True)
+            if 2 in dtab:
+                dreqs = dtab[2]
             else:
-                if 2 in stab:
-                    reqs = stab[2]
-                else:
-                    reqs = stab[2] = []
-                for rinfo in stab.pop(0):
-                    reqs.append(rinfo)
-        if not dblk is None:
-            self._npath_settab(dblk[3], stab)
+                dreqs = dtab[2] = []
+            dreqs.extend(creqs)
+        creqs.clear()
 
     def _npath_rslv(self):
         cpath = self._cur_path()
-        for bsi in self.blkstack:
-            tab = self._npath_gettab(bsi[3], False)
-            if tab is None or not 0 in tab:
-                continue
-            for rinfo in tab.pop(0):
-                self._npath_reput(rinfo, cpath)
+        creqs = self.gvars['npath_rcur']
+        for rinfo in creqs:
+            self._npath_reput(rinfo, cpath)
+        creqs.clear()
 
     def _npath_flush(self):
         for bsi in self.blkstack:
@@ -266,9 +271,13 @@ class c_sdialog_buf(c_scode_buf):
             if tab is None:
                 continue
             for reqs in tab.values():
-                for hid, prompt in reqs:
-                    self.reput(hid, None, True)
+                for rinfo in reqs:
+                    self._npath_reput(rinfo, None)
             self._npath_settab(bsi[3], None)
+        creqs = self.gvars['npath_rcur']
+        for rinfo in creqs:
+            self._npath_reput(rinfo, None)
+        creqs.clear()
 
     def _npath_write(self, ntyp, prompt):
         if self._getgflag('after_jump'):
@@ -307,7 +316,7 @@ class c_sdialog_buf(c_scode_buf):
 
     def _npath_write(self, ntyp, prompt):
         blk = self._getblk(0)
-        self._npath_req(blk[3], 2, prompt)
+        self._npath_req(blk[3], 0, prompt)
 
     def _write_func_in(self, bname):
         cpath = self._cur_path()
@@ -388,6 +397,7 @@ class c_sdialog_buf(c_scode_buf):
             ename, = args
             if ename == 'prog':
                 self.gvars['npath_rcnt'] = {}
+                self.gvars['npath_rcur'] = []
         elif cmd == 'end':
             ename, = args
             if ename == 'prog':
