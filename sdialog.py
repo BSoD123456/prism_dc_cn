@@ -227,7 +227,7 @@ class c_sdialog_buf(c_scode_buf):
         sblk = self._getblk(1)
         if sblk is None:
             return
-        self._npath_bra(sblk[3], 'branch')
+        self._npath_bra(sblk[3], 'brch')
 
     def _npath_reput(self, rinfo, cpath):
         hid, prompt = rinfo
@@ -306,12 +306,13 @@ class c_sdialog_buf(c_scode_buf):
                 continue
             for reqs in tab.values():
                 for rinfo in reqs:
-                    self._npath_reput(rinfo, None)
+                    self._npath_reput(rinfo, 'ret')
             self._npath_settab(bsi[3], None)
         creqs = self.gvars['npath_rcur']
         for rinfo in creqs:
-            self._npath_reput(rinfo, None)
+            self._npath_reput(rinfo, 'ret')
         creqs.clear()
+        assert not self.gvars['npath_rcnt']
 
     def _write_func_in(self, bname):
         cpath = self._cur_path()
