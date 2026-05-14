@@ -18,11 +18,11 @@ class c_sdialog_buf(c_scode_buf):
         self.gvars = {}
 
     def _error(self, msg):
-        report('err', f'({self._cur_path()}) {msg}')
+        report('err', f'({self._cur_path(need_txt=False)}) {msg}')
         raise err_sdialog_syntax(msg)
 
     def _warn(self, msg):
-        report('war', f'({self._cur_path()}) {msg}')
+        report('war', f'({self._cur_path(need_txt=False)}) {msg}')
 
     def _getgflag(self, key):
         return self.gvars.get(key, False)
@@ -58,16 +58,29 @@ class c_sdialog_buf(c_scode_buf):
                 return True
         return False
 
-    def _cur_path(self, bsback = 0):
+    def _cur_path(self, bsback = 0, need_txt = True, strict = True):
         cpath = []
-        bsdst = len(self.blkstack) - bsback
+        bsdst = len(self.blkstack) - 1 - bsback
         lst_para_idx = 0
+        reached = False
         for bsidx, bsi in enumerate(self.blkstack):
-            if bsidx == bsdst:
-                break
-            (btyp, *_), bname, para_idx, _ = bsi
+            (btyp, *_), bname, para_idx, lflags = bsi
             cpath.append(bname.format(lst_para_idx + 1))
             lst_para_idx = para_idx
+            if bsidx >= bsdst:
+                reached = True
+            if reached:
+                if not need_txt:
+                    break
+                elif self._getlflag('has_text', lflags):
+                    break
+                elif strict:
+                    self._error('cur path without text')
+        else:
+            if reached:
+                return None
+            else:
+                self._error('cur path unreachable')
         if cpath:
             cpath.append(str(lst_para_idx + 1))
         else:
@@ -132,7 +145,6 @@ class c_sdialog_buf(c_scode_buf):
         (btyp, *_), bname, _, lflags = self._getblk(0)
         if self._getlflag('has_text', lflags):
             return
-        self._npath_rslv()
         for bsi in self.blkstack:
             (sbtyp, *_), sbname, _, slflags = bsi
             if self._getanylflag(('has_content', 'has_content_prv'), slflags):
@@ -142,6 +154,7 @@ class c_sdialog_buf(c_scode_buf):
                 self._write_func_in(sbname)
         self._setlflag('has_content', True, lflags)
         self._setlflag('has_text', True, lflags)
+        self._npath_rslv()
         self._write_para_in(btyp)
 
     def _getlpblkidx(self):
@@ -274,7 +287,7 @@ class c_sdialog_buf(c_scode_buf):
         if not (isback or isbreak):
             return
         elif isback:
-            npath = self._cur_path(bbck)
+            npath = self._cur_path(bbck, strict = False)
             rpwks = set()
             for rinfo in creqs:
                 self._npath_reput(rinfo, npath, rpwks)
@@ -315,7 +328,6 @@ class c_sdialog_buf(c_scode_buf):
         assert not self.gvars['npath_rcnt']
 
     def _write_func_in(self, bname):
-        cpath = self._cur_path()
         super().newline()
         super().write('====================')
         super().newline()
