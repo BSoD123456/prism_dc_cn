@@ -116,7 +116,8 @@ class c_sdialog_buf(c_scode_buf):
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
             self._write_para_out(self._getblk(0)[0][0])
-        self._blk_step(self._getlflag('has_content'))
+        if btyp != 'el':
+            self._blk_step(self._getlflag('has_content'))
         self.blkstack.append((binfo, bname, 0, {}))
         self._npath_blk_in(btyp)
 
@@ -162,6 +163,17 @@ class c_sdialog_buf(c_scode_buf):
         else:
             self._error('no loop')
 
+    def _npreqs_add(self, reqs, val, inc = 1):
+        cnt = reqs.get(val, 0)
+        reqs[val] = cnt + inc
+
+    def _npreqs_merge(self, reqs, sreqs):
+        for v, c in sreqs.items():
+            self._npreqs_add(reqs, v, c)
+
+    def _npreqs_items(self, reqs):
+        return reqs.items()
+
     def _npath_gettab(self, lvars, new):
         if 'npath_req' in lvars:
             return lvars['npath_req']
@@ -180,13 +192,13 @@ class c_sdialog_buf(c_scode_buf):
                 dtab = lvars['npath_req']
                 for k, reqs in tab.items():
                     if k in dtab:
-                        dtab[k].extend(reqs)
+                        self._npreqs_merge(dtab[k], reqs)
                     else:
                         dtab[k] = reqs
             else:
                 lvars['npath_req'] = tab
 
-    def _npath_req(self, hid, lvars):
+    def _npath_req(self, hid, lvars, rcinc = 1):
         if lvars is None:
             reqs = self.gvars['npath_rcur']
         else:
@@ -195,10 +207,10 @@ class c_sdialog_buf(c_scode_buf):
             if step in tab:
                 reqs = tab[step]
             else:
-                reqs = tab[step] = []
-        reqs.append(hid)
+                reqs = tab[step] = {}
+        self._npreqs_add(reqs, hid, rcinc)
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
-        self.gvars['npath_rcnt'][hid] = rcnt + 1
+        self.gvars['npath_rcnt'][hid] = rcnt + rcinc
 
     def _npath_nxt(self):
         hid = self.hold(0)
@@ -206,8 +218,8 @@ class c_sdialog_buf(c_scode_buf):
 
     def _npath_bra(self, lvars):
         creqs = self.gvars['npath_rcur']
-        for hid in creqs:
-            self._npath_req(hid, lvars)
+        for hid, rcnt in self._npreqs_items(creqs):
+            self._npath_req(hid, lvars, rcnt)
 
     def _npath_blk_step(self, lvars, step):
         stab = self._npath_gettab(lvars, False)
@@ -228,7 +240,7 @@ class c_sdialog_buf(c_scode_buf):
             if di > 0:
                 dtab[di] = sreqs
             else:
-                creqs.extend(sreqs)
+                self._npreqs_merge(creqs, sreqs)
         if dtab:
             self._npath_settab(dblk[3], dtab)
 
@@ -240,7 +252,7 @@ class c_sdialog_buf(c_scode_buf):
             return
         self._npath_bra(sblk[3])
 
-    def _npath_reput(self, rinfo, cpath, wkset):
+    def _npath_reput(self, rinfo, cpath, wkset, rcdec):
         hid = rinfo
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         assert rcnt > 0
@@ -248,11 +260,18 @@ class c_sdialog_buf(c_scode_buf):
             wkset.add(hid)
             if not cpath is None:
                 self.reput(hid, (f'[next: {cpath}]',), True, True)
-        if rcnt - 1 > 0:
-            self.gvars['npath_rcnt'][hid] = rcnt - 1
+        if rcnt > rcdec:
+            self.gvars['npath_rcnt'][hid] = rcnt - rcdec
         else:
+            assert rcnt == rcdec
             self.reput(hid, None, True, False)
             self.gvars['npath_rcnt'].pop(hid)
+
+    def _npath_reput_reqs(self, reqs, cpath, wkset = None):
+        if wkset is None:
+            wkset = set()
+        for rinfo, rcnt in self._npreqs_items(reqs):
+            self._npath_reput(rinfo, cpath, wkset, rcnt)
 
     def _npath_blk_out(self, btyp):
         creqs = self.gvars['npath_rcur']
@@ -264,8 +283,8 @@ class c_sdialog_buf(c_scode_buf):
                 sreqs = stab.get(si, None)
                 if not sreqs:
                     continue
-                creqs.extend(sreqs)
-        if len(creqs) == 0:
+                self._npreqs_merge(creqs, sreqs)
+        if not creqs:
             return
         isback = False
         isbreak = False
@@ -288,9 +307,7 @@ class c_sdialog_buf(c_scode_buf):
             npath = self._cur_path(bbck, strict = False)
             if npath is None:
                 npath = 'no-text-loop: ' + self._cur_path(bbck, ndtxt = False)
-            rpwks = set()
-            for rinfo in creqs:
-                self._npath_reput(rinfo, npath, rpwks)
+            self._npath_reput_reqs(creqs, npath)
         elif isbreak:
             dblk = self._getblk(bbck + 1)
             if dblk is None:
@@ -299,16 +316,14 @@ class c_sdialog_buf(c_scode_buf):
             if 2 in dtab:
                 dreqs = dtab[2]
             else:
-                dreqs = dtab[2] = []
-            dreqs.extend(creqs)
+                dreqs = dtab[2] = {}
+            self._npreqs_merge(dreqs, creqs)
         creqs.clear()
 
     def _npath_rslv(self):
         cpath = self._cur_path()
         creqs = self.gvars['npath_rcur']
-        rpwks = set()
-        for rinfo in creqs:
-            self._npath_reput(rinfo, cpath, rpwks)
+        self._npath_reput_reqs(creqs, cpath)
         creqs.clear()
 
     def _npath_flush(self):
@@ -318,17 +333,14 @@ class c_sdialog_buf(c_scode_buf):
             if tab is None:
                 continue
             for reqs in tab.values():
-                for rinfo in reqs:
-                    self._npath_reput(rinfo, 'ret', rpwks)
+                self._npath_reput_reqs(reqs, 'ret', rpwks)
             self._npath_settab(bsi[3], None)
         creqs = self.gvars['npath_rcur']
-        for rinfo in creqs:
-            self._npath_reput(rinfo, 'ret', rpwks)
+        self._npath_reput_reqs(creqs, 'ret', rpwks)
         creqs.clear()
         assert not self.gvars['npath_rcnt']
 
     def _write_func_in(self, bname):
-        print('func', bname)
         super().newline()
         super().write('====================')
         super().newline()
@@ -345,11 +357,6 @@ class c_sdialog_buf(c_scode_buf):
 
     def _write_para_in(self, btyp):
         cpath = self._cur_path()
-        if cpath.startswith('Scene-51cf0'):
-            print('para_in', cpath)
-            if cpath == 'Scene-51cf0/1-Pack/1-Pack/1-Pack/2-Then/1':
-                #breakpoint()
-                pass
         super().newline()
         super().write('-------------------')
         super().newline()
@@ -403,7 +410,7 @@ class c_sdialog_buf(c_scode_buf):
             ename, = args
             if ename == 'prog':
                 self.gvars['npath_rcnt'] = {}
-                self.gvars['npath_rcur'] = []
+                self.gvars['npath_rcur'] = {}
         elif cmd == 'end':
             ename, = args
             if ename == 'prog':
@@ -451,7 +458,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
             #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
