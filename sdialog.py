@@ -212,6 +212,7 @@ class c_sdialog_buf(c_scode_buf):
         self._npreqs_add(reqs, hid, rcinc)
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         self.gvars['npath_rcnt'][hid] = rcnt + rcinc
+        #print('req', hid, rcinc, rcnt, '->', rcnt + rcinc)
 
     def _npath_nxt(self):
         hid = self.hold(0)
@@ -228,29 +229,29 @@ class c_sdialog_buf(c_scode_buf):
         self._npath_req(-bidx, None)
         btab = self.gvars['npback_tab']
         assert not bidx in btab
-        btab[bidx] = []
-        print('btab', bidx)
+        btab[bidx] = ([], [])
+        #print('btab', bidx)
         blk = self._getblk(0)
         if not blk is None:
             blk[3]['np_bidx'] = bidx
-            blk[3]['np_hids'] = []
 
     def _npback_step(self, lvars):
         dblk = self._getblk(0)
         assert not dblk is None
         if 'np_bidx' in lvars:
             dblk[3]['np_bidx'] = lvars['np_bidx']
-            dblk[3]['np_hids'] = lvars['np_hids']
 
     def _npback_lp(self, lvars):
-        if not 'np_hids' in lvars:
+        if not 'np_bidx' in lvars:
             self._error('back with out loop')
         hid = self.hold(0)
-        lvars['np_hids'].append(hid)
+        bidx = lvars['np_bidx']
+        self.gvars['npback_tab'][bidx][0].append(hid)
 
-    def _npath_refill(self, hid, rcdec = 1):
+    def _npath_fulfill(self, hid, rcdec = 1):
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         assert rcnt > 0
+        #print('fulfill', hid, rcdec, rcnt, '->', rcnt - rcdec)
         if rcnt > rcdec:
             self.gvars['npath_rcnt'][hid] = rcnt - rcdec
             return False
@@ -262,33 +263,30 @@ class c_sdialog_buf(c_scode_buf):
     def _npback_lp_reqs(self, lvars, reqs):
         for rinfo, rcnt in self._npreqs_items(reqs):
             self._npback_lp(lvars)
-            self._npath_refill(rinfo, rcnt)
+            self._npath_fulfill(rinfo, rcnt)
 
-    def _npback_rslv(self, lvars):
-        if not 'np_hids' in lvars:
-            return
-        hids = lvars['np_hids']
-        bidx = lvars['np_bidx']
-        bpaths = self.gvars['npback_tab'].pop(bidx)
-        print('pop bpaths', bidx, bpaths, hids)
-        for hid in hids:
-            for bpath in bpaths:
-                self.reput(hid, (f'[loop: {bpath}]',), True, True)
-            self.reput(hid, None, True, False)
+    def _npback_rslv(self):
+        btab = self.gvars['npback_tab']
+        for bidx, (bhids, bpaths) in btab.items():
+            for hid in bhids:
+                for bpath in bpaths:
+                    self.reput(hid, (f'[loop: {bpath}]',), True, True)
+                self.reput(hid, None, True, False)
+        btab.clear()
 
     def _npath_reput(self, rinfo, cpath, wkset, rcdec):
         hid = rinfo
         if not hid in wkset:
             wkset.add(hid)
             if hid < 0:
-                print('get bpaths', hid)
-                bpaths = self.gvars['npback_tab'][-hid]
+                #print('get bpaths', hid)
+                bpaths = self.gvars['npback_tab'][-hid][1]
                 if not cpath is None:
                     bpaths.append(cpath)
             else:
                 if not cpath is None:
                     self.reput(hid, (f'[next: {cpath}]',), True, True)
-        if self._npath_refill(rinfo, rcdec):
+        if self._npath_fulfill(rinfo, rcdec) and hid >= 0:
             self.reput(hid, None, True, False)
 
     def _npath_reput_reqs(self, reqs, cpath, wkset = None):
@@ -358,22 +356,22 @@ class c_sdialog_buf(c_scode_buf):
             bbck = 0
             if btyp == 'lp':
                 isback = True
-        if isback or isbreak:
-            if isback:
-                dblk = self._getblk(bbck)
-                self._npback_lp_reqs(dblk[3], creqs)
-            elif isbreak:
-                dblk = self._getblk(bbck + 1)
-                if dblk is None:
-                    return
-                dtab = self._npath_gettab(dblk[3], True)
-                if 2 in dtab:
-                    dreqs = dtab[2]
-                else:
-                    dreqs = dtab[2] = {}
-                self._npreqs_merge(dreqs, creqs)
-            creqs.clear()
-        self._npback_rslv(sblk[3])
+        if not (isback or isbreak):
+            return
+        if isback:
+            dblk = self._getblk(bbck)
+            self._npback_lp_reqs(dblk[3], creqs)
+        elif isbreak:
+            dblk = self._getblk(bbck + 1)
+            if dblk is None:
+                return
+            dtab = self._npath_gettab(dblk[3], True)
+            if 2 in dtab:
+                dreqs = dtab[2]
+            else:
+                dreqs = dtab[2] = {}
+            self._npreqs_merge(dreqs, creqs)
+        creqs.clear()
 
     def _npath_rslv(self):
         cpath = self._cur_path()
@@ -393,8 +391,8 @@ class c_sdialog_buf(c_scode_buf):
         creqs = self.gvars['npath_rcur']
         self._npath_reput_reqs(creqs, 'ret', rpwks)
         creqs.clear()
+        self._npback_rslv()
         assert not self.gvars['npath_rcnt']
-        assert not self.gvars['npback_tab']
 
     def _write_func_in(self, bname):
         super().newline()
@@ -515,7 +513,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
+        if 1:
             cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
             #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
