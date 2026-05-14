@@ -229,21 +229,18 @@ class c_sdialog_buf(c_scode_buf):
             return
         self._npath_bra(sblk[3])
 
-    def _npath_reput(self, rinfo, cpath):
+    def _npath_reput(self, rinfo, cpath, wkset):
         hid = rinfo
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         assert rcnt > 0
-        if rcnt > 1:
+        if not hid in wkset:
+            wkset.add(hid)
             if not cpath is None:
                 self.reput(hid, (f'[next: {cpath}]',), True, True)
-        else:
-            if cpath is None:
-                self.reput(hid, None, True, False)
-            else:
-                self.reput(hid, f'[next: {cpath}]', True, False)
         if rcnt - 1 > 0:
             self.gvars['npath_rcnt'][hid] = rcnt - 1
         else:
+            self.reput(hid, None, True, False)
             self.gvars['npath_rcnt'].pop(hid)
 
     def _npath_blk_out(self, btyp):
@@ -278,8 +275,9 @@ class c_sdialog_buf(c_scode_buf):
             return
         elif isback:
             npath = self._cur_path(bbck)
+            rpwks = set()
             for rinfo in creqs:
-                self._npath_reput(rinfo, npath)
+                self._npath_reput(rinfo, npath, rpwks)
         elif isbreak:
             dblk = self._getblk(bbck + 1)
             if dblk is None:
@@ -295,22 +293,24 @@ class c_sdialog_buf(c_scode_buf):
     def _npath_rslv(self):
         cpath = self._cur_path()
         creqs = self.gvars['npath_rcur']
+        rpwks = set()
         for rinfo in creqs:
-            self._npath_reput(rinfo, cpath)
+            self._npath_reput(rinfo, cpath, rpwks)
         creqs.clear()
 
     def _npath_flush(self):
+        rpwks = set()
         for bsi in self.blkstack:
             tab = self._npath_gettab(bsi[3], False)
             if tab is None:
                 continue
             for reqs in tab.values():
                 for rinfo in reqs:
-                    self._npath_reput(rinfo, 'ret')
+                    self._npath_reput(rinfo, 'ret', rpwks)
             self._npath_settab(bsi[3], None)
         creqs = self.gvars['npath_rcur']
         for rinfo in creqs:
-            self._npath_reput(rinfo, 'ret')
+            self._npath_reput(rinfo, 'ret', rpwks)
         creqs.clear()
         assert not self.gvars['npath_rcnt']
 
