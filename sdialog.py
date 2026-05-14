@@ -80,7 +80,7 @@ class c_sdialog_buf(c_scode_buf):
             if reached:
                 return None
             else:
-                self._error('cur path unreachable')
+                raise err_sdialog_syntax('cur path unreachable')
         if cpath:
             cpath.append(str(lst_para_idx + 1))
         else:
