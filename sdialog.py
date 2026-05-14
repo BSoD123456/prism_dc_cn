@@ -241,10 +241,9 @@ class c_sdialog_buf(c_scode_buf):
         if 'np_bidx' in lvars:
             dblk[3]['np_bidx'] = lvars['np_bidx']
 
-    def _npback_lp(self, lvars):
+    def _npback_lp(self, hid, lvars):
         if not 'np_bidx' in lvars:
             self._error('back with out loop')
-        hid = self.hold(0)
         bidx = lvars['np_bidx']
         self.gvars['npback_tab'][bidx][0].append(hid)
 
@@ -261,17 +260,20 @@ class c_sdialog_buf(c_scode_buf):
             return True
 
     def _npback_lp_reqs(self, lvars, reqs):
-        for rinfo, rcnt in self._npreqs_items(reqs):
-            self._npback_lp(lvars)
-            self._npath_fulfill(rinfo, rcnt)
+        for hid, rcnt in self._npreqs_items(reqs):
+            self._npback_lp(hid, lvars)
+            self._npath_fulfill(hid, rcnt)
 
     def _npback_rslv(self):
         btab = self.gvars['npback_tab']
         for bidx, (bhids, bpaths) in btab.items():
             for hid in bhids:
-                for bpath in bpaths:
-                    self.reput(hid, (f'[loop: {bpath}]',), True, True)
-                self.reput(hid, None, True, False)
+                if hid < 0:
+                    breakpoint()
+                else:
+                    for bpath in bpaths:
+                        self.reput(hid, (f'[loop: {bpath}]',), True, True)
+                    self.reput(hid, None, True, False)
         btab.clear()
 
     def _npath_reput(self, rinfo, cpath, wkset, rcdec):
