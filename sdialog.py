@@ -248,20 +248,7 @@ class c_sdialog_buf(c_scode_buf):
         hid = self.hold(0)
         lvars['np_hids'].append(hid)
 
-    def _npback_rslv(self, lvars):
-        if not 'np_hids' in lvars:
-            return
-        hids = lvars['np_hids']
-        bidx = lvars['np_bidx']
-        bpaths = self.gvars['npback_tab'].pop(bidx)
-        print('pop bpaths', bidx, bpaths)
-        for hid in hids:
-            for bpath in bpaths:
-                self.reput(hid, (f'[next: {bpath}]',), True, True)
-            self.reput(hid, None, True, False)
-
-    def _npath_refill(self, rinfo, rcdec):
-        hid = rinfo
+    def _npath_refill(self, hid, rcdec = 1):
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         assert rcnt > 0
         if rcnt > rcdec:
@@ -277,13 +264,25 @@ class c_sdialog_buf(c_scode_buf):
             self._npback_lp(lvars)
             self._npath_refill(rinfo, rcnt)
 
+    def _npback_rslv(self, lvars):
+        if not 'np_hids' in lvars:
+            return
+        hids = lvars['np_hids']
+        bidx = lvars['np_bidx']
+        bpaths = self.gvars['npback_tab'].pop(bidx)
+        print('pop bpaths', bidx, bpaths, hids)
+        for hid in hids:
+            for bpath in bpaths:
+                self.reput(hid, (f'[loop: {bpath}]',), True, True)
+            self.reput(hid, None, True, False)
+
     def _npath_reput(self, rinfo, cpath, wkset, rcdec):
         hid = rinfo
         if not hid in wkset:
             wkset.add(hid)
             if hid < 0:
+                print('get bpaths', hid)
                 bpaths = self.gvars['npback_tab'][-hid]
-                print('get bpaths', hid, bpaths)
                 if not cpath is None:
                     bpaths.append(cpath)
             else:
