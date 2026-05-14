@@ -175,7 +175,7 @@ class c_sdialog_buf(c_scode_buf):
             else:
                 lvars['npath_req'] = tab
 
-    def _npath_req(self, hid, lvars, prompt):
+    def _npath_req(self, hid, lvars):
         if lvars is None:
             reqs = self.gvars['npath_rcur']
         else:
@@ -185,18 +185,18 @@ class c_sdialog_buf(c_scode_buf):
                 reqs = tab[step]
             else:
                 reqs = tab[step] = []
-        reqs.append((hid, prompt))
+        reqs.append(hid)
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         self.gvars['npath_rcnt'][hid] = rcnt + 1
 
-    def _npath_nxt(self, prompt):
+    def _npath_nxt(self):
         hid = self.hold(0)
-        self._npath_req(hid, None, prompt)
+        self._npath_req(hid, None)
 
-    def _npath_bra(self, lvars, prompt):
+    def _npath_bra(self, lvars):
         creqs = self.gvars['npath_rcur']
-        for hid, *_ in creqs:
-            self._npath_req(hid, lvars, prompt)
+        for hid in creqs:
+            self._npath_req(hid, lvars)
 
     def _npath_blk_step(self, lvars, step):
         stab = self._npath_gettab(lvars, False)
@@ -227,20 +227,20 @@ class c_sdialog_buf(c_scode_buf):
         sblk = self._getblk(1)
         if sblk is None:
             return
-        self._npath_bra(sblk[3], 'brch')
+        self._npath_bra(sblk[3])
 
     def _npath_reput(self, rinfo, cpath):
-        hid, prompt = rinfo
+        hid = rinfo
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         assert rcnt > 0
         if rcnt > 1:
             if not cpath is None:
-                self.reput(hid, (f'[{prompt}: {cpath}]',), True, True)
+                self.reput(hid, (f'[next: {cpath}]',), True, True)
         else:
             if cpath is None:
                 self.reput(hid, None, True, False)
             else:
-                self.reput(hid, f'[{prompt}: {cpath}]', True, False)
+                self.reput(hid, f'[next: {cpath}]', True, False)
         if rcnt - 1 > 0:
             self.gvars['npath_rcnt'][hid] = rcnt - 1
         else:
@@ -343,7 +343,7 @@ class c_sdialog_buf(c_scode_buf):
     def _write_para_out(self, btyp):
         super().write('[/text]')
         super().newline()
-        self._npath_nxt('next')
+        self._npath_nxt()
         super().write('--------------------')
         super().newline()
         super().newline()
