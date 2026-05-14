@@ -202,7 +202,6 @@ class c_sdialog_buf(c_scode_buf):
     def _npath_refill(self, hid, rcinc):
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         self.gvars['npath_rcnt'][hid] = rcnt + rcinc
-        #print('refill', hid, rcinc, rcnt, '->', rcnt + rcinc)
 
     def _npath_req(self, hid, lvars, rcinc = 1):
         if lvars is None:
@@ -233,7 +232,6 @@ class c_sdialog_buf(c_scode_buf):
         btab = self.gvars['npback_tab']
         assert not bidx in btab
         btab[bidx] = ([], [])
-        #print('btab', bidx)
         blk = self._getblk(0)
         if not blk is None:
             blk[3]['np_bidx'] = bidx
@@ -248,13 +246,11 @@ class c_sdialog_buf(c_scode_buf):
         if not 'np_bidx' in lvars:
             self._error('back with out loop')
         bidx = lvars['np_bidx']
-        #print('loop', hid, '->', bidx)
         self.gvars['npback_tab'][bidx][0].append(hid)
 
     def _npath_fulfill(self, hid, rcdec = 1):
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
         assert rcnt > 0
-        #print('fulfill', hid, rcdec, rcnt, '->', rcnt - rcdec)
         if rcnt > rcdec:
             self.gvars['npath_rcnt'][hid] = rcnt - rcdec
             return False
@@ -311,7 +307,6 @@ class c_sdialog_buf(c_scode_buf):
         if not hid in wkset:
             wkset.add(hid)
             if hid < 0:
-                #print('get bpaths', hid)
                 bpaths = self.gvars['npback_tab'][-hid][1]
                 if not cpath is None:
                     bpaths.append(cpath)
