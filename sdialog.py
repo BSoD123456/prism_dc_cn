@@ -199,6 +199,11 @@ class c_sdialog_buf(c_scode_buf):
             else:
                 lvars['npath_req'] = tab
 
+    def _npath_refill(self, hid, rcinc):
+        rcnt = self.gvars['npath_rcnt'].get(hid, 0)
+        self.gvars['npath_rcnt'][hid] = rcnt + rcinc
+        #print('refill', hid, rcinc, rcnt, '->', rcnt + rcinc)
+
     def _npath_req(self, hid, lvars, rcinc = 1):
         if lvars is None:
             reqs = self.gvars['npath_rcur']
@@ -210,9 +215,7 @@ class c_sdialog_buf(c_scode_buf):
             else:
                 reqs = tab[step] = {}
         self._npreqs_add(reqs, hid, rcinc)
-        rcnt = self.gvars['npath_rcnt'].get(hid, 0)
-        self.gvars['npath_rcnt'][hid] = rcnt + rcinc
-        #print('req', hid, rcinc, rcnt, '->', rcnt + rcinc)
+        self._npath_refill(hid, rcinc)
 
     def _npath_nxt(self):
         hid = self.hold(0)
@@ -264,6 +267,7 @@ class c_sdialog_buf(c_scode_buf):
         for hid, rcnt in self._npreqs_items(reqs):
             self._npback_lp(hid, lvars)
             self._npath_fulfill(hid, rcnt)
+            self._npath_refill(hid, 1)
 
     def _npbp_merge(self, btab, bref, dpaths, bidx, wk):
         if bidx in wk:
@@ -293,11 +297,13 @@ class c_sdialog_buf(c_scode_buf):
             if not dpaths:
                 continue
             for hid in bhids:
+                hd = self._npath_fulfill(hid, 1)
                 if hid < 0:
                     continue
                 for bpath in dpaths:
                     self.reput(hid, (f'[loop: {bpath}]',), True, True)
-                self.reput(hid, None, True, False)
+                if hd:
+                    self.reput(hid, None, True, False)
         btab.clear()
 
     def _npath_reput(self, rinfo, cpath, wkset, rcdec):
@@ -539,7 +545,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
             #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
