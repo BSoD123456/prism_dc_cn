@@ -91,14 +91,12 @@ class c_sdialog_buf(c_scode_buf):
         if not self.blkstack:
             return
         binfo, bname, para_idx, lflags = self.blkstack.pop()
-        if step:
-            if half:
-                stpv = 1
-            else:
-                stpv = 2
-                para_idx += 1
+        if half:
+            stpv = 1
         else:
-            stpv = 0
+            stpv = 2
+            if step:
+                para_idx += 1
         self.blkstack.append((binfo, bname, para_idx, {}))
         if self._getanylflag(('has_content', 'has_content_prv'), lflags):
             self._setlflag('has_content_prv', True)
@@ -330,6 +328,7 @@ class c_sdialog_buf(c_scode_buf):
         assert not self.gvars['npath_rcnt']
 
     def _write_func_in(self, bname):
+        print('func', bname)
         super().newline()
         super().write('====================')
         super().newline()
@@ -346,6 +345,11 @@ class c_sdialog_buf(c_scode_buf):
 
     def _write_para_in(self, btyp):
         cpath = self._cur_path()
+        if cpath.startswith('Scene-51cf0'):
+            print('para_in', cpath)
+            if cpath == 'Scene-51cf0/1-Pack/1-Pack/1-Pack/2-Then/1':
+                #breakpoint()
+                pass
         super().newline()
         super().write('-------------------')
         super().newline()
@@ -447,7 +451,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
+        if 1:
             cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
             #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
