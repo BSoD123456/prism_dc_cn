@@ -245,6 +245,7 @@ class c_sdialog_buf(c_scode_buf):
         if not 'np_bidx' in lvars:
             self._error('back with out loop')
         bidx = lvars['np_bidx']
+        #print('loop', hid, '->', bidx)
         self.gvars['npback_tab'][bidx][0].append(hid)
 
     def _npath_fulfill(self, hid, rcdec = 1):
@@ -264,16 +265,39 @@ class c_sdialog_buf(c_scode_buf):
             self._npback_lp(hid, lvars)
             self._npath_fulfill(hid, rcnt)
 
+    def _npbp_merge(self, btab, bref, dpaths, bidx, wk):
+        if bidx in wk:
+            return
+        wk.add(bidx)
+        dpaths.extend(btab[bidx][1])
+        if not bidx in bref:
+            return
+        for didx in bref[bidx]:
+            self._npbp_merge(btab, bref, dpaths, didx, wk)
+
     def _npback_rslv(self):
         btab = self.gvars['npback_tab']
+        bref = {}
         for bidx, (bhids, bpaths) in btab.items():
             for hid in bhids:
+                if hid < 0 and -hid != bidx:
+                    if -hid in bref:
+                        refs = bref[-hid]
+                    else:
+                        refs = bref[-hid] = []
+                    refs.append(bidx)
+        for bidx, (bhids, bpaths) in btab.items():
+            dpaths = []
+            wk = set()
+            self._npbp_merge(btab, bref, dpaths, bidx, wk)
+            if not dpaths:
+                continue
+            for hid in bhids:
                 if hid < 0:
-                    breakpoint()
-                else:
-                    for bpath in bpaths:
-                        self.reput(hid, (f'[loop: {bpath}]',), True, True)
-                    self.reput(hid, None, True, False)
+                    continue
+                for bpath in dpaths:
+                    self.reput(hid, (f'[loop: {bpath}]',), True, True)
+                self.reput(hid, None, True, False)
         btab.clear()
 
     def _npath_reput(self, rinfo, cpath, wkset, rcdec):
