@@ -18,11 +18,11 @@ class c_sdialog_buf(c_scode_buf):
         self.gvars = {}
 
     def _error(self, msg):
-        report('err', f'({self._cur_path(need_txt=False)}) {msg}')
+        report('err', f'({self._cur_path(ndtxt=False)}) {msg}')
         raise err_sdialog_syntax(msg)
 
     def _warn(self, msg):
-        report('war', f'({self._cur_path(need_txt=False)}) {msg}')
+        report('war', f'({self._cur_path(ndtxt=False)}) {msg}')
 
     def _getgflag(self, key):
         return self.gvars.get(key, False)
@@ -58,7 +58,7 @@ class c_sdialog_buf(c_scode_buf):
                 return True
         return False
 
-    def _cur_path(self, bsback = 0, need_txt = True, strict = True):
+    def _cur_path(self, bsback = 0, ndtxt = True, strict = True):
         cpath = []
         bsdst = len(self.blkstack) - 1 - bsback
         lst_para_idx = 0
@@ -70,7 +70,7 @@ class c_sdialog_buf(c_scode_buf):
             if bsidx >= bsdst:
                 reached = True
             if reached:
-                if not need_txt:
+                if not ndtxt:
                     break
                 elif self._getlflag('has_text', lflags):
                     break
@@ -288,6 +288,8 @@ class c_sdialog_buf(c_scode_buf):
             return
         elif isback:
             npath = self._cur_path(bbck, strict = False)
+            if npath is None:
+                npath = 'no-text-loop: ' + self._cur_path(bbck, ndtxt = False)
             rpwks = set()
             for rinfo in creqs:
                 self._npath_reput(rinfo, npath, rpwks)
