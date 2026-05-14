@@ -286,6 +286,7 @@ class c_sdialog_buf(c_scode_buf):
                     else:
                         refs = bref[-hid] = []
                     refs.append(bidx)
+        wkpaths = {}
         for bidx, (bhids, bpaths) in btab.items():
             dpaths = []
             wk = set()
@@ -296,8 +297,14 @@ class c_sdialog_buf(c_scode_buf):
                 hd = self._npath_fulfill(hid, 1)
                 if hid < 0:
                     continue
+                if hid in wkpaths:
+                    wk = wkpaths[hid]
+                else:
+                    wk = wkpaths[hid] = set()
                 for bpath in dpaths:
-                    self.reput(hid, (f'[loop: {bpath}]',), True, True)
+                    if not bpath in wk:
+                        self.reput(hid, (f'[loop: {bpath}]',), True, True)
+                        wk.add(bpath)
                 if hd:
                     self.reput(hid, None, True, False)
         btab.clear()
