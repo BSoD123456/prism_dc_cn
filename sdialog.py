@@ -100,6 +100,7 @@ class c_sdialog_buf(c_scode_buf):
         self.blkstack.append((binfo, bname, para_idx, {}))
         if self._getanylflag(('has_content', 'has_content_prv'), lflags):
             self._setlflag('has_content_prv', True)
+        self._npback_step(lflags)
         self._npath_blk_step(lflags, stpv)
 
     def _blk_in(self, binfo):
@@ -221,6 +222,82 @@ class c_sdialog_buf(c_scode_buf):
         for hid, rcnt in self._npreqs_items(creqs):
             self._npath_req(hid, lvars, rcnt)
 
+    def _npback_st(self):
+        bidx = self.gvars.get('npback_idx', 0) + 1
+        self.gvars['npback_idx'] = bidx
+        self._npath_req(-bidx, None)
+        btab = self.gvars['npback_tab']
+        assert not bidx in btab
+        btab[bidx] = []
+        print('btab', bidx)
+        blk = self._getblk(0)
+        if not blk is None:
+            blk[3]['np_bidx'] = bidx
+            blk[3]['np_hids'] = []
+
+    def _npback_step(self, lvars):
+        dblk = self._getblk(0)
+        assert not dblk is None
+        if 'np_bidx' in lvars:
+            dblk[3]['np_bidx'] = lvars['np_bidx']
+            dblk[3]['np_hids'] = lvars['np_hids']
+
+    def _npback_lp(self, lvars):
+        if not 'np_hids' in lvars:
+            self._error('back with out loop')
+        hid = self.hold(0)
+        lvars['np_hids'].append(hid)
+
+    def _npback_rslv(self, lvars):
+        if not 'np_hids' in lvars:
+            return
+        hids = lvars['np_hids']
+        bidx = lvars['np_bidx']
+        bpaths = self.gvars['npback_tab'].pop(bidx)
+        print('pop bpaths', bidx, bpaths)
+        for hid in hids:
+            for bpath in bpaths:
+                self.reput(hid, (f'[next: {bpath}]',), True, True)
+            self.reput(hid, None, True, False)
+
+    def _npath_refill(self, rinfo, rcdec):
+        hid = rinfo
+        rcnt = self.gvars['npath_rcnt'].get(hid, 0)
+        assert rcnt > 0
+        if rcnt > rcdec:
+            self.gvars['npath_rcnt'][hid] = rcnt - rcdec
+            return False
+        else:
+            assert rcnt == rcdec
+            self.gvars['npath_rcnt'].pop(hid)
+            return True
+
+    def _npback_lp_reqs(self, lvars, reqs):
+        for rinfo, rcnt in self._npreqs_items(reqs):
+            self._npback_lp(lvars)
+            self._npath_refill(rinfo, rcnt)
+
+    def _npath_reput(self, rinfo, cpath, wkset, rcdec):
+        hid = rinfo
+        if not hid in wkset:
+            wkset.add(hid)
+            if hid < 0:
+                bpaths = self.gvars['npback_tab'][-hid]
+                print('get bpaths', hid, bpaths)
+                if not cpath is None:
+                    bpaths.append(cpath)
+            else:
+                if not cpath is None:
+                    self.reput(hid, (f'[next: {cpath}]',), True, True)
+        if self._npath_refill(rinfo, rcdec):
+            self.reput(hid, None, True, False)
+
+    def _npath_reput_reqs(self, reqs, cpath, wkset = None):
+        if wkset is None:
+            wkset = set()
+        for rinfo, rcnt in self._npreqs_items(reqs):
+            self._npath_reput(rinfo, cpath, wkset, rcnt)
+
     def _npath_blk_step(self, lvars, step):
         stab = self._npath_gettab(lvars, False)
         if stab is None:
@@ -245,33 +322,14 @@ class c_sdialog_buf(c_scode_buf):
             self._npath_settab(dblk[3], dtab)
 
     def _npath_blk_in(self, btyp):
-        if btyp != 'lp' and btyp != 'if':
+        if btyp == 'lp':
+            self._npback_st()
+        elif btyp != 'if':
             return
         sblk = self._getblk(1)
         if sblk is None:
             return
         self._npath_bra(sblk[3])
-
-    def _npath_reput(self, rinfo, cpath, wkset, rcdec):
-        hid = rinfo
-        rcnt = self.gvars['npath_rcnt'].get(hid, 0)
-        assert rcnt > 0
-        if not hid in wkset:
-            wkset.add(hid)
-            if not cpath is None:
-                self.reput(hid, (f'[next: {cpath}]',), True, True)
-        if rcnt > rcdec:
-            self.gvars['npath_rcnt'][hid] = rcnt - rcdec
-        else:
-            assert rcnt == rcdec
-            self.reput(hid, None, True, False)
-            self.gvars['npath_rcnt'].pop(hid)
-
-    def _npath_reput_reqs(self, reqs, cpath, wkset = None):
-        if wkset is None:
-            wkset = set()
-        for rinfo, rcnt in self._npreqs_items(reqs):
-            self._npath_reput(rinfo, cpath, wkset, rcnt)
 
     def _npath_blk_out(self, btyp):
         creqs = self.gvars['npath_rcur']
@@ -301,24 +359,22 @@ class c_sdialog_buf(c_scode_buf):
             bbck = 0
             if btyp == 'lp':
                 isback = True
-        if not (isback or isbreak):
-            return
-        elif isback:
-            npath = self._cur_path(bbck, strict = False)
-            if npath is None:
-                npath = 'no-text-loop: ' + self._cur_path(bbck, ndtxt = False)
-            self._npath_reput_reqs(creqs, npath)
-        elif isbreak:
-            dblk = self._getblk(bbck + 1)
-            if dblk is None:
-                return
-            dtab = self._npath_gettab(dblk[3], True)
-            if 2 in dtab:
-                dreqs = dtab[2]
-            else:
-                dreqs = dtab[2] = {}
-            self._npreqs_merge(dreqs, creqs)
-        creqs.clear()
+        if isback or isbreak:
+            if isback:
+                dblk = self._getblk(bbck)
+                self._npback_lp_reqs(dblk[3], creqs)
+            elif isbreak:
+                dblk = self._getblk(bbck + 1)
+                if dblk is None:
+                    return
+                dtab = self._npath_gettab(dblk[3], True)
+                if 2 in dtab:
+                    dreqs = dtab[2]
+                else:
+                    dreqs = dtab[2] = {}
+                self._npreqs_merge(dreqs, creqs)
+            creqs.clear()
+        self._npback_rslv(sblk[3])
 
     def _npath_rslv(self):
         cpath = self._cur_path()
@@ -339,6 +395,7 @@ class c_sdialog_buf(c_scode_buf):
         self._npath_reput_reqs(creqs, 'ret', rpwks)
         creqs.clear()
         assert not self.gvars['npath_rcnt']
+        assert not self.gvars['npback_tab']
 
     def _write_func_in(self, bname):
         super().newline()
@@ -411,6 +468,7 @@ class c_sdialog_buf(c_scode_buf):
             if ename == 'prog':
                 self.gvars['npath_rcnt'] = {}
                 self.gvars['npath_rcur'] = {}
+                self.gvars['npback_tab'] = {}
         elif cmd == 'end':
             ename, = args
             if ename == 'prog':
