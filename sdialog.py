@@ -568,7 +568,7 @@ class c_sdialog_sys_buf(c_sdialog_buf):
         ntab = self.gvars['sc_name_tab']
         if not idx in ntab:
             self._error(f'unset name idx: {idx:x}')
-        return ntab[idx]
+        return f'{{word({ntab[idx]})}}'
 
     def write(self, s):
         if self._getgflag('in_syscall'):
