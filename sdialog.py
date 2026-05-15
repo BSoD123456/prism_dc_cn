@@ -148,6 +148,7 @@ class c_sdialog_buf(c_scode_buf):
             self._setlflag('has_content', True, slflags)
             if sbtyp == 'func':
                 self._write_func_in(sbname)
+                self._npback_nxt(slflags)
         self._setlflag('has_content', True, lflags)
         self._setlflag('has_text', True, lflags)
         self._npath_rslv()
@@ -243,6 +244,11 @@ class c_sdialog_buf(c_scode_buf):
             self._error('back with out loop')
         bidx = lvars['np_bidx']
         self.gvars['npback_tab'][bidx][0].append(hid)
+        self._npath_refill(hid, 1)
+
+    def _npback_nxt(self, lvars):
+        hid = self.hold(0)
+        self._npback_lp(hid, lvars)
 
     def _npath_fulfill(self, hid, rcdec = 1):
         rcnt = self.gvars['npath_rcnt'].get(hid, 0)
@@ -259,7 +265,6 @@ class c_sdialog_buf(c_scode_buf):
         for hid, rcnt in self._npreqs_items(reqs):
             self._npback_lp(hid, lvars)
             self._npath_fulfill(hid, rcnt)
-            self._npath_refill(hid, 1)
 
     def _npath_reput(self, hid, cpath, wkset, rcdec):
         assert hid >= 0
@@ -370,7 +375,7 @@ class c_sdialog_buf(c_scode_buf):
             self._npath_settab(dblk[3], dtab)
 
     def _npath_blk_in(self, btyp):
-        if btyp == 'lp':
+        if btyp == 'lp' or btyp == 'func':
             self._npback_st()
         elif btyp != 'if':
             return
@@ -452,7 +457,6 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         super().write(f'[scene: {bname}]')
         super().newline()
-        self._npath_nxt()
 
     def _write_func_out(self, bname):
         super().write(f'[/scene: {bname}]')
