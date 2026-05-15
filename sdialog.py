@@ -231,7 +231,7 @@ class c_sdialog_buf(c_scode_buf):
         self._npath_req(-bidx, None)
         btab = self.gvars['npback_tab']
         assert not bidx in btab
-        btab[bidx] = ([], [])
+        btab[bidx] = ([], {})
         blk = self._getblk(0)
         if not blk is None:
             blk[3]['np_bidx'] = bidx
@@ -265,11 +265,53 @@ class c_sdialog_buf(c_scode_buf):
             self._npath_fulfill(hid, rcnt)
             self._npath_refill(hid, 1)
 
+    def _npath_reput(self, hid, cpath, wkset, rcdec):
+        assert hid >= 0
+        if not hid in wkset:
+            wkset.add(hid)
+            if not cpath is None:
+                self.reput(hid, (f'[next: {cpath}]',), True, True)
+        if self._npath_fulfill(hid, rcdec):
+            self.reput(hid, None, True, False)
+
+    def _npback_bpaths_append(self, bpaths, cpath, reqs):
+        if cpath in bpaths:
+            pset = bpaths[cpath]
+        else:
+            pset = bpaths[cpath] = set()
+        pset.update(reqs.keys())
+
+    def _npback_bpaths_merge(self, bpaths, sbpaths):
+        for spath, spset in sbpaths.items():
+            if spath in bpaths:
+                pset = bpaths[spath]
+                pset.update(spset)
+            else:
+                bpaths[spath] = spset.copy()
+
+    def _npback_reput(self, hid, cpath, wkset, rcdec, reqs):
+        assert hid < 0
+        if not hid in wkset:
+            wkset.add(hid)
+            bpaths = self.gvars['npback_tab'][-hid][1]
+            if not cpath is None:
+                self._npback_bpaths_append(bpaths, cpath, reqs)
+        self._npath_fulfill(hid, rcdec)
+
+    def _npath_reput_reqs(self, reqs, cpath, wkset = None):
+        if wkset is None:
+            wkset = set()
+        for hid, rcnt in self._npreqs_items(reqs):
+            if hid < 0:
+                self._npback_reput(hid, cpath, wkset, rcnt, reqs)
+            else:
+                self._npath_reput(hid, cpath, wkset, rcnt)
+
     def _npbp_merge(self, btab, bref, dpaths, bidx, wk):
         if bidx in wk:
             return
         wk.add(bidx)
-        dpaths.extend(btab[bidx][1])
+        self._npback_bpaths_merge(dpaths, btab[bidx][1])
         if not bidx in bref:
             return
         for didx in bref[bidx]:
@@ -288,7 +330,7 @@ class c_sdialog_buf(c_scode_buf):
                     refs.append(bidx)
         wkpaths = {}
         for bidx, (bhids, bpaths) in btab.items():
-            dpaths = []
+            dpaths = {}
             wk = set()
             self._npbp_merge(btab, bref, dpaths, bidx, wk)
             if not dpaths:
@@ -308,26 +350,6 @@ class c_sdialog_buf(c_scode_buf):
                 if hd:
                     self.reput(hid, None, True, False)
         btab.clear()
-
-    def _npath_reput(self, rinfo, cpath, wkset, rcdec):
-        hid = rinfo
-        if not hid in wkset:
-            wkset.add(hid)
-            if hid < 0:
-                bpaths = self.gvars['npback_tab'][-hid][1]
-                if not cpath is None:
-                    bpaths.append(cpath)
-            else:
-                if not cpath is None:
-                    self.reput(hid, (f'[next: {cpath}]',), True, True)
-        if self._npath_fulfill(rinfo, rcdec) and hid >= 0:
-            self.reput(hid, None, True, False)
-
-    def _npath_reput_reqs(self, reqs, cpath, wkset = None):
-        if wkset is None:
-            wkset = set()
-        for rinfo, rcnt in self._npreqs_items(reqs):
-            self._npath_reput(rinfo, cpath, wkset, rcnt)
 
     def _npath_blk_step(self, lvars, step):
         stab = self._npath_gettab(lvars, False)
