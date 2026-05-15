@@ -471,9 +471,7 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         super().write('-------------------')
         super().newline()
-        super().write(f'<path: {cpath}>')
-        super().newline()
-        super().write('<text>')
+        super().write(f'<text: {cpath}>')
         super().newline()
 
     def _write_para_out(self):
