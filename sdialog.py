@@ -61,8 +61,8 @@ class c_sdialog_buf(c_scode_buf):
     def _cur_path(self, bsback = 0, strict = True):
         cpath = []
         bsdst = len(self.blkstack) - 1 - bsback
-        if bsdst < 0:
-            raise err_sdialog_syntax('cur path unreachable')
+        if strict and bsdst < 0:
+            self._error('cur path unreachable')
         lst_para_idx = 0
         for bsidx, bsi in enumerate(self.blkstack):
             (btyp, *_), bname, para_idx, lflags = bsi
@@ -75,7 +75,8 @@ class c_sdialog_buf(c_scode_buf):
                 else:
                     self._error('cur path without text')
         else:
-            raise err_sdialog_syntax('cur path unreachable')
+            if strict:
+                self._error('cur path unreachable')
         if cpath:
             cpath.append(str(lst_para_idx + 1))
         else:
@@ -202,7 +203,7 @@ class c_sdialog_buf(c_scode_buf):
         if lvars is None:
             reqs = self.gvars['npath_rcur']
         else:
-            step = 2
+            step = 1
             tab = self._npath_gettab(lvars, True)
             if step in tab:
                 reqs = tab[step]
@@ -406,12 +407,10 @@ class c_sdialog_buf(c_scode_buf):
             bbck = 0
             if btyp == 'lp':
                 isback = True
-        if not (isback or isbreak):
-            return
         if isback:
             dblk = self._getblk(bbck)
             self._npback_lp_reqs(dblk[3], creqs)
-        elif isbreak:
+        else:
             dblk = self._getblk(bbck + 1)
             if dblk is None:
                 return
