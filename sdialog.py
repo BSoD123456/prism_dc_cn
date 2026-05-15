@@ -551,8 +551,25 @@ class c_sdialog_buf(c_scode_buf):
         super().meta('disline')
         super().newline()
 
+class c_sdialog_sys_buf(c_sdialog_buf):
+
+    def _sys_get_name(self, m):
+        idx = int(m.group(1), 16)
+        return f'[name:{idx}]'
+
+    def _flushltoks(self, ltoks, nl):
+        txt = self._mergeltoks(ltoks)
+        if txt is None:
+            return
+        rtxt = re.sub(
+            r'\{sys\.get_name\(([0-9a-fx]+)\)\}',
+            self._sys_get_name, txt)
+        self.par.write(rtxt)
+        if nl:
+            self.par.newline()
+
 def bind_sdialog_buf(pbuf):
-    return c_sdialog_buf(pbuf, False, 0)
+    return c_sdialog_sys_buf(pbuf, False, 0)
 
 if __name__ == '__main__':
     import pdb
