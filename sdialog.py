@@ -112,7 +112,7 @@ class c_sdialog_buf(c_scode_buf):
         else:
             self._error(f'unknown block: {btyp}')
         if self._getlflag('has_text'):
-            self._write_para_out(self._getblk(0)[0][0])
+            self._write_para_out()
         if btyp != 'el':
             self._blk_step(self._getlflag('has_content'))
         self.blkstack.append((binfo, bname, 0, {}))
@@ -127,7 +127,7 @@ class c_sdialog_buf(c_scode_buf):
             ('has_content', 'has_content_prv'), lflags)
         if has_content:
             if has_text:
-                self._write_para_out(btyp)
+                self._write_para_out()
         if btyp == 'func':
             self._npath_flush()
             if has_content:
@@ -138,7 +138,7 @@ class c_sdialog_buf(c_scode_buf):
 
     def _txt_in(self):
         assert self.blkstack
-        (btyp, *_), bname, _, lflags = self._getblk(0)
+        _, bname, _, lflags = self._getblk(0)
         if self._getlflag('has_text', lflags):
             return
         for bsi in self.blkstack:
@@ -152,7 +152,7 @@ class c_sdialog_buf(c_scode_buf):
         self._setlflag('has_content', True, lflags)
         self._setlflag('has_text', True, lflags)
         self._npath_rslv()
-        self._write_para_in(btyp)
+        self._write_para_in()
 
     def _getlpblkidx(self):
         for bsback, bsi in enumerate(reversed(self.blkstack)):
@@ -271,7 +271,7 @@ class c_sdialog_buf(c_scode_buf):
         if not hid in wkset:
             wkset.add(hid)
             if not cpath is None:
-                self.reput(hid, (f'[next: {cpath}]',), True, True)
+                self._write_next(hid, cpath)
         if self._npath_fulfill(hid, rcdec):
             self.reput(hid, None, True, False)
 
@@ -345,7 +345,7 @@ class c_sdialog_buf(c_scode_buf):
                     wk = wkpaths[hid] = set()
                 for bpath, pset in dpaths.items():
                     if not bpath in wk and not hid in pset:
-                        self.reput(hid, (f'[back: {bpath}]',), True, True)
+                        self._write_next(hid, bpath)
                         wk.add(bpath)
                 if hd:
                     self.reput(hid, None, True, False)
@@ -466,7 +466,7 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         self.flush()
 
-    def _write_para_in(self, btyp):
+    def _write_para_in(self):
         cpath = self._cur_path()
         super().newline()
         super().write('-------------------')
@@ -476,13 +476,16 @@ class c_sdialog_buf(c_scode_buf):
         super().write('[text]')
         super().newline()
 
-    def _write_para_out(self, btyp):
+    def _write_para_out(self):
         super().write('[/text]')
         super().newline()
         self._npath_nxt()
         super().write('--------------------')
         super().newline()
         super().newline()
+
+    def _write_next(self, hid, path):
+        self.reput(hid, (f'[next: {path}]',), True, True)
 
     def meta(self, cmd, *args):
         assert not self._getgflag('in_text') or cmd == 'text_done'
