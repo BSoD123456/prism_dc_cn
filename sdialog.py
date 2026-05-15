@@ -455,11 +455,11 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         super().write('====================')
         super().newline()
-        super().write(f'[scene: {bname}]')
+        super().write(f'<scene: {bname}>')
         super().newline()
 
     def _write_func_out(self, bname):
-        super().write(f'[/scene: {bname}]')
+        super().write(f'</scene: {bname}>')
         super().newline()
         super().write('====================')
         super().newline()
@@ -471,13 +471,13 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         super().write('-------------------')
         super().newline()
-        super().write(f'[path: {cpath}]')
+        super().write(f'<path: {cpath}>')
         super().newline()
-        super().write('[text]')
+        super().write('<text>')
         super().newline()
 
     def _write_para_out(self):
-        super().write('[/text]')
+        super().write('</text>')
         super().newline()
         self._npath_nxt()
         super().write('--------------------')
@@ -485,7 +485,7 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
 
     def _write_next(self, hid, path):
-        self.reput(hid, (f'[next: {path}]',), True, True)
+        self.reput(hid, (f'<next: {path}>',), True, True)
 
     def meta(self, cmd, *args):
         assert not self._getgflag('in_text') or cmd == 'text_done'
