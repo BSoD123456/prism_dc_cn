@@ -18,11 +18,11 @@ class c_sdialog_buf(c_scode_buf):
         self.gvars = {}
 
     def _error(self, msg):
-        report('err', f'({self._cur_path(ndtxt=False)}) {msg}')
+        report('err', f'({self._cur_path(strict=False)}) {msg}')
         raise err_sdialog_syntax(msg)
 
     def _warn(self, msg):
-        report('war', f'({self._cur_path(ndtxt=False)}) {msg}')
+        report('war', f'({self._cur_path(strict=False)}) {msg}')
 
     def _getgflag(self, key):
         return self.gvars.get(key, False)
@@ -58,29 +58,24 @@ class c_sdialog_buf(c_scode_buf):
                 return True
         return False
 
-    def _cur_path(self, bsback = 0, ndtxt = True, strict = True):
+    def _cur_path(self, bsback = 0, strict = True):
         cpath = []
         bsdst = len(self.blkstack) - 1 - bsback
+        if bsdst < 0:
+            raise err_sdialog_syntax('cur path unreachable')
         lst_para_idx = 0
-        reached = False
         for bsidx, bsi in enumerate(self.blkstack):
             (btyp, *_), bname, para_idx, lflags = bsi
             cpath.append(bname.format(lst_para_idx + 1))
             lst_para_idx = para_idx
             if bsidx >= bsdst:
-                reached = True
-            if reached:
-                if not ndtxt:
+                assert bsidx == bsdst
+                if not strict or self._getlflag('has_text', lflags):
                     break
-                elif self._getlflag('has_text', lflags):
-                    break
-                elif strict:
+                else:
                     self._error('cur path without text')
         else:
-            if reached:
-                return None
-            else:
-                raise err_sdialog_syntax('cur path unreachable')
+            raise err_sdialog_syntax('cur path unreachable')
         if cpath:
             cpath.append(str(lst_para_idx + 1))
         else:
