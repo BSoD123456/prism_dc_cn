@@ -80,7 +80,7 @@ class c_sdialog_buf(c_scode_buf):
         if cpath:
             cpath.append(str(lst_para_idx + 1))
         else:
-            cpath.append('ret')
+            cpath.append('Root')
         return  '/'.join(cpath)
 
     def _blk_step(self, step, half = False):
@@ -104,7 +104,7 @@ class c_sdialog_buf(c_scode_buf):
         if btyp == 'func':
             bname = f'Scene-{bargs[0]}'
         elif btyp == 'lp':
-            bname = '{}-Pack'
+            bname = '{}-Loop'
         elif btyp == 'if':
             bname = '{}-Then'
         elif btyp == 'el':
@@ -340,7 +340,7 @@ class c_sdialog_buf(c_scode_buf):
                     wk = wkpaths[hid] = set()
                 for bpath, pset in dpaths.items():
                     if not bpath in wk and not hid in pset:
-                        self.reput(hid, (f'[loop: {bpath}]',), True, True)
+                        self.reput(hid, (f'[back: {bpath}]',), True, True)
                         wk.add(bpath)
                 if hd:
                     self.reput(hid, None, True, False)
@@ -429,16 +429,19 @@ class c_sdialog_buf(c_scode_buf):
         creqs.clear()
 
     def _npath_flush(self):
+        assert self.blkstack
+        scname = self.blkstack[0][1]
+        retpath = '/'.join((scname, 'End'))
         rpwks = set()
         for bsi in self.blkstack:
             tab = self._npath_gettab(bsi[3], False)
             if tab is None:
                 continue
             for reqs in tab.values():
-                self._npath_reput_reqs(reqs, 'ret', rpwks)
+                self._npath_reput_reqs(reqs, retpath, rpwks)
             self._npath_settab(bsi[3], None)
         creqs = self.gvars['npath_rcur']
-        self._npath_reput_reqs(creqs, 'ret', rpwks)
+        self._npath_reput_reqs(creqs, retpath, rpwks)
         creqs.clear()
         self._npback_rslv()
         assert not self.gvars['npath_rcnt']
@@ -449,6 +452,7 @@ class c_sdialog_buf(c_scode_buf):
         super().newline()
         super().write(f'[scene: {bname}]')
         super().newline()
+        self._npath_nxt()
 
     def _write_func_out(self, bname):
         super().write(f'[/scene: {bname}]')
