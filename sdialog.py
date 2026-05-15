@@ -331,8 +331,7 @@ class c_sdialog_buf(c_scode_buf):
         wkpaths = {}
         for bidx, (bhids, bpaths) in btab.items():
             dpaths = {}
-            wk = set()
-            self._npbp_merge(btab, bref, dpaths, bidx, wk)
+            self._npbp_merge(btab, bref, dpaths, bidx, set())
             if not dpaths:
                 continue
             for hid in bhids:
@@ -343,8 +342,8 @@ class c_sdialog_buf(c_scode_buf):
                     wk = wkpaths[hid]
                 else:
                     wk = wkpaths[hid] = set()
-                for bpath in dpaths:
-                    if not bpath in wk:
+                for bpath, pset in dpaths.items():
+                    if not bpath in wk and not hid in pset:
                         self.reput(hid, (f'[loop: {bpath}]',), True, True)
                         wk.add(bpath)
                 if hd:
