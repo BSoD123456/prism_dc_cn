@@ -710,7 +710,9 @@ class c_scode_program:
         fname = self._getone(nd.subs[-1]).name
         if fname in self.SC_TXT_DONE:
             ctx['buf'].meta('text_print', fname)
+        ctx['buf'].meta('syscall', fname, False)
         self._gen_vnode_call('sys', nd, ctx)
+        ctx['buf'].meta('syscall_done', fname, False)
 
     def _gen_vnode_call(self, prfx, nd, ctx):
         subs = nd.subs.copy()
@@ -736,11 +738,14 @@ class c_scode_program:
         self._gen_vnode_text_post(vtc, ctx)
 
     def _gen_anode_act_call_syscall__intext(self, nd, ctx):
-        assert self._getone(nd.subs[-1]).name in self.SC_TXT_INLINE
+        fname = self._getone(nd.subs[-1]).name
+        assert fname in self.SC_TXT_INLINE
         vtc = self._gen_vnode_text_pre(ctx)
+        ctx['buf'].meta('syscall', fname, True)
         ctx['buf'].write('{')
         self._gen_vnode_call('sys', nd, ctx)
         ctx['buf'].write('}')
+        ctx['buf'].meta('syscall_done', fname, True)
         self._gen_vnode_text_post(vtc, ctx)
 
     def _gen_anode_act_call_txtcall__intext(self, nd, ctx):

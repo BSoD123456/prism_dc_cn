@@ -553,20 +553,53 @@ class c_sdialog_buf(c_scode_buf):
 
 class c_sdialog_sys_buf(c_sdialog_buf):
 
+    def _sys_set_name(self, m):
+        idx = int(m.group(1), 16)
+        assert not self.lbuf and self.buf
+        txt = self._mergeltoks(self.buf[-1])
+        assert txt
+        ntab = self.gvars['sc_name_tab']
+        if idx in ntab:
+            self._error(f'set name idx twice: {idx:x}')
+        ntab[idx] = txt
+
     def _sys_get_name(self, m):
         idx = int(m.group(1), 16)
-        return f'[name:{idx}]'
+        ntab = self.gvars['sc_name_tab']
+        if not idx in ntab:
+            self._error(f'unset name idx: {idx:x}')
+        return ntab[idx]
 
-    def _flushltoks(self, ltoks, nl):
-        txt = self._mergeltoks(ltoks)
-        if txt is None:
-            return
-        rtxt = re.sub(
-            r'\{sys\.get_name\(([0-9a-fx]+)\)\}',
-            self._sys_get_name, txt)
-        self.par.write(rtxt)
-        if nl:
-            self.par.newline()
+    def write(self, s):
+        if self._getgflag('in_syscall'):
+            self.gvars['syscall_buf'].append(s)
+        else:
+            super().write(s)
+
+    def meta(self, cmd, *args):
+        if cmd == 'syscall':
+            self._setgflag('in_syscall', True)
+            self.gvars['syscall_buf'] = []
+        elif cmd == 'syscall_done':
+            self._setgflag('in_syscall', False)
+            sctxt = ''.join(self.gvars['syscall_buf'])
+            fname, in_text = args
+            if fname == 'set_name':
+                assert not in_text
+                m = re.match(r'sys\.set_name\(([0-9a-fx]+)\)', sctxt)
+                if m:
+                    self._sys_set_name(m)
+            elif fname == 'get_name':
+                assert in_text
+                m = re.match(r'\{sys\.get_name\(([0-9a-fx]+)\)\}', sctxt)
+                if m:
+                    sctxt = self._sys_get_name(m)
+            if in_text:
+                super().write(sctxt)
+        else:
+            super().meta(cmd, *args)
+            if cmd == 'start' and args[0] == 'prog':
+                self.gvars['sc_name_tab'] = {}
 
 def bind_sdialog_buf(pbuf):
     return c_sdialog_sys_buf(pbuf, False, 0)
