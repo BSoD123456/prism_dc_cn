@@ -268,18 +268,12 @@ def with_anode(*stricts):
         return cls
     return _deco
 
-@with_anode('prim', 'intext')
-class c_scode_program:
+class c_scode_parser:
 
     def __init__(self, ast, buf, conf = None):
         self.ast = ast
         self.buf = buf
-        self.chrset = c_charset_jp()
-        self.conf = {
-            'reduce_calc': True,
-            'output_restab': False, }
-        if conf:
-            self.conf = {**self.conf, **conf}
+        self.conf = {} if conf is None else conf
 
     def _error(self, nd, msg):
         addr = getattr(nd, 'addr', -1)
@@ -320,11 +314,23 @@ class c_scode_program:
             mth(nd, ctx)
         return mn
 
+@with_anode('prim', 'intext')
+class c_scode_program(c_scode_parser):
+
     SC_TXT_INLINE = {
         'get_name', 'get_ctrl', }
     SC_TXT_DONE = {
         'set_name',
         'print_text', 'print_text_choose', 'print_text_continue', }
+
+    def __init__(self, ast, buf, conf = None):
+        dconf = {
+            'reduce_calc': True,
+            'output_restab': False, }
+        if conf:
+            dconf = {**dconf, **conf}
+        super().__init__(ast, buf, dconf)
+        self.chrset = c_charset_jp()
 
     # program
 
