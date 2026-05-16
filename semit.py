@@ -80,12 +80,15 @@ class c_semit_program(c_scode_parser):
         need_parm = False
         if len(ccode) > 1 and ccode[1] is None:
             need_parm = True
+        for i, bnd in enumerate(nd.subs):
+            snd = self._getone(bnd)
+            if i == 0 and need_parm:
+                ccode = (ccode[0], snd)
+                continue
+            self._gen_anode(snd, None, ctx)
         ctx['buf'].write(c_semit_asm_tok(
             f'act.{nd.name}', ccode))
         ctx['buf'].newline()
-        for bnd in nd.subs:
-            snd = self._getone(bnd)
-            self._gen_anode(snd, None, ctx)
 
     def _gen_anode_act_setrval(self, nd, ctx):
         sub = self._getone(nd.subs[1])
