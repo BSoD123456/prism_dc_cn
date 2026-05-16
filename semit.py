@@ -43,6 +43,9 @@ class c_semit_program(c_scode_parser):
         self._gen_anode(nd.sub, None, ctx)
 
     def _gen_anode_bat(self, nd, ctx):
+        buf = ctx['buf']
+        buf.write(f'bat')
+        buf.newline()
         for snd in nd.subs:
             self._gen_anode(snd, None, ctx)
 
@@ -54,29 +57,36 @@ class c_semit_program(c_scode_parser):
             self._gen_anode(bnd, None, ctx)
 
     def _gen_anode_act_call(self, nd, ctx):
+        buf = ctx['buf']
+        buf.write(f'call')
+        buf.newline()
         for bnd in nd.subs:
             self._gen_anode(bnd, None, ctx)
 
     def _gen_anode_ref_func(self, nd, ctx):
-        ctx['buf'].write(str(nd))
-        ctx['buf'].newline()
+        buf = ctx['buf']
+        buf.write(str(nd))
+        buf.newline()
 
     def _gen_anode_ref_label(self, nd, ctx):
-        ctx['buf'].write(str(nd))
-        ctx['buf'].newline()
+        buf = ctx['buf']
+        buf.write(str(nd))
+        buf.newline()
 
     def _gen_anode_parm(self, nd, ctx):
-        ctx['buf'].write(str(nd))
-        ctx['buf'].newline()
+        buf = ctx['buf']
+        buf.write(str(nd))
+        buf.newline()
 
     def _gen_anode_inst(self, nd, ctx, *, calc_value = None, **ka):
+        buf = ctx['buf']
         val = nd.val
         if val & 0x4000000:
             val -= 0x8000000
         if calc_value:
             calc_value[0] = val
-        ctx['buf'].write(hex(val))
-        ctx['buf'].newline()
+        buf.write(hex(val))
+        buf.newline()
 
     def _gen_anode_label(self, nd, ctx):
         pass
