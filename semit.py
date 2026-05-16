@@ -8,11 +8,11 @@ from report import report
 class c_semit_asm_tok:
 
     def __init__(self, s, v):
-        self.str = s
-        self.val = v
+        self.desc = s
+        self.code = v
 
     def __str__(self):
-        return self.str
+        return self.desc
 
 class c_semit_asm_buf_fd(c_scode_buf_fd):
     pass
@@ -71,25 +71,33 @@ class c_semit_program(c_scode_parser):
         self._gen_anode(nd.sub, None, ctx)
 
     def _gen_anode_bat(self, nd, ctx):
-        buf = ctx['buf']
-        buf.write(c_semit_asm_tok('bat', 1))
-        buf.newline()
         for snd in nd.subs:
             self._gen_anode(snd, None, ctx)
 
     def _gen_anode_act(self, nd, ctx):
-        buf = ctx['buf']
-        buf.write(f'act.{nd.name}')
-        buf.newline()
+        cname = nd.name
+        ccode = EM_CMD_INFO[cname]
+        need_parm = False
+        if len(ccode) > 1 and ccode[1] is None:
+            need_parm = True
+        ctx['buf'].write(c_semit_asm_tok(
+            f'act.{nd.name}', ccode))
+        ctx['buf'].newline()
         for bnd in nd.subs:
-            self._gen_anode(bnd, None, ctx)
+            snd = self._getone(bnd)
+            self._gen_anode(snd, None, ctx)
+
+    def _gen_anode_act_setrval(self, nd, ctx):
+        sub = self._getone(nd.subs[1])
+        self._gen_anode(sub, None, ctx)
 
     def _gen_anode_act_call(self, nd, ctx):
         buf = ctx['buf']
         buf.write(f'call')
         buf.newline()
         for bnd in nd.subs:
-            self._gen_anode(bnd, None, ctx)
+            snd = self._getone(bnd)
+            self._gen_anode(snd, None, ctx)
 
     def _gen_anode_ref_func(self, nd, ctx):
         buf = ctx['buf']
