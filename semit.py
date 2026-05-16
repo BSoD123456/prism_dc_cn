@@ -5,7 +5,27 @@ from script import SC_CMD_INFO, SC_SYS_FUNC
 from scode import with_anode, c_scode_parser, c_scode_buf_fd
 from report import report
 
-EM_CMD_INFO = {}
+def _prs_cmd_info(cmd_list):
+        rinfo = {}
+        for ci, (nm, sb, *_) in enumerate(cmd_list):
+            if isinstance(sb, int):
+                rinfo[nm] = (ci,)
+                continue
+            elif isinstance(sb, dict):
+                sbit = sb.items()
+            else:
+                sbit = enumerate(sb)
+            for si, (snm, *_) in sbit:
+                if si == '__par__':
+                    assert snm is None
+                    rinfo[nm] = (ci, None)
+                    continue
+                dnm = nm
+                if not snm is None:
+                    dnm = '_'.join((nm, snm))
+                rinfo[dnm] = (ci, si)
+        return rinfo
+EM_CMD_INFO = _prs_cmd_info(SC_CMD_INFO)
 
 EM_SYS_FUNC = {}
 
