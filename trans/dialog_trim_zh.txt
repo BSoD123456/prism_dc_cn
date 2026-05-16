@@ -44,7 +44,7 @@
 
 -------------------
 <text: Scene-6cf/1-Loop/1-Loop/1>
-[SEL:1]初動開始
+[SEL:1]重新开始
 
 </text>
 <next: Scene-6cf/1-Loop/1-Loop/2-Then/1>
@@ -54,7 +54,7 @@
 
 -------------------
 <text: Scene-6cf/1-Loop/1-Loop/2-Then/1>
-[SEL:2]継続行動
+[SEL:2]继续行动
 
 </text>
 <next: Scene-6cf/1-Loop/1-Loop/3>
