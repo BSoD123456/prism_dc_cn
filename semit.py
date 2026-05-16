@@ -12,8 +12,16 @@ class c_semit_asm_tok:
         self.desc = s
         self.code = v
 
+    def bytes(self):
+        cc = self.code
+        cv = cc[0] << 0x1b
+        if len(cc) > 1:
+            cv |= cc[1]
+        return val2bytes(cv, 4)
+
     def __str__(self):
-        return self.desc
+        cs = ' '.join(f'{b:02X}' for b in self.bytes())
+        return f'{cs}: {self.desc}'
 
 class c_semit_asm_buf_fd(c_scode_buf_fd):
 
@@ -159,7 +167,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
+        if 1:
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
