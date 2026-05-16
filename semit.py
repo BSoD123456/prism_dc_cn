@@ -26,9 +26,15 @@ class c_semit_program(c_scode_parser):
         buf.newline()
         for snd in nd.subs:
             self._gen_anode(snd, None, ctx)
+            break
         buf.meta('end', 'prog')
         buf.meta('disline')
         buf.newline()
+
+    def _gen_anode_func(self, nd, ctx):
+        buf = ctx['buf']
+        buf.write(f'fun.{nd.name}')
+        buf.newline
 
 if __name__ == '__main__':
     import pdb
