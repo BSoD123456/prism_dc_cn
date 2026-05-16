@@ -1,13 +1,18 @@
 #! python3
 # coding: utf-8
 
+from script import SC_CMD_INFO, SC_SYS_FUNC
 from scode import with_anode, c_scode_parser, c_scode_buf_fd
 from report import report
+
+EM_CMD_INFO = {}
+
+EM_SYS_FUNC = {}
 
 class c_semit_asm_buf_fd(c_scode_buf_fd):
     pass
 
-@with_anode('prim')
+@with_anode()
 class c_semit_program(c_scode_parser):
 
     def __init__(self, ast, buf, conf = None):
@@ -34,7 +39,47 @@ class c_semit_program(c_scode_parser):
     def _gen_anode_func(self, nd, ctx):
         buf = ctx['buf']
         buf.write(f'fun.{nd.name}')
-        buf.newline
+        buf.newline()
+        self._gen_anode(nd.sub, None, ctx)
+
+    def _gen_anode_bat(self, nd, ctx):
+        for snd in nd.subs:
+            self._gen_anode(snd, None, ctx)
+
+    def _gen_anode_act(self, nd, ctx):
+        buf = ctx['buf']
+        buf.write(f'act.{nd.name}')
+        buf.newline()
+        for bnd in nd.subs:
+            self._gen_anode(bnd, None, ctx)
+
+    def _gen_anode_act_call(self, nd, ctx):
+        for bnd in nd.subs:
+            self._gen_anode(bnd, None, ctx)
+
+    def _gen_anode_ref_func(self, nd, ctx):
+        ctx['buf'].write(str(nd))
+        ctx['buf'].newline()
+
+    def _gen_anode_ref_label(self, nd, ctx):
+        ctx['buf'].write(str(nd))
+        ctx['buf'].newline()
+
+    def _gen_anode_parm(self, nd, ctx):
+        ctx['buf'].write(str(nd))
+        ctx['buf'].newline()
+
+    def _gen_anode_inst(self, nd, ctx, *, calc_value = None, **ka):
+        val = nd.val
+        if val & 0x4000000:
+            val -= 0x8000000
+        if calc_value:
+            calc_value[0] = val
+        ctx['buf'].write(hex(val))
+        ctx['buf'].newline()
+
+    def _gen_anode_label(self, nd, ctx):
+        pass
 
 if __name__ == '__main__':
     import pdb
