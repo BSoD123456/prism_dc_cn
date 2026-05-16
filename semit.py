@@ -8,9 +8,10 @@ from report import report
 
 class c_semit_asm_tok:
 
-    def __init__(self, s, v):
+    def __init__(self, s, v, p):
         self.desc = s
         self.code = v
+        self.pnum = p
 
     def bytes(self):
         cc = self.code
@@ -21,7 +22,11 @@ class c_semit_asm_tok:
 
     def __str__(self):
         cs = ' '.join(f'{b:02X}' for b in self.bytes())
-        return f'{cs}: {self.desc}'
+        ps = []
+        for i in range(len(self.code) - self.pnum, len(self.code)):
+            ps.append(hex(self.code[i]))
+        ps = ' '.join(ps)
+        return f'{cs}: {self.desc} {ps}'
 
 class c_semit_asm_buf_fd(c_scode_buf_fd):
 
@@ -41,7 +46,11 @@ def _prs_cmd_info(cmd_list):
         rinfo = {}
         for ci, (nm, sb, *_) in enumerate(cmd_list):
             if isinstance(sb, int):
-                rinfo[nm] = (ci,)
+                if sb > 0:
+                    assert sb == 1
+                    rinfo[nm] = (ci, None)
+                else:
+                    rinfo[nm] = (ci,)
                 continue
             elif isinstance(sb, dict):
                 sbit = sb.items()
@@ -103,11 +112,11 @@ class c_semit_program(c_scode_parser):
         for i, bnd in enumerate(nd.subs):
             snd = self._getone(bnd)
             if i == 0 and need_parm:
-                ccode = (ccode[0], snd)
+                ccode = (ccode[0], snd.val)
                 continue
             self._gen_anode(snd, None, ctx)
         ctx['buf'].write(c_semit_asm_tok(
-            f'act.{nd.name}', ccode))
+            f'act.{nd.name}', ccode, 1 if need_parm else 0))
         ctx['buf'].newline()
 
     def _gen_anode_act_setrval(self, nd, ctx):
