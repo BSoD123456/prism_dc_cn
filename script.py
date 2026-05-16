@@ -142,128 +142,130 @@ class c_script_anode_text(c_script_anode_func):
     def __repr__(self):
         return f'txt.{self.name}:{self.text}'
 
+SC_CMD_INFO = [
+    # 0x0
+    ('nop', 0, 0, 0),
+    ('vset', 0, 2, 1),
+    ('vmask', 0, 2, 1),
+    ('vget', 0, 1, 1),
+    ('vcheck', 0, 1, 1),
+    ('push', 1, 0, 1),
+    ('pop', 0, 1, 0),
+    ('calc', [
+        # 0x0
+        (None, 0, 0),
+        ('add', 2, 1),
+        ('sub', 2, 1),
+        ('mul', 2, 1),
+        ('div', 2, 1),
+        ('mod', 2, 1),
+        ('neg', 1, 1),
+        ('eq', 2, 1),
+        # 0x8
+        ('gt', 2, 1),
+        ('ge', 2, 1),
+        ('lt', 2, 1),
+        ('le', 2, 1),
+        ('ne', 2, 1),
+        ('and', 2, 1),
+        ('or', 2, 1),
+        ('band', 2, 1),
+        # 0x10
+        ('bor', 2, 1),
+        ('bxor', 2, 1),
+        ('shl', 2, 1),
+        ('shr', 2, 1),
+    ]),
+    # 0x8
+    ('jump', {
+        0x14: (None, 1, 0, 'jmp'),
+        0x15: ('if', 2, 0, 'bra'),
+        0x16: ('if_not', 2, 0, 'bra'),
+    }),
+    ('call', 0, 1, 0, 'call'),
+    ('syscall', 0, 1, 0, 'call'),
+    ('return', 0, 0, 0, 'ret'),
+    ('txtcall', 0, 1, 0, 'call'),
+    ('halloc', 1, 0, 0),
+    ('hfree', 1, 0, 0),
+    ('hpush', 0, 0, 1),
+    # 0x10
+    ('pass', 0, 0, 0),
+    ('text', {
+        '__par__': (None, 0, 0),
+        0x3ffffff: ('end', 0, 0, 'ret'),
+    }),
+    ('texth', 1, 0, 0),
+]
+
+SC_SYS_FUNC = [
+    # 0x0
+    ('set_name', 1, 1),
+    ('get_name', 1, 1),
+    ('get_ctrl', 1, 1),
+    ('3', 0, 1),
+    ('4_i1', 0, 1), #i1
+    ('5_e', 0, 1), #e
+    ('6_c', 4, 1), #c
+    ('7_c', 0, 1), #c
+    # 0x8
+    ('8_c', 1, 1), #c
+    ('9', 0, 1),
+    ('a', 0, 1),
+    ('b', 1, 1),
+    ('print_text', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n4|i3|n3 / 3:push1;->r / 4:call d27;->n5:pop1->i2
+    ('print_text_choose', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n3|i3|i4 / 3:push1->r / 4:call d27;->n5:pop1->i2
+    ('print_text_continue', 0, 1), #i2
+    ('f_c', 1, 1),
+    # 0x10
+    ('10', 1, 1),
+    ('11_c', 1, 1), #c
+    ('set_bg', 1, 1), #c
+    ('set_char', 1, 1), #c
+    ('14_c', 1, 1), #c
+    ('set_icon', 1, 1), #c
+    ('16', 1, 1),
+    ('17', 1, 1),
+    # 0x18
+    ('18', 2, 1),
+    ('19', 1, 1),
+    ('1a', 0, 1),
+    ('1b', 1, 1),
+    ('1c_c', 1, 1), #c
+    ('1d', 4, 1),
+    ('1e', 1, 1),
+    ('1f', 1, 1),
+    # 0x20
+    ('20', 0, 1),
+    ('21_n1', 1, 1), # pop1;push1;call 1f9b; -> 1:pop1;push1;
+    ('22', 2, 1),
+    ('23', 0, 1),
+    ('24', 1, 1),
+    ('25', 1, 1),
+    ('26', 3, 1),
+    ('27', 1, 1),
+    # 0x28
+    ('28', 1, 1),
+    ('29', 0, 1),
+    ('2a', 1, 1),
+    ('2b', 0, 1),
+    ('2c', 0, 1),
+    ('2d', 0, 1),
+    ('2e', 0, 1),
+    ('2f', 0, 1),
+    # 0x30
+    ('30', 0, 1),
+    ('31', 1, 1),
+    ('32', 2, 1),
+    ('33_i3e', 1, 1), #i3e
+    ('34_i3e', 1, 1), #i3e
+    ('35', 1, 1),
+    ('36', 1, 1),
+]
+
 class c_script_program:
 
-    _CMD_INFO = [
-        # 0x0
-        ('nop', 0, 0, 0),
-        ('vset', 0, 2, 1),
-        ('vmask', 0, 2, 1),
-        ('vget', 0, 1, 1),
-        ('vcheck', 0, 1, 1),
-        ('push', 1, 0, 1),
-        ('pop', 0, 1, 0),
-        ('calc', [
-            # 0x0
-            (None, 0, 0),
-            ('add', 2, 1),
-            ('sub', 2, 1),
-            ('mul', 2, 1),
-            ('div', 2, 1),
-            ('mod', 2, 1),
-            ('neg', 1, 1),
-            ('eq', 2, 1),
-            # 0x8
-            ('gt', 2, 1),
-            ('ge', 2, 1),
-            ('lt', 2, 1),
-            ('le', 2, 1),
-            ('ne', 2, 1),
-            ('and', 2, 1),
-            ('or', 2, 1),
-            ('band', 2, 1),
-            # 0x10
-            ('bor', 2, 1),
-            ('bxor', 2, 1),
-            ('shl', 2, 1),
-            ('shr', 2, 1),
-        ]),
-        # 0x8
-        ('jump', {
-            0x14: (None, 1, 0, 'jmp'),
-            0x15: ('if', 2, 0, 'bra'),
-            0x16: ('if_not', 2, 0, 'bra'),
-        }),
-        ('call', 0, 1, 0, 'call'),
-        ('syscall', 0, 1, 0, 'call'),
-        ('return', 0, 0, 0, 'ret'),
-        ('txtcall', 0, 1, 0, 'call'),
-        ('halloc', 1, 0, 0),
-        ('hfree', 1, 0, 0),
-        ('hpush', 0, 0, 1),
-        # 0x10
-        ('pass', 0, 0, 0),
-        ('text', {
-            '__par__': (None, 0, 0),
-            0x3ffffff: ('end', 0, 0, 'ret'),
-        }),
-        ('texth', 1, 0, 0),
-    ]
-
-    _SYS_FUNC = [
-        # 0x0
-        ('set_name', 1, 1),
-        ('get_name', 1, 1),
-        ('get_ctrl', 1, 1),
-        ('3', 0, 1),
-        ('4_i1', 0, 1), #i1
-        ('5_e', 0, 1), #e
-        ('6_c', 4, 1), #c
-        ('7_c', 0, 1), #c
-        # 0x8
-        ('8_c', 1, 1), #c
-        ('9', 0, 1),
-        ('a', 0, 1),
-        ('b', 1, 1),
-        ('print_text', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n4|i3|n3 / 3:push1;->r / 4:call d27;->n5:pop1->i2
-        ('print_text_choose', 3, 1), #0:peek2;pop1;peek2;pop1;pop1;->n1->i2|i3 / 2->n3|i3|i4 / 3:push1->r / 4:call d27;->n5:pop1->i2
-        ('print_text_continue', 0, 1), #i2
-        ('f_c', 1, 1),
-        # 0x10
-        ('10', 1, 1),
-        ('11_c', 1, 1), #c
-        ('set_bg', 1, 1), #c
-        ('set_char', 1, 1), #c
-        ('14_c', 1, 1), #c
-        ('set_icon', 1, 1), #c
-        ('16', 1, 1),
-        ('17', 1, 1),
-        # 0x18
-        ('18', 2, 1),
-        ('19', 1, 1),
-        ('1a', 0, 1),
-        ('1b', 1, 1),
-        ('1c_c', 1, 1), #c
-        ('1d', 4, 1),
-        ('1e', 1, 1),
-        ('1f', 1, 1),
-        # 0x20
-        ('20', 0, 1),
-        ('21_n1', 1, 1), # pop1;push1;call 1f9b; -> 1:pop1;push1;
-        ('22', 2, 1),
-        ('23', 0, 1),
-        ('24', 1, 1),
-        ('25', 1, 1),
-        ('26', 3, 1),
-        ('27', 1, 1),
-        # 0x28
-        ('28', 1, 1),
-        ('29', 0, 1),
-        ('2a', 1, 1),
-        ('2b', 0, 1),
-        ('2c', 0, 1),
-        ('2d', 0, 1),
-        ('2e', 0, 1),
-        ('2f', 0, 1),
-        # 0x30
-        ('30', 0, 1),
-        ('31', 1, 1),
-        ('32', 2, 1),
-        ('33_i3e', 1, 1), #i3e
-        ('34_i3e', 1, 1), #i3e
-        ('35', 1, 1),
-        ('36', 1, 1),
-    ]
+    
 
     def __init__(self, sect):
         self.sect = sect
@@ -445,7 +447,7 @@ class c_script_program:
 
     def _parse_func_bra(self,
             staddr, functab, mstack, msneed, fwkset, gwkset):
-        cmd_list = self._CMD_INFO
+        cmd_list = SC_CMD_INFO
         labseq = []
         msneed_cntn = [msneed]
         def bpush(nd):
@@ -536,7 +538,7 @@ class c_script_program:
                     self._error(addr, f'call to non-instant addr: {cdst_nd}')
                 if ctype == 'call':
                     if cname == 'syscall':
-                        finfo = self._keyget(self._SYS_FUNC, cdst)
+                        finfo = self._keyget(SC_SYS_FUNC, cdst)
                         if finfo is None:
                             self._error(addr,
                                 f'unreachable call: {cname} {cdst:x}')
