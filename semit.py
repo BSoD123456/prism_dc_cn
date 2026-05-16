@@ -15,7 +15,14 @@ class c_semit_asm_tok:
         return self.desc
 
 class c_semit_asm_buf_fd(c_scode_buf_fd):
-    pass
+
+    def _conltoks(self, ltoks):
+        for tok in ltoks:
+            if isinstance(tok, c_semit_asm_tok):
+                self.fd.write(bytes(tok.code))
+
+    def _writeltoks(self, ltoks):
+        self._mergeltoks(ltoks)
 
 def _prs_cmd_info(cmd_list):
         rinfo = {}

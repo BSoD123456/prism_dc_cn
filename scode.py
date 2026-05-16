@@ -38,6 +38,9 @@ class c_scode_buf:
     def _idtsym(self, idt):
         return (self.IDTSYM for _ in range(idt))
 
+    def _conltoks(self, ltoks):
+        return ''.join(str(t) for t in ltoks)
+
     def _mergeltoks(self, ltoks):
         arls = []
         rls = ['__head']
@@ -58,11 +61,11 @@ class c_scode_buf:
                     scnt = 0
                     rls.extend(self._idtsym(idt))
             else:
-                rls.append(str(tok))
+                rls.append(tok)
                 scnt += 1
         else:
             arls.extend(rls)
-        return ''.join(arls[1:]) if arls else None
+        return self._conltoks(arls[1:]) if arls else None
 
     def _flushltoks(self, ltoks, nl):
         for tok in ltoks:

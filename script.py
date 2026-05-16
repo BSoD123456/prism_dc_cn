@@ -265,8 +265,6 @@ SC_SYS_FUNC = [
 
 class c_script_program:
 
-    
-
     def __init__(self, sect):
         self.sect = sect
 
