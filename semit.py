@@ -5,6 +5,18 @@ from script import SC_CMD_INFO, SC_SYS_FUNC
 from scode import with_anode, c_scode_parser, c_scode_buf_fd
 from report import report
 
+class c_semit_asm_tok:
+
+    def __init__(self, s, v):
+        self.str = s
+        self.val = v
+
+    def __str__(self):
+        return self.str
+
+class c_semit_asm_buf_fd(c_scode_buf_fd):
+    pass
+
 def _prs_cmd_info(cmd_list):
         rinfo = {}
         for ci, (nm, sb, *_) in enumerate(cmd_list):
@@ -26,20 +38,7 @@ def _prs_cmd_info(cmd_list):
                 rinfo[dnm] = (ci, si)
         return rinfo
 EM_CMD_INFO = _prs_cmd_info(SC_CMD_INFO)
-
-EM_SYS_FUNC = {}
-
-class c_semit_asm_tok:
-
-    def __init__(self, s, v):
-        self.str = s
-        self.val = v
-
-    def __str__(self):
-        return self.str
-
-class c_semit_asm_buf_fd(c_scode_buf_fd):
-    pass
+EM_SYS_FUNC = {nm: si for si, (nm, *_) in enumerate(SC_SYS_FUNC)}
 
 @with_anode()
 class c_semit_program(c_scode_parser):
