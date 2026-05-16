@@ -1,6 +1,7 @@
 #! python3
 # coding: utf-8
 
+from mark import val2bytes
 from script import SC_CMD_INFO, SC_SYS_FUNC
 from scode import with_anode, c_scode_parser, c_scode_buf_fd
 from report import report
@@ -19,7 +20,11 @@ class c_semit_asm_buf_fd(c_scode_buf_fd):
     def _conltoks(self, ltoks):
         for tok in ltoks:
             if isinstance(tok, c_semit_asm_tok):
-                self.fd.write(bytes(tok.code))
+                cc = tok.code
+                cv = cc[0] << 0x1b
+                if len(cc) > 1:
+                    cv |= cc[1]
+                self.fd.write(val2bytes(cv, 4))
 
     def _writeltoks(self, ltoks):
         self._mergeltoks(ltoks)
@@ -154,7 +159,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
