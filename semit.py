@@ -29,6 +29,15 @@ EM_CMD_INFO = _prs_cmd_info(SC_CMD_INFO)
 
 EM_SYS_FUNC = {}
 
+class c_semit_asm_tok:
+
+    def __init__(self, s, v):
+        self.str = s
+        self.val = v
+
+    def __str__(self):
+        return self.str
+
 class c_semit_asm_buf_fd(c_scode_buf_fd):
     pass
 
@@ -64,7 +73,7 @@ class c_semit_program(c_scode_parser):
 
     def _gen_anode_bat(self, nd, ctx):
         buf = ctx['buf']
-        buf.write(f'bat')
+        buf.write(c_semit_asm_tok('bat', 1))
         buf.newline()
         for snd in nd.subs:
             self._gen_anode(snd, None, ctx)

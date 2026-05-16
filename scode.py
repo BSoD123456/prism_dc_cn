@@ -58,7 +58,7 @@ class c_scode_buf:
                     scnt = 0
                     rls.extend(self._idtsym(idt))
             else:
-                rls.append(tok)
+                rls.append(str(tok))
                 scnt += 1
         else:
             arls.extend(rls)
