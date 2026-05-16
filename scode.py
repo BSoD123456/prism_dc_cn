@@ -314,6 +314,9 @@ class c_scode_parser:
             mth(nd, ctx)
         return mn
 
+    def gen_code(self):
+        self._gen_anode(self.ast)
+
 @with_anode('prim', 'intext')
 class c_scode_program(c_scode_parser):
 
@@ -1147,9 +1150,6 @@ class c_scode_program(c_scode_parser):
         if calc_value:
             calc_value[0] = val
         ctx['buf'].write(hex(val))
-
-    def gen_code(self):
-        self._gen_anode(self.ast)
 
 if __name__ == '__main__':
     import pdb
