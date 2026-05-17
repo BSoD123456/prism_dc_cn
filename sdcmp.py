@@ -35,35 +35,35 @@ class c_sdialog_comparer:
         return seq, tuple(tmpl_seq)
 
     def _feed_shdw(self, ln, shd_seq):
-        seq = []
-        for typ, s in shd_seq:
+        for i in range(len(shd_seq)):
+            typ, s = shd_seq[i]
             if typ != 'txt':
-                seq.append((typ, s))
                 continue
-            for i, trs in enumerate(re.split(r'\<tr\: ([t0-9a-z]+)\>', s)):
-                if i % 2 == 0:
+            seq = []
+            for j, trs in enumerate(re.split(r'\<tr\: ([t0-9a-z]+)\>', s)):
+                if j % 2 == 0:
                     if trs:
                         self._error(ln, f'unknown text in shadow: {trs}')
                 else:
-                    seq.append(('tref', trs))
+                    seq.append(trs)
                     if trs in self.txttab:
                         self._error(ln, f'duplicated textref: {trs}')
                     self.txttab[trs] = [ln]
-        return seq
+            shd_seq[i] = ('tref', seq)
 
     def _feed_line(self, ln, src_dlg, dst_dlg, shd_dlg):
         if src_dlg == shd_dlg:
             if dst_dlg != shd_dlg:
-                self._error(ln, 'unmatched lines')
+                self._error(ln, 'unmatched line')
             return
         src_seq, src_tmpl_seq = self._split_tmpl(src_dlg)
         dst_seq, dst_tmpl_seq = self._split_tmpl(dst_dlg)
         shd_seq, shd_tmpl_seq = self._split_tmpl(shd_dlg)
         if not src_tmpl_seq == shd_tmpl_seq:
-            self._error(ln, f'unmatched lines')
+            self._error(ln, f'unmatched line')
         if not dst_tmpl_seq == shd_tmpl_seq:
             self._error(ln, f'shaffled trans: {dst_tmpl_seq}')
-        shd_seq = self._feed_shdw(ln, shd_seq)
+        self._feed_shdw(ln, shd_seq)
         self.linebuf[ln] = (src_seq, dst_seq, shd_seq)
 
     def feed(self, srcfd, dstfd, shdfd):
