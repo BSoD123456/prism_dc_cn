@@ -20,6 +20,7 @@ class c_sdialog_comparer:
 
     def _split_tmpl(self, dlg):
         seq = []
+        tmpl_seq = []
         for i, s in enumerate(re.split(r'\{([^\{\}]+)\}', dlg)):
             if i % 2 == 0:
                 if not s:
@@ -29,8 +30,9 @@ class c_sdialog_comparer:
                 typ = 'txt'
             else:
                 typ = 'tmpl'
+                tmpl_seq.append(s)
             seq.append((typ, s))
-        return seq
+        return seq, tuple(tmpl_seq)
 
     def _feed_shdw(self, ln, shd_seq):
         seq = []
@@ -54,9 +56,14 @@ class c_sdialog_comparer:
             if dst_dlg != shd_dlg:
                 self._error(ln, 'unmatched lines')
             return
-        src_seq = self._split_tmpl(src_dlg)
-        dst_seq = self._split_tmpl(dst_dlg)
-        shd_seq = self._feed_shdw(ln, self._split_tmpl(shd_dlg))
+        src_seq, src_tmpl_seq = self._split_tmpl(src_dlg)
+        dst_seq, dst_tmpl_seq = self._split_tmpl(dst_dlg)
+        shd_seq, shd_tmpl_seq = self._split_tmpl(shd_dlg)
+        if not src_tmpl_seq == shd_tmpl_seq:
+            self._error(ln, f'unmatched lines')
+        if not dst_tmpl_seq == shd_tmpl_seq:
+            self._error(ln, f'shaffled trans: {dst_tmpl_seq}')
+        shd_seq = self._feed_shdw(ln, shd_seq)
         self.linebuf[ln] = (src_seq, dst_seq, shd_seq)
 
     def feed(self, srcfd, dstfd, shdfd):
