@@ -148,7 +148,6 @@ class c_semit_program(c_scode_parser):
             if not ctx['reftab_q']:
                 buf.touch()
                 buf = ctx['buf'] = self.buf.sub(0)
-            if ctx['addr'] > 0x220: break
         buf.meta('end', 'prog')
         buf.meta('disline')
         buf.newline()
@@ -200,6 +199,8 @@ class c_semit_program(c_scode_parser):
             tidx += 1
             if len(cpair) >= 2:
                 emit()
+        ccode = EM_CMD_INFO['text_end']
+        self._write_cmd('text_end', ccode, ctx)
 
     # struct
 
@@ -306,7 +307,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
