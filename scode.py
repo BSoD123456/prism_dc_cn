@@ -775,7 +775,9 @@ class c_scode_program(c_scode_parser):
             self._error(nd, f'unknown text: {dnd.name}')
         txt = ctx['restab']['text'][dnd.name]
         vtc = self._gen_vnode_text_pre(ctx)
+        ctx['buf'].meta('textref', dnd.name)
         ctx['buf'].write(txt)
+        ctx['buf'].meta('textref_done', dnd.name)
         self._gen_vnode_text_post(vtc, ctx)
 
     def _gen_vnode_text_pre(self, ctx):
