@@ -218,7 +218,7 @@ class c_semit_program(c_scode_parser):
 
     def _gen_anode_pad(self, nd, ctx):
         plen = nd.plen
-        name = f'pad.{nd.addr}_{plen}'
+        name = f'pad.{nd.addr:x}_{plen:x}'
         self._write_cmt('@' + name, ctx)
         if not self.conf['padding']:
             return
