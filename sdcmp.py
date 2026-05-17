@@ -45,10 +45,8 @@ class c_sdialog_comparer:
                 else:
                     seq.append(('tref', trs))
                     if trs in self.txttab:
-                        rinfo = self.txttab[trs]
-                    else:
-                        rinfo = self.txttab[trs] = [[]]
-                    rinfo[0].append(ln)
+                        self._error(ln, f'duplicated textref: {trs}')
+                    self.txttab[trs] = [ln]
         return seq
 
     def _feed_line(self, ln, src_dlg, dst_dlg, shd_dlg):
