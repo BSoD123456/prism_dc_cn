@@ -19,7 +19,7 @@ class c_sdialog_comparer:
         report('war', f'(ln: {ln}) {msg}')
 
     def _split_tmpl(self, dlg):
-        seq = []
+        txt_seq = []
         tmpl_seq = []
         for i, s in enumerate(re.split(r'\{([^\{\}]+)\}', dlg)):
             if i % 2 == 0:
@@ -27,18 +27,14 @@ class c_sdialog_comparer:
                     continue
                 elif s.endswith('\n'):
                     s = s[:-1]
-                typ = 'txt'
+                txt_seq.append(s)
             else:
-                typ = 'tmpl'
                 tmpl_seq.append(s)
-            seq.append((typ, s))
-        return seq, tuple(tmpl_seq)
+        return txt_seq, tuple(tmpl_seq)
 
     def _feed_shdw(self, ln, shd_seq):
         for i in range(len(shd_seq)):
-            typ, s = shd_seq[i]
-            if typ != 'txt':
-                continue
+            s = shd_seq[i]
             seq = []
             for j, trs in enumerate(re.split(r'\<tr\: ([t0-9a-z]+)\>', s)):
                 if j % 2 == 0:
@@ -49,7 +45,7 @@ class c_sdialog_comparer:
                     if trs in self.txttab:
                         self._error(ln, f'duplicated textref: {trs}')
                     self.txttab[trs] = [ln]
-            shd_seq[i] = ('tref', seq)
+            shd_seq[i] = seq
 
     def _feed_line(self, ln, src_dlg, dst_dlg, shd_dlg):
         if src_dlg == shd_dlg:
