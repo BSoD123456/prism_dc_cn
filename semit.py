@@ -4,7 +4,6 @@
 from mark import val2bytes
 from script import SC_CMD_INFO, SC_SYS_FUNC
 from scode import with_anode, c_scode_parser, c_scode_buf_fd
-from report import report
 
 class c_semit_asm_tok:
 
