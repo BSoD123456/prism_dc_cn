@@ -27,9 +27,14 @@ class c_sdialog_comparer:
                 m = re.match(r'\{([^\{\}]+)\}', s)
                 if not m:
                     self._error(ln, f'unknown text in shadow: {s}')
-                shd_seq.append(m.group(1))
+                shd_seq.append(('tmpl', m.group(1)))
             else:
-                shd_seq.append(s)
+                shd_seq.append(('tref', s))
+                if s in self.txttab:
+                    rinfo = self.txttab[s]
+                else:
+                    rinfo = self.txttab[s] = [[]]
+                rinfo[0].append(ln)
         return shd_seq
 
     def _feed_line(self, ln, src_dlg, dst_dlg, shd_dlg):
