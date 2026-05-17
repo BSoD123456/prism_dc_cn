@@ -75,7 +75,7 @@ def _prs_cmd_info(cmd_list):
 EM_CMD_INFO = _prs_cmd_info(SC_CMD_INFO)
 EM_SYS_FUNC = {nm: si for si, (nm, *_) in enumerate(SC_SYS_FUNC)}
 
-@with_anode()
+@with_anode('call', 'syscall', 'txtcall')
 class c_semit_program(c_scode_parser):
 
     def __init__(self, ast, buf, conf = None):
@@ -146,7 +146,7 @@ class c_semit_program(c_scode_parser):
             if not ctx['reftab_q']:
                 buf.touch()
                 buf = ctx['buf'] = self.buf.sub(0)
-            break
+            #break
         buf.meta('end', 'prog')
         buf.meta('disline')
         buf.newline()
@@ -187,38 +187,61 @@ class c_semit_program(c_scode_parser):
         ccode = EM_CMD_INFO[cname]
         need_parm = False
         if len(ccode) > 1 and ccode[1] is None:
-            need_parm = True
-        for i, bnd in enumerate(nd.subs):
-            snd = self._getone(bnd)
-            if i == 0 and need_parm:
-                ccode = (ccode[0], snd.val)
-                continue
-            self._gen_anode(snd, None, ctx)
-        if need_parm:
+            parm = self._getone(nd.subs[0])
+            ccode = (ccode[0], parm.val)
             cdesc = f'{nd.name} ( 0x{0:x} )'
+            rmsubs = nd.subs[1:]
         else:
             cdesc = f'{nd.name}'
-        self._write_cmd(cdesc, ccode, ctx)
+            rmsubs = nd.subs
+        return cdesc, ccode, rmsubs
 
     def _gen_anode_act(self, nd, ctx):
-        self._gen_vnode_cmd(nd, ctx)
+        cdesc, ccode, rmsubs = self._gen_vnode_cmd(nd, ctx)
+        for bnd in rmsubs:
+            snd = self._getone(bnd)
+            self._gen_anode(snd, None, ctx)
+        self._write_cmd(cdesc, ccode, ctx)
 
     def _gen_anode_act_return(self, nd, ctx):
         cname = nd.name
         self._write_cmd(cname, EM_CMD_INFO[cname], ctx)
 
     def _gen_anode_act_call(self, nd, ctx):
-        self._gen_vnode_cmd(nd, ctx)
+        cdesc, ccode, rmsubs = self._gen_vnode_cmd(nd, ctx)
+        for bnd in rmsubs:
+            snd = self._getone(bnd)
+            self._gen_any_anode(snd, ('call', None), ctx)
+        self._write_cmd(cdesc, ccode, ctx)
+
+    def _gen_anode_act_call_txtcall(self, nd, ctx):
+        cdesc, ccode, rmsubs = self._gen_vnode_cmd(nd, ctx)
+        for bnd in rmsubs:
+            snd = self._getone(bnd)
+            self._gen_any_anode(snd, ('syscall', None), ctx)
+        self._write_cmd(cdesc, ccode, ctx)
 
     def _gen_anode_act_call_syscall(self, nd, ctx):
-        self._gen_vnode_cmd(nd, ctx)
+        cdesc, ccode, rmsubs = self._gen_vnode_cmd(nd, ctx)
+        for bnd in rmsubs:
+            snd = self._getone(bnd)
+            self._gen_any_anode(snd, ('syscall', None), ctx)
+        self._write_cmd(cdesc, ccode, ctx)
 
     def _gen_anode_act_setrval(self, nd, ctx):
         sub = self._getone(nd.subs[1])
         self._gen_anode(sub, None, ctx)
 
-    def _gen_anode_ref_func(self, nd, ctx):
+    def _gen_anode_ref_func__call(self, nd, ctx):
         self._reftab_req(f'fun.{nd.name}', ctx)
+
+    def _gen_anode_ref_func__txtcall(self, nd, ctx):
+        self._reftab_req(f'txt.{nd.name}', ctx)
+
+    def _gen_anode_ref_func__syscall(self, nd, ctx):
+        sname = nd.name
+        scode = EM_SYS_FUNC[sname]
+        self._write_cmd(f'&sys.{sname}', self._inst_ccode(scode), ctx)
 
     def _gen_anode_ref_label(self, nd, ctx):
         self._reftab_req(f'lab.{nd.name}', ctx)
