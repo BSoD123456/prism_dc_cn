@@ -18,32 +18,48 @@ class c_sdialog_comparer:
     def _warn(self, ln, msg):
         report('war', f'(ln: {ln}) {msg}')
 
-    def _feed_shdw(self, ln, shd_dlg):
-        shd_seq = []
-        for i, s in enumerate(re.split(r'\<tr\: ([t0-9a-z]+)\>', shd_dlg)):
+    def _split_tmpl(self, dlg):
+        seq = []
+        for i, s in enumerate(re.split(r'\{([^\{\}]+)\}', dlg)):
             if i % 2 == 0:
-                if not s or s == '\n':
+                if not s:
                     continue
-                m = re.match(r'\{([^\{\}]+)\}', s)
-                if not m:
-                    self._error(ln, f'unknown text in shadow: {s}')
-                shd_seq.append(('tmpl', m.group(1)))
+                elif s.endswith('\n'):
+                    s = s[:-1]
+                typ = 'txt'
             else:
-                shd_seq.append(('tref', s))
-                if s in self.txttab:
-                    rinfo = self.txttab[s]
+                typ = 'tmpl'
+            seq.append((typ, s))
+        return seq
+
+    def _feed_shdw(self, ln, shd_seq):
+        seq = []
+        for typ, s in shd_seq:
+            if typ != 'txt':
+                seq.append((typ, s))
+                continue
+            for i, trs in enumerate(re.split(r'\<tr\: ([t0-9a-z]+)\>', s)):
+                if i % 2 == 0:
+                    if trs:
+                        self._error(ln, f'unknown text in shadow: {trs}')
                 else:
-                    rinfo = self.txttab[s] = [[]]
-                rinfo[0].append(ln)
-        return shd_seq
+                    seq.append(('tref', trs))
+                    if trs in self.txttab:
+                        rinfo = self.txttab[trs]
+                    else:
+                        rinfo = self.txttab[trs] = [[]]
+                    rinfo[0].append(ln)
+        return seq
 
     def _feed_line(self, ln, src_dlg, dst_dlg, shd_dlg):
         if src_dlg == shd_dlg:
             if dst_dlg != shd_dlg:
                 self._error(ln, 'unmatched lines')
             return
-        shd_seq = self._feed_shdw(ln, shd_dlg)
-        self.linebuf[ln] = (src_dlg, dst_dlg, shd_seq)
+        src_seq = self._split_tmpl(src_dlg)
+        dst_seq = self._split_tmpl(dst_dlg)
+        shd_seq = self._feed_shdw(ln, self._split_tmpl(shd_dlg))
+        self.linebuf[ln] = (src_seq, dst_seq, shd_seq)
 
     def feed(self, srcfd, dstfd, shdfd):
         ln = 0
