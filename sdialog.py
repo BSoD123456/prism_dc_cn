@@ -603,6 +603,23 @@ class c_sdialog_sys_buf(c_sdialog_buf):
 def bind_sdialog_buf(pbuf):
     return c_sdialog_sys_buf(pbuf, False, 0)
 
+class c_sdialog_sys_shadow_buf(c_sdialog_sys_buf):
+
+    def meta(self, cmd, *args):
+        if cmd == 'textref':
+            pass
+        elif cmd == 'textref_done':
+            trs = f'<tr: {args[0]}>'
+            super().write(trs)
+        else:
+            super().meta(cmd, *args)
+
+    def write(self, s):
+        pass
+
+def bind_shadow_buf(pbuf):
+    return c_sdialog_sys_shadow_buf(pbuf, False, 0)
+
 if __name__ == '__main__':
     import pdb
     from hexdump import hexdump as hd
@@ -624,6 +641,10 @@ if __name__ == '__main__':
             cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
             #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
+        elif 1:
+            with open(r'wktab\dialog.shadow.txt', 'w', encoding = 'utf-8') as fd:
+                cd = c_scode_program(ast, bind_shadow_buf(c_scode_buf_fd(fd)))
+                cd.gen_code()
         else:
             with open(r'wktab\dialog.txt', 'w', encoding = 'utf-8') as fd:
                 cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_fd(fd)))
