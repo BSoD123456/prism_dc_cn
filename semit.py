@@ -146,7 +146,7 @@ class c_semit_program(c_scode_parser):
             if not ctx['reftab_q']:
                 buf.touch()
                 buf = ctx['buf'] = self.buf.sub(0)
-            #break
+            break
         buf.meta('end', 'prog')
         buf.meta('disline')
         buf.newline()
@@ -210,6 +210,9 @@ class c_semit_program(c_scode_parser):
     def _gen_anode_act_call(self, nd, ctx):
         self._gen_vnode_cmd(nd, ctx)
 
+    def _gen_anode_act_call_syscall(self, nd, ctx):
+        self._gen_vnode_cmd(nd, ctx)
+
     def _gen_anode_act_setrval(self, nd, ctx):
         sub = self._getone(nd.subs[1])
         self._gen_anode(sub, None, ctx)
@@ -237,7 +240,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
+        if 1:
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
