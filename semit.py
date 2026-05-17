@@ -93,23 +93,42 @@ class c_semit_program(c_scode_parser):
         ctx['buf'].write(c_semit_asm_tok(desc, None))
         ctx['buf'].newline()
 
+    def _inst_ccode(self, val):
+        ccode = EM_CMD_INFO['push']
+        assert ccode[1] is None
+        return ccode[0], val
+
     def _reftab_reg(self, name, ctx):
         at = ctx['reftab_a']
         if name in at:
-            self._error('duplicated ref name: {name}')
+            self._error(None, f'duplicated ref name: {name}')
         addr = ctx['addr']
         at[name] = addr
         qt = ctx['reftab_q']
         if name in qt:
+            tok = c_semit_asm_tok(f'&{name}', self._inst_ccode(at[name]))
             for hid in qt.pop(name):
-                pass
+                ctx['buf'].reput(hid, tok, True)
 
     def _reftab_req(self, name, ctx):
         at = ctx['reftab_a']
         if name in at:
-            pass
+            self._write_cmd(f'&{name}', self._inst_ccode(at[name]), ctx)
             return
         qt = ctx['reftab_q']
+        if name in qt:
+            reqs = qt[name]
+        else:
+            reqs = qt[name] = []
+        hid = ctx['buf'].hold(0)
+        reqs.append(hid)
+
+    def _reftab_flush(self, ctx):
+        qt = ctx['reftab_q']
+        rq = [*qt.keys()]
+        for name in rq:
+            self._reftab_reg(name, ctx)
+        return rq
 
     # program
 
@@ -118,22 +137,33 @@ class c_semit_program(c_scode_parser):
         ctx['addr'] = 0
         ctx['reftab_a'] = {}
         ctx['reftab_q'] = {}
-        buf = ctx['buf'] = self.buf
+        buf = ctx['buf'] = self.buf.sub(0)
         buf.meta('start', 'prog')
         buf.meta('disline')
         buf.newline()
         for snd in nd.subs:
             self._gen_anode(snd, None, ctx)
+            if not ctx['reftab_q']:
+                buf.touch()
+                buf = ctx['buf'] = self.buf.sub(0)
             break
         buf.meta('end', 'prog')
         buf.meta('disline')
         buf.newline()
+        rq = self._reftab_flush(ctx)
+        buf.touch()
+        if rq:
+            self._error(nd, f'reference undefined: {rq}')
 
     def _gen_anode_label(self, nd, ctx):
-        self._write_cmt(f'@lab.{nd.name}', ctx)
+        name = f'lab.{nd.name}'
+        self._write_cmt('@' + name, ctx)
+        self._reftab_reg(name, ctx)
 
     def _gen_anode_func(self, nd, ctx):
-        self._write_cmt(f'@fun.{nd.name}', ctx)
+        name = f'fun.{nd.name}'
+        self._write_cmt('@' + name, ctx)
+        self._reftab_reg(name, ctx)
         self._gen_anode(nd.sub, None, ctx)
 
     def _gen_anode_parm(self, nd, ctx):
@@ -176,14 +206,10 @@ class c_semit_program(c_scode_parser):
         self._gen_anode(sub, None, ctx)
 
     def _gen_anode_ref_func(self, nd, ctx):
-        buf = ctx['buf']
-        buf.write(str(nd))
-        buf.newline()
+        self._reftab_req(f'fun.{nd.name}', ctx)
 
     def _gen_anode_ref_label(self, nd, ctx):
-        buf = ctx['buf']
-        buf.write(str(nd))
-        buf.newline()
+        self._reftab_req(f'lab.{nd.name}', ctx)
 
 if __name__ == '__main__':
     import pdb

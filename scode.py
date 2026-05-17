@@ -152,17 +152,17 @@ class c_scode_buf:
         if tok is None:
             assert not rehold
             ltoks.pop(li)
-        elif isinstance(tok, str):
-            if rehold:
-                ltoks.insert(li, tok)
-            else:
-                ltoks[li] = tok
-        else:
+        elif isinstance(tok, (tuple, list)):
             if not rehold:
                 ltoks.pop(li)
             for i, stok in enumerate(tok):
                 ltoks.insert(li + i * 2, stok)
                 ltoks.insert(li + i * 2 + 1, ('__sepline',))
+        else:
+            if rehold:
+                ltoks.insert(li, tok)
+            else:
+                ltoks[li] = tok
 
     def flush(self):
         if self.tch:
