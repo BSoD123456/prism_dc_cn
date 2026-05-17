@@ -218,7 +218,7 @@ class c_semit_program(c_scode_parser):
         cdesc, ccode, rmsubs = self._gen_vnode_cmd(nd, ctx)
         for bnd in rmsubs:
             snd = self._getone(bnd)
-            self._gen_any_anode(snd, ('syscall', None), ctx)
+            self._gen_any_anode(snd, ('txtcall', None), ctx)
         self._write_cmd(cdesc, ccode, ctx)
 
     def _gen_anode_act_call_syscall(self, nd, ctx):
@@ -263,7 +263,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
