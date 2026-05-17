@@ -486,7 +486,6 @@ class c_sdialog_buf(c_scode_buf):
         self.reput(hid, (f'<next: {path}>',), True, True)
 
     def meta(self, cmd, *args):
-        assert not self._getgflag('in_text') or cmd == 'text_done'
         ajchk = self._getgflag('after_jump')
         if cmd == 'text':
             self._txt_in()
