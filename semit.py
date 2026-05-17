@@ -14,29 +14,36 @@ class c_semit_asm_tok:
 
     def bytes(self):
         cc = self.code
+        if cc is None:
+            return b''
         cv = cc[0] << 0x1b
         if len(cc) > 1:
             cv |= cc[1]
         return val2bytes(cv, 4)
 
     def text(self):
-        return self.desc.format(self.code[1:])
+        if self.code:
+            return self.desc.format(self.code[1:])
+        else:
+            return self.desc
 
     def __str__(self):
-        cs = ' '.join(f'{b:02X}' for b in self.bytes())
+        bs = self.bytes()
         ds = self.text()
-        return f'{cs}: {ds}'
+        if bs:
+            cs = ' '.join(f'{b:02X}' for b in bs)
+            return f'{cs}: {ds}'
+        else:
+            return ds
 
 class c_semit_asm_buf_fd(c_scode_buf_fd):
 
     def _conltoks(self, ltoks):
         for tok in ltoks:
             if isinstance(tok, c_semit_asm_tok):
-                cc = tok.code
-                cv = cc[0] << 0x1b
-                if len(cc) > 1:
-                    cv |= cc[1]
-                self.fd.write(val2bytes(cv, 4))
+                bs = tok.bytes()
+                if bs:
+                    self.fd.write()
 
     def _writeltoks(self, ltoks):
         self._mergeltoks(ltoks)
@@ -82,6 +89,11 @@ class c_semit_program(c_scode_parser):
         ctx['buf'].newline()
         ctx['addr'] += 1
 
+    def _write_lab(self, desc, ctx):
+        ctx['buf'].write(c_semit_asm_tok('@'+desc, None))
+        ctx['buf'].newline()
+        ctx['addr'] += 1
+
     def _reftab_reg(self, name, ctx):
         at = ctx['reftab_a']
         if name in at:
@@ -118,10 +130,11 @@ class c_semit_program(c_scode_parser):
         buf.meta('disline')
         buf.newline()
 
+    def _gen_anode_label(self, nd, ctx):
+        self._write_lab(f'lab.{nd.name}', ctx)
+
     def _gen_anode_func(self, nd, ctx):
-        buf = ctx['buf']
-        buf.write(f'fun.{nd.name}')
-        buf.newline()
+        self._write_lab(f'fun.{nd.name}', ctx)
         self._gen_anode(nd.sub, None, ctx)
 
     def _gen_anode_bat(self, nd, ctx):
@@ -180,9 +193,6 @@ class c_semit_program(c_scode_parser):
             calc_value[0] = val
         buf.write(hex(val))
         buf.newline()
-
-    def _gen_anode_label(self, nd, ctx):
-        pass
 
 if __name__ == '__main__':
     import pdb
