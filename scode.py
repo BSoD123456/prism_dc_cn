@@ -392,6 +392,9 @@ class c_scode_program(c_scode_parser):
         ctx['buf'].write(f'txt.{nd.name} = "{txt}";')
         ctx['buf'].newline()
 
+    def _gen_anode_pad__restab(self, nd, ctx):
+        pass
+
     # invoke-order scan
 
     def _gen_anode_prog__ivkscan(self, nd, ctx):
@@ -401,6 +404,9 @@ class c_scode_program(c_scode_parser):
         ctx.pop('ivkwk')
 
     def _gen_anode_text__ivkscan(self, nd, ctx):
+        pass
+
+    def _gen_anode_pad__ivkscan(self, nd, ctx):
         pass
 
     def _gen_anode_func__ivkscan(self, nd, ctx):
@@ -517,6 +523,9 @@ class c_scode_program(c_scode_parser):
         ctx.pop('lbrvs')
 
     def _gen_anode_text(self, nd, ctx):
+        pass
+
+    def _gen_anode_pad(self, nd, ctx):
         pass
 
     def _gen_anode_bat__prim(self, nd, ctx):

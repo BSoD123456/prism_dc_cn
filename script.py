@@ -142,6 +142,15 @@ class c_script_anode_text(c_script_anode_func):
     def __repr__(self):
         return f'txt.{self.name}:{self.text}'
 
+class c_script_anode_pad(c_script_anode_func):
+
+    def __init__(self, plen, addr):
+        self.addr = addr
+        self.plen = plen
+
+    def __repr__(self):
+        return f'pad.{{self.addr:x}}_{self.plen:x}'
+
 SC_CMD_INFO = [
     # 0x0
     ('nop', 0, 0, 0),
@@ -620,6 +629,7 @@ class c_script_program:
     def _post_parse_prog(self, functab, progctxs):
         progbat = []
         fawkset = set()
+        progbot = {}
         for progctx in progctxs:
             for faddr, ctx in progctx.items():
                 if faddr in fawkset:
@@ -652,8 +662,18 @@ class c_script_program:
                         fbat,
                         faddr)
                 progbat.append(func)
-        progbat.sort(key = lambda nd: nd.addr)
-        prog = c_script_anode_prog(progbat)
+                progbot[faddr] = max(ctx['fwkset']) + 1
+        padding_progbat = []
+        last_bot = 0
+        for func in sorted(progbat, key = lambda nd: nd.addr):
+            faddr = func.addr
+            plen = faddr - last_bot
+            if plen != 0:
+                assert plen > 0
+                padding_progbat.append(c_script_anode_pad(plen, last_bot))
+            padding_progbat.append(func)
+            last_bot = progbot[faddr]
+        prog = c_script_anode_prog(padding_progbat)
         return prog
 
     def parse_sect(self, entry):
