@@ -89,10 +89,9 @@ class c_semit_program(c_scode_parser):
         ctx['buf'].newline()
         ctx['addr'] += 1
 
-    def _write_lab(self, desc, ctx):
-        ctx['buf'].write(c_semit_asm_tok('@'+desc, None))
+    def _write_cmt(self, desc, ctx):
+        ctx['buf'].write(c_semit_asm_tok(desc, None))
         ctx['buf'].newline()
-        ctx['addr'] += 1
 
     def _reftab_reg(self, name, ctx):
         at = ctx['reftab_a']
@@ -131,10 +130,10 @@ class c_semit_program(c_scode_parser):
         buf.newline()
 
     def _gen_anode_label(self, nd, ctx):
-        self._write_lab(f'lab.{nd.name}', ctx)
+        self._write_cmt(f'@lab.{nd.name}', ctx)
 
     def _gen_anode_func(self, nd, ctx):
-        self._write_lab(f'fun.{nd.name}', ctx)
+        self._write_cmt(f'@fun.{nd.name}', ctx)
         self._gen_anode(nd.sub, None, ctx)
 
     def _gen_anode_bat(self, nd, ctx):
@@ -180,9 +179,7 @@ class c_semit_program(c_scode_parser):
         buf.newline()
 
     def _gen_anode_parm(self, nd, ctx):
-        buf = ctx['buf']
-        buf.write(str(nd))
-        buf.newline()
+        self._write_cmt(f',arg{nd.aidx}', ctx)
 
     def _gen_anode_inst(self, nd, ctx, *, calc_value = None, **ka):
         buf = ctx['buf']
