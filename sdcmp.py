@@ -23,10 +23,12 @@ class c_sdialog_comparer:
         tmpl_seq = []
         for i, s in enumerate(re.split(r'\{([^\{\}]+)\}', dlg)):
             if i % 2 == 0:
-                if not s:
+                if i == 1 and not s:
                     continue
                 elif s.endswith('\n'):
                     s = s[:-1]
+                    if not s:
+                        continue
                 txt_seq.append(s)
             else:
                 tmpl_seq.append(s)
@@ -55,7 +57,8 @@ class c_sdialog_comparer:
         src_seq, src_tmpl_seq = self._split_tmpl(src_dlg)
         dst_seq, dst_tmpl_seq = self._split_tmpl(dst_dlg)
         shd_seq, shd_tmpl_seq = self._split_tmpl(shd_dlg)
-        if not src_tmpl_seq == shd_tmpl_seq:
+        if not (src_tmpl_seq == shd_tmpl_seq
+                and len(src_seq) == len(shd_seq) ):
             self._error(ln, f'unmatched line')
         if not dst_tmpl_seq == shd_tmpl_seq:
             self._error(ln, f'shaffled trans: {dst_tmpl_seq}')
@@ -75,9 +78,6 @@ class c_sdialog_comparer:
                 break
             self._feed_line(ln, s, d, h)
 
-    def scan(self):
-        pass
-
 if __name__ == '__main__':
     import pdb
     from hexdump import hexdump as hd
@@ -92,5 +92,4 @@ if __name__ == '__main__':
             with open(r'trans\dialog_trim_zh.txt', 'r', encoding = 'utf-8') as dstfd:
                 with open(r'wktab\dialog_trim.shadow.txt', 'r', encoding = 'utf-8') as shdfd:
                     cmp.feed(srcfd, dstfd, shdfd)
-        cmp.scan()
     tst1()
