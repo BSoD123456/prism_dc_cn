@@ -8,10 +8,9 @@ from report import report
 
 class c_semit_asm_tok:
 
-    def __init__(self, s, v, p):
+    def __init__(self, s, v):
         self.desc = s
         self.code = v
-        self.pnum = p
 
     def bytes(self):
         cc = self.code
@@ -20,13 +19,13 @@ class c_semit_asm_tok:
             cv |= cc[1]
         return val2bytes(cv, 4)
 
+    def text(self):
+        return self.desc.format(self.code[1:])
+
     def __str__(self):
         cs = ' '.join(f'{b:02X}' for b in self.bytes())
-        ps = []
-        for i in range(len(self.code) - self.pnum, len(self.code)):
-            ps.append(hex(self.code[i]))
-        ps = ' '.join(ps)
-        return f'{cs}: {self.desc} {ps}'
+        ds = self.text()
+        return f'{cs}: {ds}'
 
 class c_semit_asm_buf_fd(c_scode_buf_fd):
 
@@ -78,6 +77,9 @@ class c_semit_program(c_scode_parser):
             dconf = {**dconf, **conf}
         super().__init__(ast, buf, dconf)
 
+    def _write_tok(self, desc, code):
+        pass
+
     # program
 
     def _gen_anode_prog(self, nd, ctx):
@@ -115,8 +117,11 @@ class c_semit_program(c_scode_parser):
                 ccode = (ccode[0], snd.val)
                 continue
             self._gen_anode(snd, None, ctx)
-        ctx['buf'].write(c_semit_asm_tok(
-            f'act.{nd.name}', ccode, 1 if need_parm else 0))
+        if need_parm:
+            cdesc = f'act.{nd.name} ( 0x{0:x} )'
+        else:
+            cdesc = f'act.{nd.name}'
+        ctx['buf'].write(c_semit_asm_tok(cdesc, ccode))
         ctx['buf'].newline()
 
     def _gen_anode_act_setrval(self, nd, ctx):
