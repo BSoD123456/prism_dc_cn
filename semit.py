@@ -77,8 +77,9 @@ class c_semit_program(c_scode_parser):
             dconf = {**dconf, **conf}
         super().__init__(ast, buf, dconf)
 
-    def _write_tok(self, desc, code):
-        pass
+    def _write_cmd(self, desc, code, ctx):
+        ctx['buf'].write(c_semit_asm_tok(desc, code))
+        ctx['buf'].newline()
 
     # program
 
@@ -121,8 +122,7 @@ class c_semit_program(c_scode_parser):
             cdesc = f'act.{nd.name} ( 0x{0:x} )'
         else:
             cdesc = f'act.{nd.name}'
-        ctx['buf'].write(c_semit_asm_tok(cdesc, ccode))
-        ctx['buf'].newline()
+        self._write_cmd(cdesc, ccode, ctx)
 
     def _gen_anode_act_setrval(self, nd, ctx):
         sub = self._getone(nd.subs[1])
