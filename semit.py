@@ -159,10 +159,47 @@ class c_semit_program(c_scode_parser):
             rqs = ', '.join(rq)
             self._error(nd, f'reference undefined: {rqs}')
 
+    # text
+
     def _gen_anode_text(self, nd, ctx):
         name = f'txt.{nd.name}'
         self._write_cmt('@' + name, ctx)
         self._reftab_reg(name, ctx)
+        txt = nd.text
+        tidx = 0
+        cpair = []
+        cphi = False
+        def emit():
+            v1 = cpair[0]
+            v2 = cpair[1] if len(cpair) > 1 else 0x1fff
+            cpair.clear()
+            val = (((v2 & 0x1fff) << 0xd) | (v1 & 0x1fff))
+            if cphi:
+                cname = 'texth'
+            else:
+                cname = 'text'
+            ccode = EM_CMD_INFO[cname]
+            assert ccode[1] is None
+            self._write_cmd(name, (ccode[0], val), ctx)
+        while True:
+            if tidx >= len(txt):
+                if cpair:
+                    emit()
+                break
+            c = txt[tidx]
+            ishi = not not (c | 0x2000)
+            c &= 0x1fff
+            if cphi != ishi:
+                if cpair:
+                    emit()
+                cphi = ishi
+                continue
+            cpair.append(c)
+            tidx += 1
+            if len(cpair) >= 2:
+                emit()
+
+    # struct
 
     def _gen_anode_label(self, nd, ctx):
         name = f'lab.{nd.name}'
@@ -182,6 +219,8 @@ class c_semit_program(c_scode_parser):
         for snd in nd.subs:
             self._gen_anode(snd, None, ctx)
 
+    # act
+
     def _gen_vnode_cmd(self, nd, ctx):
         cname = nd.name
         ccode = EM_CMD_INFO[cname]
@@ -189,10 +228,10 @@ class c_semit_program(c_scode_parser):
         if len(ccode) > 1 and ccode[1] is None:
             parm = self._getone(nd.subs[0])
             ccode = (ccode[0], parm.val)
-            cdesc = f'{nd.name} ( 0x{0:x} )'
+            cdesc = f'{cname} ( 0x{0:x} )'
             rmsubs = nd.subs[1:]
         else:
-            cdesc = f'{nd.name}'
+            cdesc = f'{cname}'
             rmsubs = nd.subs
         return cdesc, ccode, rmsubs
 
@@ -231,6 +270,8 @@ class c_semit_program(c_scode_parser):
     def _gen_anode_act_setrval(self, nd, ctx):
         sub = self._getone(nd.subs[1])
         self._gen_anode(sub, None, ctx)
+
+    # ref
 
     def _gen_anode_ref_func__call(self, nd, ctx):
         self._reftab_req(f'fun.{nd.name}', ctx)
