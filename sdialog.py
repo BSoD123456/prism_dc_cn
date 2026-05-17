@@ -607,15 +607,20 @@ class c_sdialog_sys_shadow_buf(c_sdialog_sys_buf):
 
     def meta(self, cmd, *args):
         if cmd == 'textref':
-            pass
-        elif cmd == 'textref_done':
             trs = f'<tr: {args[0]}>'
             super().write(trs)
+        elif cmd == 'textref_done':
+            pass
         else:
             super().meta(cmd, *args)
 
     def write(self, s):
-        pass
+        if self._getgflag('in_syscall'):
+            super().write(s)
+        elif self._getgflag('in_text'):
+            s = self._rplc_ctrl(s)
+            s = re.sub(r'[^\n]', '', s)
+            super(c_sdialog_buf, self).write(s)
 
 def bind_shadow_buf(pbuf):
     return c_sdialog_sys_shadow_buf(pbuf, False, 0)
