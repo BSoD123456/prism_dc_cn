@@ -624,13 +624,18 @@ class c_sdialog_sys_shadow_buf(c_sdialog_sys_buf):
             super(c_sdialog_buf, self).write(trs)
         elif cmd == 'textref_done':
             pass
+        elif cmd == 'iltmpl':
+            self._setgflag('in_iltmpl', True)
+        elif cmd == 'iltmpl_done':
+            self._setgflag('in_iltmpl', False)
         else:
             super().meta(cmd, *args)
 
     def write(self, s):
         if self._write_sys(s):
             s = self._rplc_ctrl(s)
-            s = re.sub(r'[^\n]', '', s)
+            if not self._getgflag('in_iltmpl'):
+                s = re.sub(r'[^\n]', '', s)
             super(c_sdialog_buf, self).write(s)
 
 def bind_shadow_buf(pbuf):

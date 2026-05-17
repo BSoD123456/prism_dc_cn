@@ -753,9 +753,11 @@ class c_scode_program(c_scode_parser):
     def _gen_anode_act_call__intext(self, nd, ctx):
         assert nd.name == 'call'
         vtc = self._gen_vnode_text_pre(ctx)
+        ctx['buf'].meta('iltmpl', 'fun')
         ctx['buf'].write('{')
         self._gen_vnode_call('fun', nd, ctx)
         ctx['buf'].write('}')
+        ctx['buf'].meta('iltmpl_done', 'fun')
         self._gen_vnode_text_post(vtc, ctx)
 
     def _gen_anode_act_call_syscall__intext(self, nd, ctx):
@@ -763,9 +765,11 @@ class c_scode_program(c_scode_parser):
         assert fname in self.SC_TXT_INLINE
         vtc = self._gen_vnode_text_pre(ctx)
         ctx['buf'].meta('syscall', fname, True)
+        ctx['buf'].meta('iltmpl', 'sys')
         ctx['buf'].write('{')
         self._gen_vnode_call('sys', nd, ctx)
         ctx['buf'].write('}')
+        ctx['buf'].meta('iltmpl_done', 'sys')
         ctx['buf'].meta('syscall_done', fname, True)
         self._gen_vnode_text_post(vtc, ctx)
 
