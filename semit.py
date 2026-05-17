@@ -23,7 +23,7 @@ class c_semit_asm_tok:
 
     def text(self):
         if self.code:
-            return self.desc.format(self.code[1:])
+            return self.desc.format(*self.code[1:])
         else:
             return self.desc
 
@@ -142,11 +142,10 @@ class c_semit_program(c_scode_parser):
         buf.meta('disline')
         buf.newline()
         for snd in nd.subs:
-            self._gen_anode(snd, None, ctx)
+            if self._gen_anode(snd, None, ctx) == 'text': break
             if not ctx['reftab_q']:
                 buf.touch()
                 buf = ctx['buf'] = self.buf.sub(0)
-            #break
         buf.meta('end', 'prog')
         buf.meta('disline')
         buf.newline()
@@ -180,7 +179,7 @@ class c_semit_program(c_scode_parser):
                 cname = 'text'
             ccode = EM_CMD_INFO[cname]
             assert ccode[1] is None
-            self._write_cmd(name, (ccode[0], val), ctx)
+            self._write_cmd(f'{cname} ( 0x{{0:x}} )', (ccode[0], val), ctx)
         while True:
             if tidx >= len(txt):
                 if cpair:
@@ -228,7 +227,7 @@ class c_semit_program(c_scode_parser):
         if len(ccode) > 1 and ccode[1] is None:
             parm = self._getone(nd.subs[0])
             ccode = (ccode[0], parm.val)
-            cdesc = f'{cname} ( 0x{0:x} )'
+            cdesc = f'{cname} ( 0x{{0:x}} )'
             rmsubs = nd.subs[1:]
         else:
             cdesc = f'{cname}'
@@ -304,7 +303,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
+        if 1:
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
