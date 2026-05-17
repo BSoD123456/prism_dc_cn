@@ -90,7 +90,8 @@ class c_semit_program(c_scode_parser):
         ctx['addr'] += 1
 
     def _write_cmt(self, desc, ctx):
-        ctx['buf'].write(c_semit_asm_tok(desc, None))
+        adesc = f'{desc} ( 0x{ctx["addr"]:x} )'
+        ctx['buf'].write(c_semit_asm_tok(adesc, None))
         ctx['buf'].newline()
 
     def _inst_ccode(self, val):
@@ -121,6 +122,7 @@ class c_semit_program(c_scode_parser):
         else:
             reqs = qt[name] = []
         hid = ctx['buf'].hold(0)
+        ctx['addr'] += 1
         reqs.append(hid)
 
     def _reftab_flush(self, ctx):
@@ -142,7 +144,7 @@ class c_semit_program(c_scode_parser):
         buf.meta('disline')
         buf.newline()
         for snd in nd.subs:
-            if self._gen_anode(snd, None, ctx) == 'text': break
+            self._gen_anode(snd, None, ctx)
             if not ctx['reftab_q']:
                 buf.touch()
                 buf = ctx['buf'] = self.buf.sub(0)
@@ -303,7 +305,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
