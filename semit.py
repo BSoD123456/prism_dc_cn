@@ -216,7 +216,7 @@ class c_semit_program(c_scode_parser):
         self._gen_anode(nd.sub, None, ctx)
 
     def _gen_anode_parm(self, nd, ctx):
-        self._write_cmt(f',arg{nd.aidx}', ctx)
+        self._write_cmt(f':arg{nd.aidx}', ctx)
 
     def _gen_anode_bat(self, nd, ctx):
         for snd in nd.subs:
@@ -311,6 +311,10 @@ if __name__ == '__main__':
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
+        elif 1:
+            with open(r'wktab\escript.txt', 'w', encoding = 'utf-8') as fd:
+                cd = c_semit_program(ast, c_scode_buf_fd(fd))
+                cd.gen_code()
         else:
             with open(r'wktab\escript.bin', 'wb') as fd:
                 cd = c_semit_program(ast, c_semit_asm_buf_fd(fd))
