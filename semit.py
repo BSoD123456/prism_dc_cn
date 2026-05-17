@@ -79,7 +79,8 @@ EM_SYS_FUNC = {nm: si for si, (nm, *_) in enumerate(SC_SYS_FUNC)}
 class c_semit_program(c_scode_parser):
 
     def __init__(self, ast, buf, conf = None):
-        dconf = {}
+        dconf = {
+            'padding': True }
         if conf:
             dconf = {**dconf, **conf}
         super().__init__(ast, buf, dconf)
@@ -215,6 +216,16 @@ class c_semit_program(c_scode_parser):
         self._reftab_reg(name, ctx)
         self._gen_anode(nd.sub, None, ctx)
 
+    def _gen_anode_pad(self, nd, ctx):
+        plen = nd.plen
+        name = f'pad.{nd.addr}_{plen}'
+        self._write_cmt('@' + name, ctx)
+        if not self.conf['padding']:
+            return
+        ccode = EM_CMD_INFO['nop']
+        for _ in range(plen):
+            self._write_cmd('pad', ccode, ctx)
+
     def _gen_anode_parm(self, nd, ctx):
         self._write_cmt(f':arg{nd.aidx}', ctx)
 
@@ -311,7 +322,7 @@ if __name__ == '__main__':
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
-        elif 1:
+        elif 0:
             with open(r'wktab\escript.txt', 'w', encoding = 'utf-8') as fd:
                 cd = c_semit_program(ast, c_scode_buf_fd(fd))
                 cd.gen_code()
