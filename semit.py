@@ -148,6 +148,7 @@ class c_semit_program(c_scode_parser):
             if not ctx['reftab_q']:
                 buf.touch()
                 buf = ctx['buf'] = self.buf.sub(0)
+            if ctx['addr'] > 0x220: break
         buf.meta('end', 'prog')
         buf.meta('disline')
         buf.newline()
@@ -188,7 +189,7 @@ class c_semit_program(c_scode_parser):
                     emit()
                 break
             c = txt[tidx]
-            ishi = not not (c | 0x2000)
+            ishi = not not (c & 0x2000)
             c &= 0x1fff
             if cphi != ishi:
                 if cpair:
@@ -305,7 +306,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 0:
+        if 1:
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
