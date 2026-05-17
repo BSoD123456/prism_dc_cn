@@ -3,6 +3,8 @@
 
 from report import report
 
+import re
+
 class c_sdialog_comparer:
 
     def __init__(self):
@@ -16,12 +18,27 @@ class c_sdialog_comparer:
     def _warn(self, ln, msg):
         report('war', f'(ln: {ln}) {msg}')
 
+    def _feed_shdw(self, ln, shd_dlg):
+        shd_seq = []
+        for i, s in enumerate(re.split(r'\<tr\: ([t0-9a-z]+)\>', shd_dlg)):
+            if i % 2 == 0:
+                if not s or s == '\n':
+                    continue
+                m = re.match(r'\{([^\{\}]+)\}', s)
+                if not m:
+                    self._error(ln, f'unknown text in shadow: {s}')
+                shd_seq.append(m.group(1))
+            else:
+                shd_seq.append(s)
+        return shd_seq
+
     def _feed_line(self, ln, src_dlg, dst_dlg, shd_dlg):
         if src_dlg == shd_dlg:
             if dst_dlg != shd_dlg:
                 self._error(ln, 'unmatched lines')
             return
-        self.linebuf[ln] = (src_dlg, dst_dlg, shd_dlg)
+        shd_seq = self._feed_shdw(ln, shd_dlg)
+        self.linebuf[ln] = (src_dlg, dst_dlg, shd_seq)
 
     def feed(self, srcfd, dstfd, shdfd):
         ln = 0
