@@ -43,7 +43,7 @@ class c_semit_asm_buf_fd(c_scode_buf_fd):
             if isinstance(tok, c_semit_asm_tok):
                 bs = tok.bytes()
                 if bs:
-                    self.fd.write()
+                    self.fd.write(bs)
 
     def _writeltoks(self, ltoks):
         self._mergeltoks(ltoks)
@@ -146,14 +146,23 @@ class c_semit_program(c_scode_parser):
             if not ctx['reftab_q']:
                 buf.touch()
                 buf = ctx['buf'] = self.buf.sub(0)
-            break
+            #break
         buf.meta('end', 'prog')
         buf.meta('disline')
         buf.newline()
         rq = self._reftab_flush(ctx)
         buf.touch()
         if rq:
-            self._error(nd, f'reference undefined: {rq}')
+            if len(rq) > 5:
+                rq = rq[:5]
+                rq.append('...')
+            rqs = ', '.join(rq)
+            self._error(nd, f'reference undefined: {rqs}')
+
+    def _gen_anode_text(self, nd, ctx):
+        name = f'txt.{nd.name}'
+        self._write_cmt('@' + name, ctx)
+        self._reftab_reg(name, ctx)
 
     def _gen_anode_label(self, nd, ctx):
         name = f'lab.{nd.name}'
@@ -228,7 +237,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        if 1:
+        if 0:
             #cd = c_semit_program(ast, c_scode_buf_null())
             cd = c_semit_program(ast, c_scode_buf_std())
             cd.gen_code()
