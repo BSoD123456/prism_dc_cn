@@ -554,8 +554,7 @@ class c_sdialog_sys_buf(c_sdialog_buf):
 
     def _sys_set_name(self, m):
         idx = int(m.group(1), 16)
-        assert not self.lbuf and self.buf
-        txt = self._mergeltoks(self.buf[-1])
+        txt = self._mergeltoks(self.gvars['sc_lst_line'])
         assert txt
         ntab = self.gvars['sc_name_tab']
         if idx in ntab:
@@ -569,11 +568,23 @@ class c_sdialog_sys_buf(c_sdialog_buf):
             self._error(f'unset name idx: {idx:x}')
         return f'{{word({ntab[idx]})}}'
 
-    def write(self, s):
+    def _write_sys(self, s):
         if self._getgflag('in_syscall'):
             self.gvars['syscall_buf'].append(s)
-        else:
+        elif self._getgflag('in_text'):
+            s = self._rplc_ctrl(s)
+            self.gvars['sc_cur_line'].append(s)
+            return True
+        return False
+
+    def write(self, s):
+        if self._write_sys(s):
             super().write(s)
+
+    def newline(self):
+        super().newline()
+        self.gvars['sc_lst_line'] = self.gvars['sc_cur_line']
+        self.gvars['sc_cur_line'] = []
 
     def meta(self, cmd, *args):
         if cmd == 'syscall':
@@ -599,6 +610,8 @@ class c_sdialog_sys_buf(c_sdialog_buf):
             super().meta(cmd, *args)
             if cmd == 'start' and args[0] == 'prog':
                 self.gvars['sc_name_tab'] = {}
+                self.gvars['sc_cur_line'] = []
+                self.gvars['sc_lst_line'] = None
 
 def bind_sdialog_buf(pbuf):
     return c_sdialog_sys_buf(pbuf, False, 0)
@@ -608,16 +621,14 @@ class c_sdialog_sys_shadow_buf(c_sdialog_sys_buf):
     def meta(self, cmd, *args):
         if cmd == 'textref':
             trs = f'<tr: {args[0]}>'
-            super().write(trs)
+            super(c_sdialog_buf, self).write(trs)
         elif cmd == 'textref_done':
             pass
         else:
             super().meta(cmd, *args)
 
     def write(self, s):
-        if self._getgflag('in_syscall'):
-            super().write(s)
-        elif self._getgflag('in_text'):
+        if self._write_sys(s):
             s = self._rplc_ctrl(s)
             s = re.sub(r'[^\n]', '', s)
             super(c_sdialog_buf, self).write(s)
