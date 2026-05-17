@@ -80,7 +80,8 @@ class c_semit_program(c_scode_parser):
 
     def __init__(self, ast, buf, conf = None):
         dconf = {
-            'padding': True }
+            'padding': True,
+            'ret_hfree': True }
         if conf:
             dconf = {**dconf, **conf}
         super().__init__(ast, buf, dconf)
@@ -145,6 +146,7 @@ class c_semit_program(c_scode_parser):
         buf.meta('disline')
         buf.newline()
         for snd in nd.subs:
+            ctx['retval'] = 0
             self._gen_anode(snd, None, ctx)
             if not ctx['reftab_q']:
                 buf.touch()
@@ -256,9 +258,17 @@ class c_semit_program(c_scode_parser):
             self._gen_anode(snd, None, ctx)
         self._write_cmd(cdesc, ccode, ctx)
 
+    def _gen_anode_act_hfree(self, nd, ctx):
+        if self.conf['ret_hfree']:
+            ctx['retval'] = self._getone(nd.subs[0]).val
+        self._gen_anode_act(nd, ctx)
+
     def _gen_anode_act_return(self, nd, ctx):
         cname = nd.name
-        self._write_cmd(cname, EM_CMD_INFO[cname], ctx)
+        ccode = EM_CMD_INFO[cname]
+        assert len(ccode) == 1
+        retval = ctx['retval']
+        self._write_cmd(cname, (ccode[0], retval), ctx)
 
     def _gen_anode_act_call(self, nd, ctx):
         cdesc, ccode, rmsubs = self._gen_vnode_cmd(nd, ctx)
