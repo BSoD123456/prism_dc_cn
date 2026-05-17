@@ -80,11 +80,33 @@ class c_semit_program(c_scode_parser):
     def _write_cmd(self, desc, code, ctx):
         ctx['buf'].write(c_semit_asm_tok(desc, code))
         ctx['buf'].newline()
+        ctx['addr'] += 1
+
+    def _reftab_reg(self, name, ctx):
+        at = ctx['reftab_a']
+        if name in at:
+            self._error('duplicated ref name: {name}')
+        addr = ctx['addr']
+        at[name] = addr
+        qt = ctx['reftab_q']
+        if name in qt:
+            for hid in qt.pop(name):
+                pass
+
+    def _reftab_req(self, name, ctx):
+        at = ctx['reftab_a']
+        if name in at:
+            pass
+            return
+        qt = ctx['reftab_q']
 
     # program
 
     def _gen_anode_prog(self, nd, ctx):
         ctx = {}
+        ctx['addr'] = 0
+        ctx['reftab_a'] = {}
+        ctx['reftab_q'] = {}
         buf = ctx['buf'] = self.buf
         buf.meta('start', 'prog')
         buf.meta('disline')
@@ -106,7 +128,7 @@ class c_semit_program(c_scode_parser):
         for snd in nd.subs:
             self._gen_anode(snd, None, ctx)
 
-    def _gen_anode_act(self, nd, ctx):
+    def _gen_vnode_cmd(self, nd, ctx):
         cname = nd.name
         ccode = EM_CMD_INFO[cname]
         need_parm = False
@@ -119,22 +141,20 @@ class c_semit_program(c_scode_parser):
                 continue
             self._gen_anode(snd, None, ctx)
         if need_parm:
-            cdesc = f'act.{nd.name} ( 0x{0:x} )'
+            cdesc = f'{nd.name} ( 0x{0:x} )'
         else:
-            cdesc = f'act.{nd.name}'
+            cdesc = f'{nd.name}'
         self._write_cmd(cdesc, ccode, ctx)
+
+    def _gen_anode_act(self, nd, ctx):
+        self._gen_vnode_cmd(nd, ctx)
+
+    def _gen_anode_act_call(self, nd, ctx):
+        self._gen_vnode_cmd(nd, ctx)
 
     def _gen_anode_act_setrval(self, nd, ctx):
         sub = self._getone(nd.subs[1])
         self._gen_anode(sub, None, ctx)
-
-    def _gen_anode_act_call(self, nd, ctx):
-        buf = ctx['buf']
-        buf.write(f'call')
-        buf.newline()
-        for bnd in nd.subs:
-            snd = self._getone(bnd)
-            self._gen_anode(snd, None, ctx)
 
     def _gen_anode_ref_func(self, nd, ctx):
         buf = ctx['buf']
