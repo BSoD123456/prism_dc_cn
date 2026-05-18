@@ -612,10 +612,10 @@ class c_sdialog_sys_shadow_buf(c_sdialog_sys_buf):
 
     def meta(self, cmd, *args):
         if cmd == 'textref':
-            trs = f'<tr: {args[0]}>'
-            super(c_sdialog_buf, self).write(trs)
+            self.gvars['cur_textref'] = args[0]
+            self.gvars['cur_textref_idx'] = 0
         elif cmd == 'textref_done':
-            pass
+            self.gvars['cur_textref'] = None
         elif cmd == 'iltmpl':
             self._setgflag('in_iltmpl', True)
         elif cmd == 'iltmpl_done':
@@ -625,11 +625,31 @@ class c_sdialog_sys_shadow_buf(c_sdialog_sys_buf):
             if cmd == 'text_done':
                 super(c_sdialog_buf, self).write('<td>')
 
+    def _trim_textref(self, s):
+        slns = s.split('\n')
+        rs = []
+        cur_tr = self.gvars.get('cur_textref', None)
+        cur_tr_idx = self.gvars.get('cur_textref_idx', 0)
+        for i, sln in enumerate(slns):
+            if i > 0:
+                rs.append('\n')
+            if cur_tr and (sln or cur_tr_idx == 0):
+                tr_head = False
+                if cur_tr_idx > 0:
+                    trs = f'<tr: {cur_tr}/{cur_tr_idx}>'
+                else:
+                    trs = f'<tr: {cur_tr}>'
+                cur_tr_idx += 1
+                rs.append(trs)
+        assert cur_tr_idx > 0
+        self.gvars['cur_textref_idx'] = cur_tr_idx
+        return ''.join(rs)
+
     def write(self, s):
         if self._write_sys(s):
             s = self._rplc_ctrl(s)
             if not self._getgflag('in_iltmpl'):
-                s = re.sub(r'[^\n]', '', s)
+                s = self._trim_textref(s)
             super(c_sdialog_buf, self).write(s)
 
 def bind_shadow_buf(pbuf):
