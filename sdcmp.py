@@ -23,12 +23,6 @@ class c_sdialog_comparer:
         tmpl_seq = []
         for i, s in enumerate(re.split(r'\{([^\{\}]+)\}', dlg)):
             if i % 2 == 0:
-                if i == 1 and not s:
-                    continue
-                elif s.endswith('\n'):
-                    s = s[:-1]
-                    if not s:
-                        continue
                 txt_seq.append(s)
             else:
                 tmpl_seq.append(s)
@@ -40,8 +34,9 @@ class c_sdialog_comparer:
             seq = []
             for j, trs in enumerate(re.split(r'\<t(?:r\:\s*([t0-9a-z\/]+)|d)\>', s)):
                 if j % 2 == 0:
-                    if trs:
-                        self._error(ln, f'unknown text in shadow: {trs}')
+                    if not trs or trs == '\n':
+                        continue
+                    self._error(ln, f'unknown text in shadow: {trs}')
                 else:
                     if trs:
                         if '/' in trs:
