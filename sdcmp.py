@@ -38,17 +38,20 @@ class c_sdialog_comparer:
         for i in range(len(shd_seq)):
             s = shd_seq[i]
             seq = []
-            for j, trs in enumerate(re.split(r'\<tr\: ([t0-9a-z\/]+)\>', s)):
+            for j, trs in enumerate(re.split(r'\<t(?:r\:\s*([t0-9a-z\/]+)|d)\>', s)):
                 if j % 2 == 0:
                     if trs:
                         self._error(ln, f'unknown text in shadow: {trs}')
                 else:
-                    if '/' in trs:
-                        self._error(ln, f'multiline textref unsupported: {trs}')
+                    if trs:
+                        if '/' in trs:
+                            self._error(ln, f'multiline textref unsupported: {trs}')
+                        if trs in self.txttab:
+                            self._error(ln, f'duplicated textref: {trs}')
+                        self.txttab[trs] = [ln]
+                    else:
+                        trs = 'EOL'
                     seq.append(trs)
-                    if trs in self.txttab:
-                        self._error(ln, f'duplicated textref: {trs}')
-                    self.txttab[trs] = [ln]
             shd_seq[i] = seq
 
     def _feed_line(self, ln, src_dlg, dst_dlg, shd_dlg):
@@ -59,12 +62,13 @@ class c_sdialog_comparer:
         src_seq, src_tmpl_seq = self._split_tmpl(src_dlg)
         dst_seq, dst_tmpl_seq = self._split_tmpl(dst_dlg)
         shd_seq, shd_tmpl_seq = self._split_tmpl(shd_dlg)
-        if not (src_tmpl_seq == shd_tmpl_seq
-                and len(src_seq) == len(shd_seq) ):
+        if not src_tmpl_seq == shd_tmpl_seq:
             self._error(ln, f'unmatched line')
         if not dst_tmpl_seq == shd_tmpl_seq:
             self._error(ln, f'shaffled trans: {dst_tmpl_seq}')
         self._feed_shdw(ln, shd_seq)
+        if not len(src_seq) == len(shd_seq):
+            self._error(ln, f'unmatched line')
         self.linebuf[ln] = (src_seq, dst_seq, shd_seq)
 
     def feed(self, srcfd, dstfd, shdfd):
