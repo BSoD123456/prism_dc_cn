@@ -48,11 +48,24 @@ if __name__ == '__main__':
 
     from script import *
     from sdcmp import cmp_sdialog
+    from scode import c_scode_buf_fd
+    from semit import c_semit_program, c_semit_asm_buf_fd
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
         cd = c_smod_program(ast)
+        print('cmp')
         rtxt = cmp_sdialog(r'wktab\dialog_trim.txt', r'trans\dialog_trim_zh.txt', r'wktab\dialog_trim.shadow.txt')
+        print('mod')
         mast = cd.mod_text(rtxt)
+        print('emit')
+        if 0:
+            with open(r'wktab\escript_mod.txt', 'w', encoding = 'utf-8') as fd:
+                emt = c_semit_program(mast, c_scode_buf_fd(fd))
+                emt.gen_code()
+        else:
+            with open(r'wktab\escript_mod.bin', 'wb') as fd:
+                emt = c_semit_program(mast, c_semit_asm_buf_fd(fd))
+                emt.gen_code()
     tst1()
