@@ -654,7 +654,7 @@ if __name__ == '__main__':
             cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
             #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
-        elif 0:
+        elif 1:
             with open(r'wktab\dialog.shadow.txt', 'w', encoding = 'utf-8') as fd:
                 cd = c_scode_program(ast, bind_shadow_buf(c_scode_buf_fd(fd)))
                 cd.gen_code()
