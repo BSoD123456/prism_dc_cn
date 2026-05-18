@@ -12,6 +12,9 @@ class c_smod_program(c_scode_parser):
             dconf = {**dconf, **conf}
         super().__init__(ast, dconf)
 
+    def _encode_text(self, txt):
+        return tuple(1 for _ in range(len(txt)))
+
     # program
 
     def _gen_anode_prog(self, nd, ctx):
@@ -25,14 +28,18 @@ class c_smod_program(c_scode_parser):
         pass
 
     def _gen_anode_text(self, nd, ctx):
-        pass
+        dtxt = ctx['rplc_text'].get(nd.name, None)
+        if dtxt is None:
+            self._warn(nd, f'unmod text: {nd.name}')
+        else:
+            nd.text = self._encode_text(dtxt)
 
     # intf
 
-    def mod_text(self, rtxt):
+    def modify(self, rtxt):
         ctx = {}
         ctx['rplc_text'] = rtxt
-        self._gen_anode(self.ast)
+        self._gen_anode(self.ast, None, ctx)
         return self.ast
 
 if __name__ == '__main__':
@@ -58,7 +65,7 @@ if __name__ == '__main__':
         print('cmp')
         rtxt = cmp_sdialog(r'wktab\dialog_trim.txt', r'trans\dialog_trim_zh.txt', r'wktab\dialog_trim.shadow.txt')
         print('mod')
-        mast = cd.mod_text(rtxt)
+        mast = cd.modify(rtxt)
         print('emit')
         if 0:
             with open(r'wktab\escript_mod.txt', 'w', encoding = 'utf-8') as fd:
