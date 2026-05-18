@@ -83,7 +83,8 @@ class c_semit_program(c_scode_parser):
             'ret_hfree': True }
         if conf:
             dconf = {**dconf, **conf}
-        super().__init__(ast, buf, dconf)
+        super().__init__(ast, dconf)
+        self.buf = buf
 
     def _write_cmd(self, desc, code, ctx):
         ctx['buf'].write(c_semit_asm_tok(desc, code))

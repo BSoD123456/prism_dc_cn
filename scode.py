@@ -273,9 +273,8 @@ def with_anode(*stricts):
 
 class c_scode_parser:
 
-    def __init__(self, ast, buf, conf = None):
+    def __init__(self, ast, conf = None):
         self.ast = ast
-        self.buf = buf
         self.conf = {} if conf is None else conf
 
     def _error(self, nd, msg):
@@ -335,7 +334,8 @@ class c_scode_program(c_scode_parser):
             'output_restab': False, }
         if conf:
             dconf = {**dconf, **conf}
-        super().__init__(ast, buf, dconf)
+        super().__init__(ast, dconf)
+        self.buf = buf
         self.chrset = c_charset_jp()
 
     # program
