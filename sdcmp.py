@@ -38,11 +38,13 @@ class c_sdialog_comparer:
         for i in range(len(shd_seq)):
             s = shd_seq[i]
             seq = []
-            for j, trs in enumerate(re.split(r'\<tr\: ([t0-9a-z]+)\>', s)):
+            for j, trs in enumerate(re.split(r'\<tr\: ([t0-9a-z\/]+)\>', s)):
                 if j % 2 == 0:
                     if trs:
                         self._error(ln, f'unknown text in shadow: {trs}')
                 else:
+                    if '/' in trs:
+                        self._error(ln, f'multiline textref unsupported: {trs}')
                     seq.append(trs)
                     if trs in self.txttab:
                         self._error(ln, f'duplicated textref: {trs}')
