@@ -499,10 +499,6 @@ class c_sdialog_buf(c_scode_buf):
             if not self._getlflag('after_text'):
                 if self._getlflag('has_text'):
                     self._warn(f'print before text: {args[0]}')
-            elif not self._getgflag('last_lf'):
-                if sfname != 'set_name':
-                    #self._warn(f'print without LF: {args[0]}')
-                    super().newline()
             self._setlflag('after_text', False)
         elif cmd == 'block':
             if not args[0] == 'vo':
@@ -536,10 +532,6 @@ class c_sdialog_buf(c_scode_buf):
 
     def _rplc_ctrl(self, txt):
         rtxt = re.sub(r'\[LF\]', '\n', txt)
-        if rtxt and rtxt[-1] == '\n':
-            self._setgflag('last_lf', True)
-        else:
-            self._setgflag('last_lf', False)
         return rtxt
 
     def write(self, s):
@@ -662,7 +654,7 @@ if __name__ == '__main__':
             cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_null()))
             #cd = c_scode_program(ast, bind_sdialog_buf(c_scode_buf_std()))
             cd.gen_code()
-        elif 1:
+        elif 0:
             with open(r'wktab\dialog.shadow.txt', 'w', encoding = 'utf-8') as fd:
                 cd = c_scode_program(ast, bind_shadow_buf(c_scode_buf_fd(fd)))
                 cd.gen_code()
