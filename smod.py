@@ -30,7 +30,7 @@ class c_smod_program(c_scode_parser):
     def _gen_anode_text(self, nd, ctx):
         dtxt = ctx['rplc_text'].get(nd.name, None)
         if dtxt is None:
-            self._warn(nd, f'unmod text: {nd.name}')
+            pass#self._warn(nd, f'unmod text: {nd.name}')
         else:
             nd.text = self._encode_text(dtxt)
 
