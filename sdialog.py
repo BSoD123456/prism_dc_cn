@@ -622,6 +622,8 @@ class c_sdialog_sys_shadow_buf(c_sdialog_sys_buf):
             self._setgflag('in_iltmpl', False)
         else:
             super().meta(cmd, *args)
+            if cmd == 'text_done':
+                super(c_sdialog_buf, self).write('<td>')
 
     def write(self, s):
         if self._write_sys(s):
