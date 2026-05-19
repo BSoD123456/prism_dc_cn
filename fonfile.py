@@ -5,12 +5,9 @@ from sect import *
 
 class c_fonfile(c_sect_tab):
 
-    def _set_info(self, cpath, cfg):
-        if not cpath in cfg:
-            raise ValueError(f'unconfigured font: {cpath}')
-        info = cfg[cpath]
+    def _set_info(self, info):
         self.char_shape = info['shape']
-        size = info.get('size')
+        size = info.get('size', None)
         if not size is None:
             self.tsize = size
         self.rvs_byte = info.get('rvsbyt', False)

@@ -27,15 +27,26 @@ class c_font_drawer:
     def __init__(self, font):
         self.sect = font
         fbw = font.char_shape[0]
-        if not fbw in self.PAL:
-            raise ValueError(f'unsupported PAL: {fbw}')
-        pal = self.PAL[fbw]
+        if fbw in self.PAL:
+            pal = self.PAL[fbw]
+        else:
+            pal = self._monopal(fbw)
         try:
             pal_shdw = pal.index((0, 0, 0))
         except ValueError:
             pal_shdw = 1
         self.pal = pal
         self.pal_shdw = pal_shdw
+
+    def _monopal(self, bw):
+        pnum = (1 << bw)
+        pstp = 256 / pnum
+        assert int(pstp * (pnum - 1)) == 255
+        pal = []
+        for i in range(pnum):
+            cv = 255 - int(pstp * i)
+            pal.append((cv, cv, cv))
+        return pal
 
     def palclr(self, sel, noshadow = False):
         pal = self.pal
@@ -275,16 +286,20 @@ if __name__ == '__main__':
     from pprint import pprint
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
-    from env import ENV
-    from report import RPT
-    from psr import load_rom
-
-    rom = load_rom('eo3.nds')
-    fon = rom.get_term('Data/Target.bin:Data/Font/Font12x12.cmp:decomp')
-    dr = c_font_drawer(fon)
+    from fonfile import c_fonfile
 
     def _show(gen):
         img = dr.make_img(gen)
         img.show()
         return img
 
+    def tst1():
+        global fon, dr
+        fn = r'wktab\FONT.DAT'
+        with open(fn, 'rb') as fd:
+            raw = fd.read()
+        fon = c_fonfile(raw, 0)
+        fon.set_info({'shape': (8, 12, 24, 1)})
+        fon.parse_size(len(raw), 4)
+        dr = c_font_drawer(fon)
+    tst1()
