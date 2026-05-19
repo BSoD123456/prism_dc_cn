@@ -1184,6 +1184,7 @@ if __name__ == '__main__':
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
+        #ast = loadobj(r'wktab\ast_mod.pck')
         print('start')
         if 0:
             cd = c_scode_program(ast, c_scode_buf_null())
@@ -1191,6 +1192,7 @@ if __name__ == '__main__':
             cd.gen_code()
         else:
             with open(r'wktab\output.txt', 'w', encoding = 'utf-8') as fd:
+            #with open(r'wktab\output_mod.txt', 'w', encoding = 'utf-8') as fd:
                 cd = c_scode_program(ast, c_scode_buf_fd(fd))
                 cd.gen_code()
     tst1()

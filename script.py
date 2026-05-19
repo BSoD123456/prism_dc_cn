@@ -697,6 +697,7 @@ if __name__ == '__main__':
     def tst1():
         global sc, prog, ast
         fn = r'wktab\SCRIPT.BIN'
+        #fn = r'wktab\escript_mod.bin'
         #fn = r'wktab\tst_recur1.bin'
         #fn = r'wktab\tst_noret.bin'
         with open(fn, 'rb') as fd:
@@ -711,4 +712,5 @@ if __name__ == '__main__':
         #print(ast.repr_as(True))
         #print(ast)
         saveobj(ast, r'wktab\ast.pck')
+        #saveobj(ast, r'wktab\ast_mod.pck')
     tst1()
