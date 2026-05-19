@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from scode import with_anode, c_scode_parser
-from charset import c_charset_zh
+from charset import c_charset_zh, c_charset_jp
 
 @with_anode()
 class c_smod_program(c_scode_parser):
@@ -12,7 +12,8 @@ class c_smod_program(c_scode_parser):
         if conf:
             dconf = {**dconf, **conf}
         super().__init__(ast, dconf)
-        self.chrset = c_charset_zh()
+        #self.chrset = c_charset_zh()
+        self.chrset = c_charset_jp()
 
     def _encode_text(self, txt):
         return self.chrset.encode(txt.replace('\n', '[LF]'))
@@ -65,7 +66,11 @@ if __name__ == '__main__':
         print('start')
         cd = c_smod_program(ast)
         print('cmp')
-        rtxt = cmp_sdialog(r'wktab\dialog_trim.txt', r'trans\dialog_trim_zh.txt', r'wktab\dialog_trim.shadow.txt')
+        rtxt = cmp_sdialog(
+            r'wktab\dialog_trim.txt',
+            r'wktab\dialog_trim.txt',
+            #r'trans\dialog_trim_zh.txt',
+            r'wktab\dialog_trim.shadow.txt')
         print('mod')
         mast = cd.modify(rtxt)
         print('emit')
