@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from scode import with_anode, c_scode_parser
+from charset import c_charset_zh
 
 @with_anode()
 class c_smod_program(c_scode_parser):
@@ -11,9 +12,10 @@ class c_smod_program(c_scode_parser):
         if conf:
             dconf = {**dconf, **conf}
         super().__init__(ast, dconf)
+        self.chrset = c_charset_zh()
 
     def _encode_text(self, txt):
-        return tuple(50 for _ in range(len(txt)))
+        return self.chrset.encode(txt.replace('\n', '[LF]'))
 
     # program
 
