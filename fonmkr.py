@@ -43,8 +43,8 @@ class c_font_maker:
     def __init__(self,
             src_name, src_size,
             dst_colors, dst_packshape, dst_offset, *,
-            src_enc = 'utf-8', dst_parts = None):
-        self.ssize = src_size
+            src_enc = 'utf-8', src_wscale = 1, dst_parts = None):
+        self.wscale = src_wscale
         self.dshape = dst_packshape
         self.doffset = dst_offset
         self._calc_decos(dst_parts, dst_colors)
@@ -83,6 +83,7 @@ class c_font_maker:
     def _load_font(self, name, size, enc):
         def _iname():
             yield name
+            yield f'wktab\\{name}'
         for dname in _iname():
             try:
                 font = ImageFont.truetype(dname, size, encoding = enc)
@@ -118,6 +119,7 @@ class c_font_maker:
 
     def _get_chars_data(self, img, sepw):
         size = self.fsize
+        wscale = self.wscale
         iw, ih = img.size
         uwidth = size + sepw
         assert ih == size and iw % uwidth == 0
@@ -211,17 +213,13 @@ class c_font_maker:
         chars_data = self._draw_chars(chars)
         for s in chars_data:
             drng_ofs, drng_sz = self.drange
-            ssz = tuple(self.ssize for _ in range(2))
+            ssz = tuple(self.fsize for _ in range(2))
             dsz = tuple(ssz[i] + drng_sz[i] for i in range(2))
             dofs = tuple(-v for v in drng_ofs)
             d = [0] * (dsz[0] * dsz[1])
             for deco in reversed(self.decos):
                 self._deco_char(deco, s, ssz, d, dsz, dofs)
             yield self._pack_char(d, dsz, self.doffset, self.dshape)
-
-def make_font_maker(name, size, shape, offset, clrofs = 0):
-    return c_font_maker(name, size,
-        ((1 << shape[0]) - 1) - clrofs, shape[1:], offset)
 
 if __name__ == '__main__':
     import pdb
@@ -253,8 +251,8 @@ if __name__ == '__main__':
         sfon.set_info({'shape': (8, 12, 24, 1)})
         sfon.parse_size(len(raw), 4)
         sdr = c_font_drawer(sfon)
-        dfn = 'msyh'
-        mkr = c_font_maker(dfn, 24, [250, 200, 150], (12, 24, 1), (0, 0))
-        dfon, ddirty = sfon.repack_with((mkr.iter_chars(charset), [0]))
+        dfn = 'DFYuanW5-GB.ttf'
+        mkr = c_font_maker(dfn, 24, [250, 100, 50], (12, 24, 1), (0, 0))
+        dfon, ddirty = sfon.repack_with((mkr.iter_chars(charset[100:200]), [0]))
         ddr = c_font_drawer(dfon)
     tst1()
