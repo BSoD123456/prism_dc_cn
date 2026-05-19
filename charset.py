@@ -1,7 +1,125 @@
 #! python3
 # coding: utf-8
 
-class c_charset_jp:
+import re
+
+class c_charset:
+
+    CTRLS = [
+        ('LF', 0),
+        None,
+        ('CLR', [{0: 'white', 3: 'pink', 4: 'grey', 5: 'yellow'}]),
+        ('BLINK', 1),
+        ('SEL', 1),
+    ]
+    CTRLS_RVS = {
+        CI[0]: (i, CI[1] if isinstance(CI[1], int) else [
+            {v: k for k, v in tab.items()} if tab else tab
+            for tab in CI[1] ] )
+        for i, CI in enumerate(CTRLS) if CI }
+
+    def dec_char(self, code):
+        return None
+
+    def enc_char(self, char):
+        return None
+
+    def decode(self, seq):
+        txts = []
+        slen = len(seq)
+        si = 0
+        while si < slen:
+            code = seq[si]
+            if code & 0x2000:
+                cc = (code & 0x1fff)
+                if cc >= len(self.CTRLS) or self.CTRLS[cc] is None:
+                    raise ValueError(f'unknown ctrl code: {cc:x}')
+                cmd, cfeed = self.CTRLS[cc]
+                crs = [cmd]
+                if isinstance(cfeed, list):
+                    cflen = len(cfeed)
+                    cflst = cfeed
+                else:
+                    cflen = cfeed
+                    cflst = None
+                if cflen > 0:
+                    subs = []
+                    for ci in range(cflen):
+                        si += 1
+                        if si >= slen:
+                            subs.append('+')
+                            continue
+                        scc = (seq[si] & 0x1fff)
+                        if cflst and not cflst[ci] is None:
+                            if not scc in cflst[ci]:
+                                raise ValueError(
+                                    f'unknown sub ctrl code: {cmd}/{ci}:{scc:x}')
+                            sr = cflst[ci][scc]
+                        else:
+                            sr = f'{scc:x}'
+                        subs.append(sr)
+                    subr = ','.join(subs)
+                    crs.append(subr)
+                cr = ':'.join(crs)
+                c = f'[{cr}]'
+            else:
+                c = self.dec_char(code)
+                if c is None:
+                    raise ValueError(f'unknown char code: {code:x}')
+            si += 1
+            txts.append(c)
+        return ''.join(txts)
+
+    def encode(self, txt):
+        seq = []
+        for i, tok in enumerate(re.split(r'\[([^\[\]]+)\]', txt)):
+            if i % 2 == 0:
+                for c in tok:
+                    code = self.enc_char(c)
+                    if code is None:
+                        raise ValueError(f'unknown char: {c}')
+                    seq.append(code)
+            else:
+                m = re.match(r'(\w+)(?:\s*\:\s*((?:(?:\w+|\+)(?:\s*\,\s*)?)+)|)', tok)
+                if m is None:
+                    raise ValueError(f'invalid ctrl: {tok}')
+                cmd = m.group(1)
+                if not cmd in self.CTRLS_RVS:
+                    raise ValueError(f'unknown ctrl cmd: {cmd}')
+                icode, iargs = self.CTRLS_RVS[cmd]
+                cseq = [icode]
+                cargs = m.group(2)
+                if cargs is None:
+                    cargs = []
+                else:
+                    cargs = [v.strip() for v in cargs.split(',')]
+                if isinstance(iargs, int):
+                    if not len(cargs) == iargs:
+                        raise ValueError(f'unmatched ctrl args: {tok}')
+                    cseq.extend(cargs)
+                else:
+                    if not len(cargs) == len(iargs):
+                        raise ValueError(f'unmatched ctrl args: {tok}')
+                    vargs = []
+                    for si in range(len(cargs)):
+                        ca = cargs[si]
+                        ia = iargs[si]
+                        if ia:
+                            if not ca in ia:
+                                raise ValueError(f'unknown ctrl arg: {ca}')
+                            cseq.append(ia[ca])
+                        else:
+                            cseq.append(ca)
+                for si, code in enumerate(cseq):
+                    if isinstance(code, str):
+                        if code == '+':
+                            assert si == len(cseq) - 1
+                            continue
+                        code = int(code, 16)
+                    seq.append(code | 0x2000)
+        return seq
+
+class c_charset_jp(c_charset):
 
     CENC = 'shift-jis'
     CHRS = [
@@ -51,14 +169,6 @@ class c_charset_jp:
         *'顰騙遙',
     ]
 
-    CTRLS = [
-        ('LF', 0),
-        None,
-        ('CLR', [{0: 'white', 3: 'pink', 4: 'grey', 5: 'yellow'}]),
-        ('BLINK', 1),
-        ('SEL', 1),
-    ]
-
     def __init__(self):
         self.charset = self._expand_charset()
 
@@ -90,54 +200,13 @@ class c_charset_jp:
                     idx += 1
         return chrset
 
-    def encode(self, txt):
-        pass
+    def dec_char(self, code):
+        return self.charset.get(code, None)
 
-    def decode(self, seq):
-        txts = []
-        slen = len(seq)
-        si = 0
-        while si < slen:
-            code = seq[si]
-            if code in self.charset:
-                c = self.charset[code]
-            elif code & 0x2000:
-                cc = (code & 0x1fff)
-                if cc >= len(self.CTRLS) or self.CTRLS[cc] is None:
-                    raise ValueError(f'unknown ctrl code: {cc:x}')
-                cmd, cfeed = self.CTRLS[cc]
-                crs = [cmd]
-                if isinstance(cfeed, list):
-                    cflen = len(cfeed)
-                    cflst = cfeed
-                else:
-                    cflen = cfeed
-                    cflst = None
-                if cflen > 0:
-                    subs = []
-                    for ci in range(cflen):
-                        si += 1
-                        if si >= slen:
-                            subs.append('+')
-                            continue
-                        scc = (seq[si] & 0x1fff)
-                        if cflst and not cflst[ci] is None:
-                            if not scc in cflst[ci]:
-                                raise ValueError(
-                                    f'unknown sub ctrl code: {cmd}/{ci}:{scc:x}')
-                            sr = cflst[ci][scc]
-                        else:
-                            sr = f'{scc:x}'
-                        subs.append(sr)
-                    subr = ','.join(subs)
-                    crs.append(subr)
-                cr = ':'.join(crs)
-                c = f'[{cr}]'
-            else:
-                raise ValueError(f'unknown char code: {code:x}')
-            si += 1
-            txts.append(c)
-        return ''.join(txts)
+class c_charset_zh(c_charset):
+
+    def enc_char(self, char):
+        return 50
 
 if __name__ == '__main__':
     import pdb
