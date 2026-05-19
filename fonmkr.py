@@ -266,7 +266,7 @@ if __name__ == '__main__':
     _drw_tst = _draw_tester()
     #_drw_tst(bar, '\n啊\n啊', 'la')
     #_drw_tst(bar, '\n啊\n好啊', 'la')
-    _drw_tst(bar, '\n好啊\n好啊', 'la')
+    #_drw_tst(bar, '\n好啊\n好啊', 'la')
     charset = ''
     def _get_highest_char(mkr, an='la'):
         font = mkr.font
