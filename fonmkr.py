@@ -123,7 +123,7 @@ class c_font_maker:
         dw, dh = self.dshape[:2]
         iw, ih = img.size
         uwidth = size + sepw
-        assert ih == size and iw % uwidth == 0
+        assert ih == dh and iw % uwidth == 0
         clen = iw // uwidth
         rs = [[1 for _ in range(dw * dh)] for _ in range(clen)]
         for i, v in enumerate(img.getdata()):
@@ -141,7 +141,8 @@ class c_font_maker:
         anchor = 'lt'
         font = self.font
         size = self.fsize
-        dtop = (self.dshape[1] - size) // 2
+        dw, dh = self.dshape[:2]
+        dtop = (dh - size) // 2
         clen = len(chars)
         sep = self.PAD_SEP
         cline = ''.join((sep, sep.join(chars), sep))
@@ -151,12 +152,12 @@ class c_font_maker:
             cline, mode = mode, anchor = anchor)
         uwidth = sp_r + size
         ov_r = cb_r - sp_r - uwidth * clen
-        ov_b = cb_b - size
+        ov_b = cb_b - dh
         if cb_l or cb_t or ov_r or ov_b > 1: # ignore ov_b == 1
             report('warning',
                 'font bbox overflow: '
                 f'left {cb_l} top {cb_t} rigth {ov_r} bot {ov_b}')
-        img = Image.new("1", (uwidth * clen, size), color=1)
+        img = Image.new("1", (uwidth * clen, dh), color=1)
         idr = ImageDraw.Draw(img)
         idr.text((-sp_r, dtop), cline, font = font, anchor = anchor)
         return self._get_chars_data(img, sp_r)
@@ -256,8 +257,11 @@ if __name__ == '__main__':
         sfon.parse_size(len(raw), 4)
         sdr = c_font_drawer(sfon)
         dfn = 'DFYuanW5-GB.ttf'
+        #dfn = 'BoutiqueBitmap9x9_1.9.ttf'
         #mkr = c_font_maker(dfn, 22, [250, 100, 50], (24, 24, 1), (0, 0))
         mkr = c_font_maker(dfn, 22, [250, 100, 50], (12, 24, 1), (0, 0))
-        dfon, ddirty = sfon.repack_with((mkr.iter_chars(charset[100:200]), [0]))
+        cs = charset[100:200]
+        #cs = '卑'
+        dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), [0]))
         ddr = c_font_drawer(dfon)
     tst1()
