@@ -2,7 +2,6 @@
 # coding: utf-8
 
 from sect import report, INF
-from env import ENV
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -84,8 +83,6 @@ class c_font_maker:
     def _load_font(self, name, size, enc):
         def _iname():
             yield name
-            yield ENV.path('nfont', name)
-            yield ENV.path('ofont', name)
         for dname in _iname():
             try:
                 font = ImageFont.truetype(dname, size, encoding = enc)
@@ -224,7 +221,7 @@ class c_font_maker:
 
 def make_font_maker(name, size, shape, offset, clrofs = 0):
     return c_font_maker(name, size,
-        (1 << shape[0] - 1) - clrofs, shape[1:], offset)
+        ((1 << shape[0]) - 1) - clrofs, shape[1:], offset)
 
 if __name__ == '__main__':
     import pdb
@@ -233,9 +230,10 @@ if __name__ == '__main__':
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
     #foo = make_font_maker('msyh', 12, (4,8,16,2), (1, 2), 5)
-    foo = make_font_maker('msyh', 12, (1,12,12,1), (0, 0))
-    bar = make_font_maker('03_DFYuanW5-GB.ttf', 12, (1,12,12,1), (0, 0))
+    #foo = make_font_maker('msyh', 12, (1,12,12,1), (0, 0))
+    #bar = make_font_maker('03_DFYuanW5-GB.ttf', 12, (1,12,12,1), (0, 0))
     #bar = foo.get_char('好')
+    bar = make_font_maker('msyh', 24, (8,12,24,1), (0, 0))
     def _draw_darr(arr, condi = None):
         if condi is None:
             condi = lambda v: v
@@ -268,9 +266,8 @@ if __name__ == '__main__':
     _drw_tst = _draw_tester()
     #_drw_tst(bar, '\n啊\n啊', 'la')
     #_drw_tst(bar, '\n啊\n好啊', 'la')
-    #_drw_tst(bar, '\n好啊\n好啊', 'la')
-    from chrmkr import make_charset_maker
-    charset = make_charset_maker()._prio
+    _drw_tst(bar, '\n好啊\n好啊', 'la')
+    charset = ''
     def _get_highest_char(mkr, an='la'):
         font = mkr.font
         xh = (-INF, [])
