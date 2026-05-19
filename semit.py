@@ -233,7 +233,7 @@ class c_semit_program(c_scode_parser):
                 self._error(nd,
                     f'no enough space to align the entry fun.{nd.name}')
             elif faddr > raddr:
-                self._gen_vnode_pad(faddr, faddr - raddr)
+                self._gen_vnode_pad(faddr, faddr - raddr, ctx)
         name = f'fun.{nd.name}'
         self._write_cmt('@' + name, ctx)
         self._reftab_reg(name, ctx)
