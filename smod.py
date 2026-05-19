@@ -13,7 +13,7 @@ class c_smod_program(c_scode_parser):
         super().__init__(ast, dconf)
 
     def _encode_text(self, txt):
-        return tuple(1 for _ in range(len(txt)))
+        return tuple(50 for _ in range(len(txt)))
 
     # program
 
