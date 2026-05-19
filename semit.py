@@ -79,6 +79,7 @@ class c_semit_program(c_scode_parser):
 
     def __init__(self, ast, buf, conf = None):
         dconf = {
+            'entries': [],
             'padding': True,
             'ret_hfree': True }
         if conf:
@@ -207,26 +208,36 @@ class c_semit_program(c_scode_parser):
 
     # struct
 
+    def _gen_vnode_pad(self, addr, plen, ctx):
+        name = f'pad.{addr:x}_{plen:x}'
+        self._write_cmt('@' + name, ctx)
+        ccode = EM_CMD_INFO['nop']
+        for _ in range(plen):
+            self._write_cmd('pad', ccode, ctx)
+
+    def _gen_anode_pad(self, nd, ctx):
+        if not self.conf['padding']:
+            return
+        self._gen_vnode_pad(nd.addr, nd.plen)
+
     def _gen_anode_label(self, nd, ctx):
         name = f'lab.{nd.name}'
         self._write_cmt('@' + name, ctx)
         self._reftab_reg(name, ctx)
 
     def _gen_anode_func(self, nd, ctx):
+        faddr = nd.addr
+        if faddr in self.conf['entries']:
+            raddr = ctx['addr']
+            if faddr < raddr:
+                self._error(nd,
+                    f'no enough space to align the entry fun.{nd.name}')
+            elif faddr > raddr:
+                self._gen_vnode_pad(faddr, faddr - raddr)
         name = f'fun.{nd.name}'
         self._write_cmt('@' + name, ctx)
         self._reftab_reg(name, ctx)
         self._gen_anode(nd.sub, None, ctx)
-
-    def _gen_anode_pad(self, nd, ctx):
-        plen = nd.plen
-        name = f'pad.{nd.addr:x}_{plen:x}'
-        self._write_cmt('@' + name, ctx)
-        if not self.conf['padding']:
-            return
-        ccode = EM_CMD_INFO['nop']
-        for _ in range(plen):
-            self._write_cmd('pad', ccode, ctx)
 
     def _gen_anode_parm(self, nd, ctx):
         self._write_cmt(f':arg{nd.aidx}', ctx)
@@ -328,16 +339,19 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
+        conf = {
+            'entries': SC_PROG_ENTRY,
+            'padding': False }
         if 0:
-            #cd = c_semit_program(ast, c_scode_buf_null())
-            cd = c_semit_program(ast, c_scode_buf_std())
+            #cd = c_semit_program(ast, c_scode_buf_null(), conf)
+            cd = c_semit_program(ast, c_scode_buf_std(), conf)
             cd.gen_code()
         elif 0:
             with open(r'wktab\escript.txt', 'w', encoding = 'utf-8') as fd:
-                cd = c_semit_program(ast, c_scode_buf_fd(fd))
+                cd = c_semit_program(ast, c_scode_buf_fd(fd), conf)
                 cd.gen_code()
         else:
             with open(r'wktab\escript.bin', 'wb') as fd:
-                cd = c_semit_program(ast, c_semit_asm_buf_fd(fd))
+                cd = c_semit_program(ast, c_semit_asm_buf_fd(fd), conf)
                 cd.gen_code()
     tst1()
