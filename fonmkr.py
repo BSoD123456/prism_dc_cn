@@ -251,10 +251,12 @@ if __name__ == '__main__':
         with open(fn, 'rb') as fd:
             raw = fd.read()
         sfon = c_fonfile(raw, 0)
+        #sfon.set_info({'shape': (8, 24, 24, 1)})
         sfon.set_info({'shape': (8, 12, 24, 1)})
         sfon.parse_size(len(raw), 4)
         sdr = c_font_drawer(sfon)
         dfn = 'DFYuanW5-GB.ttf'
+        #mkr = c_font_maker(dfn, 22, [250, 100, 50], (24, 24, 1), (0, 0))
         mkr = c_font_maker(dfn, 22, [250, 100, 50], (12, 24, 1), (0, 0))
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(charset[100:200]), [0]))
         ddr = c_font_drawer(dfon)
