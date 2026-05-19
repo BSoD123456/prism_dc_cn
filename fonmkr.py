@@ -229,92 +229,32 @@ if __name__ == '__main__':
     from pprint import pprint
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
-    #foo = make_font_maker('msyh', 12, (4,8,16,2), (1, 2), 5)
-    #foo = make_font_maker('msyh', 12, (1,12,12,1), (0, 0))
-    #bar = make_font_maker('03_DFYuanW5-GB.ttf', 12, (1,12,12,1), (0, 0))
-    #bar = foo.get_char('好')
-    bar = make_font_maker('msyh', 24, (8,12,24,1), (0, 0))
-    def _draw_darr(arr, condi = None):
-        if condi is None:
-            condi = lambda v: v
-        print('-' * 50)
-        for y in range(0, 18*16, 18):
-            print(f'{y:03d}:', ' '.join(
-                f'{arr[y+i]:01d}' if condi(arr[y+i]) else ' '
-                for i in range(18)))
-    #_draw_darr(bar)
-    #_draw_darr(bar, lambda v: v == 4)
-    #_draw_darr(bar, lambda v: v == 3)
-    #_draw_darr(bar, lambda v: v == 5)
-    def _draw_tester():
-        img = Image.new("1", (100, 50), color=1)
-        idr = ImageDraw.Draw(img)
-        def _tst(mkr, s, an='la', bot=False, shw=True):
-            idr.rectangle([(0, 0), (100, 50)], fill='white')
-            if bot:
-                pos = (0, 15)
-            else:
-                pos = (0, 3)
-            idr.line([(0, 3), (100, 3)])#, fill='blue')
-            idr.line([(0, 15), (100, 15)])#, fill='red')
-            idr.text(pos, s, anchor=an, font=mkr.font, spacing=0)#, fill='black')
-            #print('bbox:', img.getbbox())
-            print('bbox:', idr.textbbox((0, 0), s, anchor=an, font=mkr.font, spacing=0))
-            if shw:
-                img.show()
-        return _tst
-    _drw_tst = _draw_tester()
-    #_drw_tst(bar, '\n啊\n啊', 'la')
-    #_drw_tst(bar, '\n啊\n好啊', 'la')
-    #_drw_tst(bar, '\n好啊\n好啊', 'la')
-    charset = ''
-    def _get_highest_char(mkr, an='la'):
-        font = mkr.font
-        xh = (-INF, [])
-        xb = (-INF, [])
-        for c in charset:
-            _, t, _, b = font.getbbox(c, mode = '1', anchor = an)
-            h = b - t
-            if h > xh[0]:
-                xh = (h, [c])
-            elif h == xh[0]:
-                xh[1].append(c)
-            if b > xb[0]:
-                xb = (b, [c])
-            elif b == xb[0]:
-                xb[1].append(c)
-        return xh, xb
-    def _chk_char_width(mkr, step = 100, an='la'):
-        ka = {
-            'mode': '1',
-            'anchor': an,
-        }
-        font = mkr.font
-        sep = ' '
-        l, _, r, _ = font.getbbox(sep, **ka)
-        sepw = r - l
-        for i in range(len(charset)):
-            if i % step == 0:
-                print(i)
-                schrsl = charset[i:i+step]
-                schrs = ''.join(c + sep for c in schrsl)
-                assert len(schrs) == len(schrsl) * 2
-                sst = i
-                #sumwidth = 0
-            #c = charset[i]
-            s = schrs[:(i-sst+1)*2]
-            #l, _, r, _ = font.getbbox(c, **ka)
-            #cw = 12#r - l
-            l, _, r, _ = font.getbbox(sep + s, **ka)
-            assert l == 0
-            sw = r - sepw#r - l
-            #if sumwidth + cw + sepw != sw:
-            #    print(f'({s[-4] if len(s) > 2 else ""}){c}: should:{cw} / real:{sw - sumwidth - sepw}')
-            ssw = (12 + sepw) * len(s) / 2
-            if sw != ssw:
-                print(f'({s[-4] if len(s) > 2 else ""}){s[-2]}: should:{12 + sepw} / real:{sw - ssw + (12 + sepw)}')
-                breakpoint()
-            #sumwidth += cw + sepw
-        else:
-            print('done')
+    charset = [
+        bytes([high, low]).decode('gb2312')
+        for high in range(0xB0, 0xD8)
+        for low in range(0xA1, 0xFF)
+        if high != 0xD7 or low <= 0xD9
+    ]
+    
+    from fonfile import c_fonfile
+    from fondrw import c_font_drawer
 
+    def _sh(dr, seq):
+        img = dr.make_img(dr.draw_chars(seq))
+        img.show()
+        return img
+
+    def tst1():
+        global sfon, sdr, dfon, ddr
+        fn = r'wktab\FONT.DAT'
+        with open(fn, 'rb') as fd:
+            raw = fd.read()
+        sfon = c_fonfile(raw, 0)
+        sfon.set_info({'shape': (8, 12, 24, 1)})
+        sfon.parse_size(len(raw), 4)
+        sdr = c_font_drawer(sfon)
+        dfn = 'msyh'
+        mkr = c_font_maker(dfn, 24, [250, 200, 150], (12, 24, 1), (0, 0))
+        dfon, ddirty = sfon.repack_with((mkr.iter_chars(charset), [0]))
+        ddr = c_font_drawer(dfon)
+    tst1()
