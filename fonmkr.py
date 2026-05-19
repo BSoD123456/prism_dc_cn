@@ -43,9 +43,9 @@ class c_font_maker:
     def __init__(self,
             src_name, src_size,
             dst_colors, dst_packshape, dst_offset, *,
-            src_enc = 'utf-8', src_wscale = 1, dst_parts = None):
-        self.wscale = src_wscale
+            src_enc = 'utf-8', dst_parts = None):
         self.dshape = dst_packshape
+        self.wscale = dst_packshape[0] / dst_packshape[1]
         self.doffset = dst_offset
         self._calc_decos(dst_parts, dst_colors)
         self._load_font(src_name, src_size, src_enc)
@@ -120,20 +120,20 @@ class c_font_maker:
     def _get_chars_data(self, img, sepw):
         size = self.fsize
         wscale = self.wscale
-        wsize = int(size * wscale)
+        dw, dh = self.dshape[:2]
         iw, ih = img.size
         uwidth = size + sepw
         assert ih == size and iw % uwidth == 0
         clen = iw // uwidth
-        rs = [[1 for _ in range(wsize * size)] for _ in range(clen)]
+        rs = [[1 for _ in range(dw * dh)] for _ in range(clen)]
         for i, v in enumerate(img.getdata()):
             y = i // iw
             lx = i % iw
             ci = lx // uwidth
             cx = lx % uwidth
             scx = int(cx * wscale)
-            if scx < wsize:
-                rs[ci][scx + y * wsize] &= v
+            if scx < dw:
+                rs[ci][scx + y * dw] &= v
         return rs
 
     def _draw_chars(self, chars):
@@ -141,6 +141,7 @@ class c_font_maker:
         anchor = 'lt'
         font = self.font
         size = self.fsize
+        dtop = (self.dshape[1] - size) // 2
         clen = len(chars)
         sep = self.PAD_SEP
         cline = ''.join((sep, sep.join(chars), sep))
@@ -157,7 +158,7 @@ class c_font_maker:
                 f'left {cb_l} top {cb_t} rigth {ov_r} bot {ov_b}')
         img = Image.new("1", (uwidth * clen, size), color=1)
         idr = ImageDraw.Draw(img)
-        idr.text((-sp_r, 0), cline, font = font, anchor = anchor)
+        idr.text((-sp_r, dtop), cline, font = font, anchor = anchor)
         return self._get_chars_data(img, sp_r)
 
     @staticmethod
@@ -215,7 +216,7 @@ class c_font_maker:
         chars_data = self._draw_chars(chars)
         for s in chars_data:
             drng_ofs, drng_sz = self.drange
-            ssz = (int(self.fsize * self.wscale), self.fsize)
+            ssz = tuple(self.dshape[:2])
             dsz = tuple(ssz[i] + drng_sz[i] for i in range(2))
             dofs = tuple(-v for v in drng_ofs)
             d = [0] * (dsz[0] * dsz[1])
@@ -254,7 +255,7 @@ if __name__ == '__main__':
         sfon.parse_size(len(raw), 4)
         sdr = c_font_drawer(sfon)
         dfn = 'DFYuanW5-GB.ttf'
-        mkr = c_font_maker(dfn, 24, [250, 100, 50], (12, 24, 1), (0, 0), src_wscale = 0.5)
+        mkr = c_font_maker(dfn, 22, [250, 100, 50], (12, 24, 1), (0, 0))
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(charset[100:200]), [0]))
         ddr = c_font_drawer(dfon)
     tst1()
