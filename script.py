@@ -670,6 +670,7 @@ class c_script_program:
             plen = faddr - last_bot
             if plen != 0:
                 assert plen > 0
+                self._warn(last_bot, f'padding 0x{plen:x}: {last_bot:x} - {last_bot+plen:x}')
                 padding_progbat.append(c_script_anode_pad(plen, last_bot))
             padding_progbat.append(func)
             last_bot = progbot[faddr]
