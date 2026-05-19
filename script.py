@@ -368,11 +368,13 @@ class c_script_program:
                     i if faddr is None else faddr,
                     i, [[]], None))
 
-    def _parse_func(self, staddr, functab, gwkset):
+    def _parse_func(self, staddrs, functab, gwkset):
         progctx = {}
         sustab = {}
         suswkset = set()
-        braseq = [(staddr, staddr, [[]], 0)]
+        braseq = []
+        for staddr in staddrs:
+            braseq.append((staddr, staddr, [[]], 0))
         faddr = None
 
         while True:
@@ -677,10 +679,10 @@ class c_script_program:
         prog = c_script_anode_prog(padding_progbat)
         return prog
 
-    def parse_sect(self, entry):
+    def parse_sect(self, entries):
         gwkset = set()
         functab = {}
-        progctx = self._parse_func(entry, functab, gwkset)
+        progctx = self._parse_func(entries, functab, gwkset)
         prog = self._post_parse_prog(functab, [progctx])
         return prog
 
@@ -706,7 +708,7 @@ if __name__ == '__main__':
         sc = c_script_file(raw, 0)
         sc.parse_size(len(raw), 4)
         prog = c_script_program(sc)
-        ast = prog.parse_sect(0)
+        ast = prog.parse_sect([0, 0xd27, 0x1f9b])
         #for k, i in ast.items():
         #    print('===', k)
         #    print(i.repr_as(True))
