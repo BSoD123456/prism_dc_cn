@@ -120,18 +120,20 @@ class c_font_maker:
     def _get_chars_data(self, img, sepw):
         size = self.fsize
         wscale = self.wscale
+        wsize = int(size * wscale)
         iw, ih = img.size
         uwidth = size + sepw
         assert ih == size and iw % uwidth == 0
-        clen = iw // (size + sepw)
-        rs = [[] for _ in range(clen)]
+        clen = iw // uwidth
+        rs = [[1 for _ in range(wsize * size)] for _ in range(clen)]
         for i, v in enumerate(img.getdata()):
+            y = i // iw
             lx = i % iw
             ci = lx // uwidth
             cx = lx % uwidth
-            if cx < size:
-                rs[ci].append(v)
-        assert all(len(c) == size ** 2 for c in rs)
+            scx = int(cx * wscale)
+            if scx < wsize:
+                rs[ci][scx + y * wsize] &= v
         return rs
 
     def _draw_chars(self, chars):
@@ -213,7 +215,7 @@ class c_font_maker:
         chars_data = self._draw_chars(chars)
         for s in chars_data:
             drng_ofs, drng_sz = self.drange
-            ssz = tuple(self.fsize for _ in range(2))
+            ssz = (int(self.fsize * self.wscale), self.fsize)
             dsz = tuple(ssz[i] + drng_sz[i] for i in range(2))
             dofs = tuple(-v for v in drng_ofs)
             d = [0] * (dsz[0] * dsz[1])
@@ -252,7 +254,7 @@ if __name__ == '__main__':
         sfon.parse_size(len(raw), 4)
         sdr = c_font_drawer(sfon)
         dfn = 'DFYuanW5-GB.ttf'
-        mkr = c_font_maker(dfn, 24, [250, 100, 50], (12, 24, 1), (0, 0))
+        mkr = c_font_maker(dfn, 24, [250, 100, 50], (12, 24, 1), (0, 0), src_wscale = 0.5)
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(charset[100:200]), [0]))
         ddr = c_font_drawer(dfon)
     tst1()
