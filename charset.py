@@ -74,11 +74,15 @@ class c_charset:
         seq = []
         for i, tok in enumerate(re.split(r'\[([^\[\]]+)\]', txt)):
             if i % 2 == 0:
+                cch = []
                 for c in tok:
-                    code = self.enc_char(c)
-                    if code is None:
-                        raise ValueError(f'unknown char: {c}')
-                    seq.append(code)
+                    cch.append(c)
+                    code = self.enc_char(''.join(cch))
+                    if not code is None:
+                        seq.append(code)
+                        cch.clear()
+                if cch:
+                    raise ValueError(f'unknown char: {"".join(cch)}')
             else:
                 m = re.match(r'(\w+)(?:\s*\:\s*((?:(?:\w+|\+)(?:\s*\,\s*)?)+)|)', tok)
                 if m is None:
@@ -171,6 +175,7 @@ class c_charset_jp(c_charset):
 
     def __init__(self):
         self.charset = self._expand_charset()
+        self.charset_rvs = {v: k for k, v in self.charset.items()}
 
     def _char2code(self, c):
         return int(c.encode(self.CENC).hex(), 16)
@@ -202,6 +207,9 @@ class c_charset_jp(c_charset):
 
     def dec_char(self, code):
         return self.charset.get(code, None)
+
+    def enc_char(self, char):
+        return self.charset_rvs.get(char, None)
 
 class c_charset_zh(c_charset):
 
