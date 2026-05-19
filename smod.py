@@ -1,6 +1,7 @@
 #! python3
 # coding: utf-8
 
+from script import SC_PROG_ENTRY
 from scode import with_anode, c_scode_parser
 from charset import c_charset_zh, c_charset_jp
 
@@ -8,7 +9,9 @@ from charset import c_charset_zh, c_charset_jp
 class c_smod_program(c_scode_parser):
 
     def __init__(self, ast, conf = None):
-        dconf = {}
+        dconf = {
+            'entries': [],
+        }
         if conf:
             dconf = {**dconf, **conf}
         super().__init__(ast, dconf)
@@ -64,7 +67,7 @@ if __name__ == '__main__':
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
         print('start')
-        cd = c_smod_program(ast)
+        cd = c_smod_program(ast, {'entries': SC_PROG_ENTRY})
         print('cmp')
         rtxt = cmp_sdialog(
             r'wktab\dialog_trim.txt',
