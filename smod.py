@@ -74,12 +74,15 @@ if __name__ == '__main__':
         print('mod')
         mast = cd.modify(rtxt)
         print('emit')
+        conf = {
+            'entries': SC_PROG_ENTRY,
+            'padding': False }
         if 0:
             with open(r'wktab\escript_mod.txt', 'w', encoding = 'utf-8') as fd:
-                emt = c_semit_program(mast, c_scode_buf_fd(fd))
+                emt = c_semit_program(mast, c_scode_buf_fd(fd), conf)
                 emt.gen_code()
         else:
             with open(r'wktab\escript_mod.bin', 'wb') as fd:
-                emt = c_semit_program(mast, c_semit_asm_buf_fd(fd))
+                emt = c_semit_program(mast, c_semit_asm_buf_fd(fd), conf)
                 emt.gen_code()
     tst1()
