@@ -358,6 +358,22 @@
 
 
 ====================
+<scene: Scene-bf4>
+<next: Scene-bf4/1>
+
+-------------------
+<text: Scene-bf4/1>
+{fun.a7c(0x1, 0x2, var[local >>5] // 0x34bc0 % 0x64)}：{fun.a7c(0x1, 0x2, var[local >>5] // 0xe10 % 0x3c)}：{fun.a7c(0x1, 0x2, var[local >>5] // 0x3c % 0x3c)}，
+{fun.a7c(0x1, 0x2, var[local + 0x20 >>5] + var[local + 0x20 >>5] * 0x2 // 0x3)}
+</text>
+<next: Scene-bf4/End>
+--------------------
+
+</scene: Scene-bf4>
+====================
+
+
+====================
 <scene: Scene-c4d>
 <next: Scene-c4d/1-Then/1>
 <next: Scene-c4d/1-Else/1>
@@ -378,6 +394,128 @@
 --------------------
 
 </scene: Scene-c4d>
+====================
+
+
+====================
+<scene: Scene-c82>
+<next: Scene-c82/1>
+
+-------------------
+<text: Scene-c82/1>
+{fun.a7c(0x1, 0x3, var[local >>5] % 0x3e8)}
+</text>
+<next: Scene-c82/End>
+--------------------
+
+</scene: Scene-c82>
+====================
+
+
+====================
+<scene: Scene-c96>
+<next: Scene-c96/1-Then/1>
+<next: Scene-c96/2-Then/1>
+<next: Scene-c96/3-Then/1>
+<next: Scene-c96/4-Then/1>
+<next: Scene-c96/5-Then/1>
+<next: Scene-c96/6-Then/1>
+<next: Scene-c96/7-Then/1>
+<next: Scene-c96/8-Then/1>
+<next: Scene-c96/End>
+
+-------------------
+<text: Scene-c96/1-Then/1>
+端口A扩展槽1
+</text>
+<next: Scene-c96/2-Then/1>
+<next: Scene-c96/3-Then/1>
+<next: Scene-c96/4-Then/1>
+<next: Scene-c96/5-Then/1>
+<next: Scene-c96/6-Then/1>
+<next: Scene-c96/7-Then/1>
+<next: Scene-c96/8-Then/1>
+<next: Scene-c96/End>
+--------------------
+
+
+-------------------
+<text: Scene-c96/2-Then/1>
+端口A扩展槽2
+</text>
+<next: Scene-c96/3-Then/1>
+<next: Scene-c96/4-Then/1>
+<next: Scene-c96/5-Then/1>
+<next: Scene-c96/6-Then/1>
+<next: Scene-c96/7-Then/1>
+<next: Scene-c96/8-Then/1>
+<next: Scene-c96/End>
+--------------------
+
+
+-------------------
+<text: Scene-c96/3-Then/1>
+端口B扩展槽1
+</text>
+<next: Scene-c96/4-Then/1>
+<next: Scene-c96/5-Then/1>
+<next: Scene-c96/6-Then/1>
+<next: Scene-c96/7-Then/1>
+<next: Scene-c96/8-Then/1>
+<next: Scene-c96/End>
+--------------------
+
+
+-------------------
+<text: Scene-c96/4-Then/1>
+端口B扩展槽2
+</text>
+<next: Scene-c96/5-Then/1>
+<next: Scene-c96/6-Then/1>
+<next: Scene-c96/7-Then/1>
+<next: Scene-c96/8-Then/1>
+<next: Scene-c96/End>
+--------------------
+
+
+-------------------
+<text: Scene-c96/5-Then/1>
+端口C扩展槽1
+</text>
+<next: Scene-c96/6-Then/1>
+<next: Scene-c96/7-Then/1>
+<next: Scene-c96/8-Then/1>
+<next: Scene-c96/End>
+--------------------
+
+
+-------------------
+<text: Scene-c96/6-Then/1>
+端口C扩展槽2
+</text>
+<next: Scene-c96/7-Then/1>
+<next: Scene-c96/8-Then/1>
+<next: Scene-c96/End>
+--------------------
+
+
+-------------------
+<text: Scene-c96/7-Then/1>
+端口D扩展槽1
+</text>
+<next: Scene-c96/8-Then/1>
+<next: Scene-c96/End>
+--------------------
+
+
+-------------------
+<text: Scene-c96/8-Then/1>
+端口D扩展槽2
+</text>
+<next: Scene-c96/End>
+--------------------
+
+</scene: Scene-c96>
 ====================
 
 
@@ -1499,6 +1637,1152 @@ SE
 --------------------
 
 </scene: Scene-1e17>
+====================
+
+
+====================
+<scene: Scene-1f9b>
+<next: Scene-1f9b/1-Loop/1-Then/1-Loop/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/2-Then/1-Then/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/2-Then/1-Else/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/3-Else/1-Then/1>
+<next: Scene-1f9b/End>
+
+-------------------
+<text: Scene-1f9b/1-Loop/1-Then/1-Loop/1>
+
+                [SEL:1]记录    [SEL:2]参照
+
+</text>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/2-Then/1-Then/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/2-Then/1-Else/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/3-Else/1-Then/1>
+<next: Scene-1f9b/End>
+<next: Scene-1f9b/1-Loop/1-Then/1-Loop/1>
+--------------------
+
+
+-------------------
+<text: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/1-Loop/1-Then/1>
+[SEL:+]{sys.get_ctrl(var[local + 0x60 >>5] + 0x1)}  {fun.c96(var[local + 0x60 >>5])}
+
+</text>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/2-Then/1-Then/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/2-Then/1-Else/1>
+<next: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/3-Else/1-Then/1>
+<next: Scene-1f9b/End>
+--------------------
+
+
+-------------------
+<text: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/2-Then/1-Then/1>
+[CLR:yellow]没有插入[CLR:white]记忆卡。记录需要有13格空间的记忆卡。
+
+</text>
+<next: Scene-1f9b/End>
+--------------------
+
+
+-------------------
+<text: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/2-Then/1-Else/1>
+[CLR:yellow]没有插入[CLR:white]记忆卡。
+
+</text>
+<next: Scene-1f9b/End>
+--------------------
+
+
+-------------------
+<text: Scene-1f9b/1-Loop/1-Then/2-Then/1-Loop/3-Else/1-Then/1>
+  {fun.c96(var[local + 0x1c0 >>5])}[CLR:yellow]没有插入[CLR:white]记忆卡。
+
+</text>
+<next: Scene-1f9b/End>
+--------------------
+
+</scene: Scene-1f9b>
+====================
+
+
+====================
+<scene: Scene-2249>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/End>
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+  正在[CLR:yellow]检查[CLR:white]记忆卡。
+  请[CLR:grey][BLINK:f][CLR:yellow]不要拔出[BLINK:0][CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+  已[CLR:yellow]停止处理[CLR:white]。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+  与记忆卡的[CLR:yellow]通信失败[CLR:white]了。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}插入的记忆卡的[CLR:yellow]文件损坏了[CLR:white]。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}插入的记忆卡[CLR:yellow]没有初始化[CLR:white]。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}插入的记忆卡[CLR:yellow]被拔出来了[CLR:white]。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}[CLR:yellow]没有插入[CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}插入的记忆卡[CLR:yellow]空间不足[CLR:white]。记录需要13格空间。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}插入的记忆卡中，本游戏的[CLR:yellow]文件并不存在[CLR:white]。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+  正在[CLR:yellow]初始化[CLR:white]记忆卡。
+  请[CLR:grey][BLINK:f][CLR:yellow]不要拔出[BLINK:0][CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+  {fun.c96(var[local + 0x20 >>5])}插入的记忆卡[CLR:yellow]没有初始化[CLR:white]。
+  要[CLR:yellow]初始化[CLR:white]吗？          [SEL:1]是    [SEL:2]否
+
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/2-Then/1>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/2-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}[CLR:yellow]没有插入[CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+  正在记忆卡中[CLR:yellow]记录文件[CLR:white]。  请[CLR:grey][BLINK:f][CLR:yellow]不要拔出[BLINK:0][CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+  {fun.c96(var[local + 0x20 >>5])}插入的记忆卡中，对本游戏的[CLR:yellow]文件进行覆盖[CLR:white]吗？              [SEL:1]是    [SEL:2]否
+
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/2-Else/1-Then/1>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/2-Else/1-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}[CLR:yellow]没有插入[CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+  已[CLR:yellow]记录文件[CLR:white]。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+  正在记忆卡中[CLR:yellow]参照文件[CLR:white]。  请[CLR:grey][BLINK:f][CLR:yellow]不要拔出[BLINK:0][CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+  现在的[CLR:yellow]游戏状态将被丢弃[CLR:white]，从插入{fun.c96(var[local + 0x20 >>5])}的记忆卡中[CLR:yellow]读取文件[CLR:white]吗？    [SEL:1]是    [SEL:2]否
+
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/2-Else/1-Then/1>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/2-Else/1-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}[CLR:yellow]没有插入[CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+  [CLR:yellow]文件已读取[CLR:white]。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+  发生了致命的[CLR:yellow]错误[CLR:white]。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+[SEL:11]上一页
+
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+[SEL:+]{sys.get_ctrl(var[local + 0x100 >>5] + 0x1)}
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/2-Else/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/2-Then/1>
+{fun.c82(var[local + 0x60 >>5])}／{fun.c4d(var[local + 0xa0 >>5])}／{fun.bf4(var[local + 0x80 >>5])}
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/3>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/2-Else/1>
+－－－空闲区域－－－
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/3>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/3>
+
+
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+[SEL:10]下一页
+
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}[CLR:yellow]没有插入[CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+[SEL:11]上一页
+
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+[SEL:+]{sys.get_ctrl(var[local + 0x100 >>5] + 0x1)}{fun.c82(var[local + 0x60 >>5])}／{fun.c4d(var[local + 0xa0 >>5])}／{fun.bf4(var[local + 0x80 >>5])}
+
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+[SEL:10]下一页
+
+</text>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+--------------------
+
+
+-------------------
+<text: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+  {fun.c96(var[local + 0x20 >>5])}[CLR:yellow]没有插入[CLR:white]记忆卡。
+
+</text>
+<next: Scene-2249/End>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/2-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/4-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/5-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/6-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/7-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/8-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/9-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/10-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/11-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/12-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/13-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/14-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/15-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/16-Then/1-Loop/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/17-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/18-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/1-Then/1-Loop/4-Else/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/2-Loop/1-Then/1-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/3-Then/1>
+<next: Scene-2249/1-Then/1-Loop/1-Loop/19-Then/1-Loop/2-Then/1-Loop/4-Else/1-Then/1>
+--------------------
+
+</scene: Scene-2249>
 ====================
 
 
