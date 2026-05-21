@@ -16,7 +16,7 @@ pip install pillow
 class c_font_source:
     pass
 
-class c_font_source_pil1b:
+class c_font_source_pil(c_font_source):
 
     PAD_SEP = ' '
 
@@ -67,9 +67,9 @@ class c_font_source_pil1b:
             report('warning',
                 'font bbox overflow: '
                 f'left {cb_l} top {cb_t} rigth {ov_r} bot {ov_b}')
-        img = Image.new("1", (uwidth * clen, dh), color=1)
-        idr = ImageDraw.Draw(img)
-        idr.text((-sp_r, dtop), cline, font = font, anchor = anchor)
+        img = self._draw_chars_img(
+            cline, (-sp_r, dtop), (uwidth * clen, dh),
+            font, anchor)
         return img, sp_r
 
     def _get_chars_data(self, img, sepw):
@@ -94,6 +94,20 @@ class c_font_source_pil1b:
     def get_chars_data(self, chars):
         img, sepw = self._draw_chars(chars)
         return self._get_chars_data(img, sepw)
+
+    def _draw_chars_img(self, cline, offset, size, font, anchor):
+        raise NotImplementedError()
+
+    def get_color(self, src_color, dst_part):
+        raise NotImplementedError()
+
+class c_font_source_pil1b(c_font_source_pil):
+
+    def _draw_chars_img(self, cline, offset, size, font, anchor):
+        img = Image.new("1", size, color=1)
+        idr = ImageDraw.Draw(img)
+        idr.text(offset, cline, font = font, anchor = anchor)
+        return img
 
     def get_color(self, src_color, dst_part):
         if src_color == 1:
