@@ -323,4 +323,8 @@ if __name__ == '__main__':
         cs = charset
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), range(262)))
         ddr = c_font_drawer(dfon)
+
+        fn = r'wktab\font_mod.dat'
+        with open(fn, 'wb') as fd:
+            fd.write(dfon.BYTES())
     tst1()
