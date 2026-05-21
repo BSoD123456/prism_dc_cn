@@ -321,6 +321,6 @@ if __name__ == '__main__':
         fsrc = c_font_maker_source_fonfile(dsfon, [255-80, 255-160, 255], encode_hzk)
         mkr = c_font_maker(fsrc, (0, 0))
         cs = charset
-        dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), [0]))
+        dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), range(262)))
         ddr = c_font_drawer(dfon)
     tst1()
