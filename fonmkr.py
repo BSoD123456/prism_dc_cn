@@ -97,7 +97,7 @@ class c_font_source_pil1b:
 
     def get_color(self, src_color, dst_part):
         if src_color == 1:
-            return 0
+            return None
         else:
             return self.scolors[dst_part]
 
@@ -170,6 +170,9 @@ class c_font_maker:
             sy = si // ssz[0]
             assert 0 <= sy < ssz[1]
             for (px, py), dv in deco.items():
+                clr = self.source.get_color(v, dv)
+                if clr is None:
+                    continue
                 dx = sx + px + dofs[0]
                 if not 0 <= dx < dsz[0]:
                     continue
@@ -178,7 +181,7 @@ class c_font_maker:
                     continue
                 di = dy * dsz[0] + dx
                 assert 0 <= di < dlen
-                dst[di] = self.source.get_color(v, dv)
+                dst[di] = clr
 
     @staticmethod
     def _peek_char_val(src, ssz, dofs, shp, pos):
