@@ -297,7 +297,7 @@ if __name__ == '__main__':
         return img
 
     def tst1():
-        global sdr, dsdr, ddr
+        global sfon, sdr, dsfon, dsdr, dfon, ddr
         fn = r'wktab\FONT.DAT'
         with open(fn, 'rb') as fd:
             raw = fd.read()
@@ -311,9 +311,10 @@ if __name__ == '__main__':
         with open(fn, 'rb') as fd:
             raw = fd.read()
         dsfon = c_fonfile(raw, 0)
-        dsfon.set_info({'shape': (2, 12, 24, 1)})
+        dsfon.set_info({'shape': (2, 12, 24, 1), 'rvsbyt': True})
         dsfon.parse_size(len(raw), 4)
-        dsdr = c_font_drawer(dsfon)
+        dsdr = c_font_drawer(dsfon, pal = [
+            (255, 255, 255), (180, 180, 180), (100, 100, 100), (0, 0, 0)])
         
         #dfn = 'DFYuanW5-GB.ttf'
         #fsrc = c_font_maker_source_pil1b(dfn, 22, (12, 24, 1), [250, 100, 50])
