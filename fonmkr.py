@@ -95,6 +95,9 @@ class c_font_maker_source_pil(c_font_maker_source):
         img, sepw = self._draw_chars(chars)
         return self._get_chars_data(img, sepw)
 
+    def get_shape(self):
+        return self.dshape
+
     def _draw_chars_img(self, cline, offset, size, font, anchor):
         raise NotImplementedError()
 
@@ -114,6 +117,32 @@ class c_font_maker_source_pil1b(c_font_maker_source_pil):
             return None
         else:
             return self.scolors[dst_part]
+
+class c_font_maker_source_fonfile(c_font_maker_source):
+
+    def __init__(self, fonfile, enc):
+        self.font = fonfile
+        self.enc = enc
+
+    def get_chars_data(self, chars):
+        rs = []
+        for c in chars:
+            ccode = self.enc(c)
+            cs = []
+            for rg in self.font.gen_char(ccode):
+                for v in rg:
+                    cs.append(v)
+            rs.append(cs)
+        return rs
+
+    def get_shape(self):
+        return self.font.char_shape[1:]
+
+    def get_color(self, src_color, dst_part):
+        if dst_part == 0 and src_color != 0:
+            return src_color
+        else:
+            return None
 
 class c_font_maker:
 
@@ -144,7 +173,7 @@ class c_font_maker:
             source, offset, *,
             deco_parts = None):
         self.source = source
-        self.shape = source.dshape
+        self.shape = source.get_shape()
         self.offset = offset
         self._calc_decos(deco_parts)
 
@@ -238,6 +267,13 @@ class c_font_maker:
                 self._deco_char(deco, s, ssz, d, dsz, dofs)
             yield self._pack_char(d, dsz, self.offset, self.shape)
 
+def encode_hzk(c):
+    bs = c.encode('gbk')
+    hc, lc = bs
+    if hc < 0xa1 or not 0xa1 <= lc < 0xff:
+        raise ValueError(f'cannot encode char: {c}')
+    return (hc - 0xa1) * 0x5e + (lc - 0xa1)
+
 if __name__ == '__main__':
     import pdb
     from hexdump import hexdump as hd
@@ -260,7 +296,7 @@ if __name__ == '__main__':
         return img
 
     def tst1():
-        global sfon, sdr, dfon, ddr
+        global sdr, dsdr, ddr
         fn = r'wktab\FONT.DAT'
         with open(fn, 'rb') as fd:
             raw = fd.read()
@@ -269,11 +305,21 @@ if __name__ == '__main__':
         sfon.set_info({'shape': (8, 12, 24, 1)})
         sfon.parse_size(len(raw), 4)
         sdr = c_font_drawer(sfon)
-        dfn = 'DFYuanW5-GB.ttf'
-        fsrc = c_font_maker_source_pil1b(dfn, 22, [250, 100, 50], (12, 24, 1))
+
+        fn = r'wktab\HZK24S'
+        with open(fn, 'rb') as fd:
+            raw = fd.read()
+        dsfon = c_fonfile(raw, 0)
+        dsfon.set_info({'shape': (2, 12, 24, 1)})
+        dsfon.parse_size(len(raw), 4)
+        dsdr = c_font_drawer(sfon)
+        
+        #dfn = 'DFYuanW5-GB.ttf'
+        #fsrc = c_font_maker_source_pil1b(dfn, 22, [250, 100, 50], (12, 24, 1))
+        fsrc = c_font_maker_source_fonfile(dsfon, encode_hzk)
         mkr = c_font_maker(fsrc, (0, 0))
         cs = charset[100:200]
-        #cs = '卑'
+        cs = '你'
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), [0]))
         ddr = c_font_drawer(dfon)
     tst1()
