@@ -24,13 +24,14 @@ class c_font_drawer:
         4: [(255, 255, 255), (200, 200, 200), (150, 150, 150), (0, 0, 0), (255, 0, 0)]
     }
 
-    def __init__(self, font):
+    def __init__(self, font, *, pal = None):
         self.sect = font
-        fbw = font.char_shape[0]
-        if fbw in self.PAL:
-            pal = self.PAL[fbw]
-        else:
-            pal = self._monopal(fbw)
+        if pal is None:
+            fbw = font.char_shape[0]
+            if fbw in self.PAL:
+                pal = self.PAL[fbw]
+            else:
+                pal = self._monopal(fbw)
         try:
             pal_shdw = pal.index((0, 0, 0))
         except ValueError:
