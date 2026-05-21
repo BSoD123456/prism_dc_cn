@@ -314,7 +314,7 @@ if __name__ == '__main__':
         dsfon.set_info({'shape': (2, 12, 24, 1), 'rvsbyt': True})
         dsfon.parse_size(len(raw), 4)
         dsdr = c_font_drawer(dsfon, pal = [
-            (255, 255, 255), (0, 0, 200), (0, 200, 0), (1, 0, 0)])
+            (255, 255, 255), (80, 80, 80), (200, 200, 200), (0, 0, 0)])
         
         #dfn = 'DFYuanW5-GB.ttf'
         #fsrc = c_font_maker_source_pil1b(dfn, 22, (12, 24, 1), [250, 100, 50])
