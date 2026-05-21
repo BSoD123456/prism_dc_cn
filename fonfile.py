@@ -28,7 +28,7 @@ class c_fonfile(c_sect_tab):
             byt = self.U8(ofs + bpos)
             cch[bpos] = byt
         if rvs:
-            bshft = bed
+            bshft = bb - bed
         else:
             bshft = bst
         return (byt >> bshft) & ((1 << blen) - 1)
