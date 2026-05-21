@@ -21,11 +21,11 @@ class c_font_maker_source_pil(c_font_maker_source):
     PAD_SEP = ' '
 
     def __init__(
-            self, name, size, colors, dshape, *,
+            self, name, size, dshape, dcolors, *,
             scale = 1, enc = 'utf-8'):
         self.size = size
         self.sscale = scale
-        self.scolors = colors
+        self.dcolors = dcolors
         self.dshape = dshape
         self.dscale = dshape[0] / dshape[1]
         self.wscale = self.dscale / self.sscale
@@ -116,12 +116,13 @@ class c_font_maker_source_pil1b(c_font_maker_source_pil):
         if src_color == 1:
             return None
         else:
-            return self.scolors[dst_part]
+            return self.dcolors[dst_part]
 
 class c_font_maker_source_fonfile(c_font_maker_source):
 
-    def __init__(self, fonfile, enc):
+    def __init__(self, fonfile, dcolors, enc):
         self.font = fonfile
+        self.dcolors = dcolors
         self.enc = enc
 
     def get_chars_data(self, chars):
@@ -140,7 +141,7 @@ class c_font_maker_source_fonfile(c_font_maker_source):
 
     def get_color(self, src_color, dst_part):
         if dst_part == 0 and src_color != 0:
-            return src_color
+            return self.dcolors[3 - src_color]
         else:
             return None
 
@@ -315,11 +316,10 @@ if __name__ == '__main__':
         dsdr = c_font_drawer(sfon)
         
         #dfn = 'DFYuanW5-GB.ttf'
-        #fsrc = c_font_maker_source_pil1b(dfn, 22, [250, 100, 50], (12, 24, 1))
-        fsrc = c_font_maker_source_fonfile(dsfon, encode_hzk)
+        #fsrc = c_font_maker_source_pil1b(dfn, 22, (12, 24, 1), [250, 100, 50])
+        fsrc = c_font_maker_source_fonfile(dsfon, [250, 200, 50], encode_hzk)
         mkr = c_font_maker(fsrc, (0, 0))
         cs = charset[100:200]
-        cs = '你'
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), [0]))
         ddr = c_font_drawer(dfon)
     tst1()
