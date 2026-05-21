@@ -52,9 +52,9 @@ class c_font_drawer:
     def palclr(self, sel, noshadow = False):
         pal = self.pal
         shdw = self.pal_shdw
-        if sel == False:
+        if sel is False:
             sel = 0
-        elif sel == True:
+        elif sel is True:
             sel = shdw
         else:
             sel = min(sel, len(pal) - 1)
