@@ -13,10 +13,10 @@ pip install pillow
 ''')
     raise
 
-class c_font_source:
+class c_font_maker_source:
     pass
 
-class c_font_source_pil(c_font_source):
+class c_font_maker_source_pil(c_font_maker_source):
 
     PAD_SEP = ' '
 
@@ -101,7 +101,7 @@ class c_font_source_pil(c_font_source):
     def get_color(self, src_color, dst_part):
         raise NotImplementedError()
 
-class c_font_source_pil1b(c_font_source_pil):
+class c_font_maker_source_pil1b(c_font_maker_source_pil):
 
     def _draw_chars_img(self, cline, offset, size, font, anchor):
         img = Image.new("1", size, color=1)
@@ -270,7 +270,7 @@ if __name__ == '__main__':
         sfon.parse_size(len(raw), 4)
         sdr = c_font_drawer(sfon)
         dfn = 'DFYuanW5-GB.ttf'
-        fsrc = c_font_source_pil1b(dfn, 22, [250, 100, 50], (12, 24, 1))
+        fsrc = c_font_maker_source_pil1b(dfn, 22, [250, 100, 50], (12, 24, 1))
         mkr = c_font_maker(fsrc, (0, 0))
         cs = charset[100:200]
         #cs = '卑'
