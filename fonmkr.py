@@ -318,9 +318,9 @@ if __name__ == '__main__':
         
         #dfn = 'DFYuanW5-GB.ttf'
         #fsrc = c_font_maker_source_pil1b(dfn, 22, (12, 24, 1), [250, 100, 50])
-        fsrc = c_font_maker_source_fonfile(dsfon, [255-80, 255-200, 255], encode_hzk)
+        fsrc = c_font_maker_source_fonfile(dsfon, [255-80, 255-160, 255], encode_hzk)
         mkr = c_font_maker(fsrc, (0, 0))
-        cs = charset[100:200]
+        cs = charset
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), [0]))
         ddr = c_font_drawer(dfon)
     tst1()
