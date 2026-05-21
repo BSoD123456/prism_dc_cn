@@ -141,7 +141,7 @@ class c_font_maker_source_fonfile(c_font_maker_source):
 
     def get_color(self, src_color, dst_part):
         if dst_part == 0 and src_color != 0:
-            return self.dcolors[3 - src_color]
+            return self.dcolors[src_color - 1]
         else:
             return None
 
@@ -318,7 +318,7 @@ if __name__ == '__main__':
         
         #dfn = 'DFYuanW5-GB.ttf'
         #fsrc = c_font_maker_source_pil1b(dfn, 22, (12, 24, 1), [250, 100, 50])
-        fsrc = c_font_maker_source_fonfile(dsfon, [250, 200, 50], encode_hzk)
+        fsrc = c_font_maker_source_fonfile(dsfon, [255-80, 255-200, 255], encode_hzk)
         mkr = c_font_maker(fsrc, (0, 0))
         cs = charset[100:200]
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), [0]))
