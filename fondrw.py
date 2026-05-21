@@ -41,7 +41,7 @@ class c_font_drawer:
     def _monopal(self, bw):
         pnum = (1 << bw)
         pstp = 256 / pnum
-        assert int(pstp * (pnum - 1)) == 255
+        assert int(pstp * pnum) == 256
         pal = []
         for i in range(pnum):
             cv = 255 - int(pstp * i)
