@@ -1,6 +1,8 @@
 #! python3
 # coding: utf-8
 
+from report import report
+
 import re
 
 class c_charset:
@@ -18,6 +20,13 @@ class c_charset:
             for tab in CI[1] ] )
         for i, CI in enumerate(CTRLS) if CI }
 
+    def _error(self, msg):
+        report('err', msg)
+        raise ValueError(msg)
+
+    def _warn(self, msg):
+        report('war', msg)
+
     def dec_char(self, code):
         return None
 
@@ -33,7 +42,7 @@ class c_charset:
             if code & 0x2000:
                 cc = (code & 0x1fff)
                 if cc >= len(self.CTRLS) or self.CTRLS[cc] is None:
-                    raise ValueError(f'unknown ctrl code: {cc:x}')
+                    self._error(f'unknown ctrl code: {cc:x}')
                 cmd, cfeed = self.CTRLS[cc]
                 crs = [cmd]
                 if isinstance(cfeed, list):
@@ -52,7 +61,7 @@ class c_charset:
                         scc = (seq[si] & 0x1fff)
                         if cflst and not cflst[ci] is None:
                             if not scc in cflst[ci]:
-                                raise ValueError(
+                                self._error(
                                     f'unknown sub ctrl code: {cmd}/{ci}:{scc:x}')
                             sr = cflst[ci][scc]
                         else:
@@ -65,7 +74,7 @@ class c_charset:
             else:
                 c = self.dec_char(code)
                 if c is None:
-                    raise ValueError(f'unknown char code: {code:x}')
+                    self._error(f'unknown char code: {code:x}')
             si += 1
             txts.append(c)
         return ''.join(txts)
@@ -82,14 +91,14 @@ class c_charset:
                         seq.append(code)
                         cch.clear()
                 if cch:
-                    raise ValueError(f'unknown char: {"".join(cch)}')
+                    self._error(f'unknown char: {"".join(cch)}')
             else:
                 m = re.match(r'(\w+)(?:\s*\:\s*((?:(?:\w+|\+)(?:\s*\,\s*)?)+)|)', tok)
                 if m is None:
-                    raise ValueError(f'invalid ctrl: {tok}')
+                    self._error(f'invalid ctrl: {tok}')
                 cmd = m.group(1)
                 if not cmd in self.CTRLS_RVS:
-                    raise ValueError(f'unknown ctrl cmd: {cmd}')
+                    self._error(f'unknown ctrl cmd: {cmd}')
                 icode, iargs = self.CTRLS_RVS[cmd]
                 cseq = [icode]
                 cargs = m.group(2)
@@ -99,18 +108,18 @@ class c_charset:
                     cargs = [v.strip() for v in cargs.split(',')]
                 if isinstance(iargs, int):
                     if not len(cargs) == iargs:
-                        raise ValueError(f'unmatched ctrl args: {tok}')
+                        self._error(f'unmatched ctrl args: {tok}')
                     cseq.extend(cargs)
                 else:
                     if not len(cargs) == len(iargs):
-                        raise ValueError(f'unmatched ctrl args: {tok}')
+                        self._error(f'unmatched ctrl args: {tok}')
                     vargs = []
                     for si in range(len(cargs)):
                         ca = cargs[si]
                         ia = iargs[si]
                         if ia:
                             if not ca in ia:
-                                raise ValueError(f'unknown ctrl arg: {ca}')
+                                self._error(f'unknown ctrl arg: {ca}')
                             cseq.append(ia[ca])
                         else:
                             cseq.append(ca)
@@ -142,6 +151,7 @@ class c_charset_extendable(c_charset):
         if code is None and not self.strict:
             code = self._charset_top()
             self.append(char, code)
+            self._warn(f'extend new char: {char}')
         return code
 
     def append(self, char, code):
