@@ -148,10 +148,13 @@ class c_charset_extendable(c_charset):
 
     def enc_char(self, char):
         code = self.charset_rvs.get(char, None)
-        if code is None and not self.strict:
-            code = self._charset_top()
-            self.append(char, code)
-            self._warn(f'extend new char: {char}')
+        if code is None:
+            if self.strict:
+                code = self.charset_rvs.get('？', 0)
+            else:
+                code = self._charset_top()
+                self.append(char, code)
+                self._warn(f'extend new char: {char}')
         return code
 
     def append(self, char, code):
@@ -267,7 +270,7 @@ class c_charset_zh(c_charset_base):
     ]
 
     def __init__(self):
-        super().__init__(False)
+        super().__init__(True)
         self.update(
             self._expand_charset(self.CHRS_ZH, self._charset_top()) )
 
