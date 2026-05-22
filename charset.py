@@ -148,7 +148,7 @@ class c_charset_extendable(c_charset):
 
     def enc_char(self, char):
         code = self.charset_rvs.get(char, None)
-        if code is None:
+        if code is None and not char.isascii():
             if self.strict:
                 code = self.charset_rvs.get('？', 0)
             else:
