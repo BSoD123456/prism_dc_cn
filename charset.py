@@ -123,9 +123,39 @@ class c_charset:
                     seq.append(code | 0x2000)
         return seq
 
-class c_charset_jp(c_charset):
+class c_charset_extendable(c_charset):
 
-    CENC = 'shift-jis'
+    def __init__(self, charset, strict):
+        self.charset = charset
+        self.charset_rvs = {v: k for k, v in charset.items()}
+        self.ext_chars = []
+        self.strict = strict
+
+    def _charset_top(self):
+        return max(self.charset.keys()) + 1
+
+    def dec_char(self, code):
+        return self.charset.get(code, None)
+
+    def enc_char(self, char):
+        code = self.charset_rvs.get(char, None)
+        if code is None and not self.strict:
+            code = self._charset_top()
+            self.append(char, code)
+        return code
+
+    def append(self, char, code):
+        assert not code in self.charset and not char in self.charset_rvs
+        self.charset[code] = char
+        self.charset_rvs[char] = code
+        self.ext_chars.append(char)
+
+    def update(self, charset):
+        for code, char in charset.items():
+            self.append(char, code)
+
+class c_charset_base(c_charset_extendable):
+
     CHRS = [
         None,
         '  ', '、', '。', '，', '・', '：', '？', '！',
@@ -143,6 +173,43 @@ class c_charset_jp(c_charset):
         ('ァ', 'ミ'),
         ('ム', 'ロ'),
         'ワ', 'ヲ', 'ン', 'ヴ',
+    ]
+
+    def __init__(self, strict):
+        super().__init__(self._expand_charset(self.CHRS, 0), strict)
+
+    def _char2code(self, c):
+        return int(c.encode(self.CENC).hex(), 16)
+
+    def _code2char(self, cc):
+        return bytes.fromhex(hex(cc)[2:]).decode(self.CENC)
+
+    def _expand_charset(self, chars, offs):
+        chrset = {}
+        idx = offs
+        for cs in chars:
+            if cs is None:
+                idx += 1
+            elif isinstance(cs, str):
+                chrset[idx] = cs
+                idx += 1
+            else:
+                st, ed = cs
+                if st is None:
+                    idx += ed
+                    continue
+                elif isinstance(st, str):
+                    st = self._char2code(st)
+                    ed = self._char2code(ed)
+                for cc in range(st, ed + 1):
+                    chrset[idx] = self._code2char(cc)
+                    idx += 1
+        return chrset
+
+class c_charset_jp(c_charset_base):
+
+    CENC = 'shift-jis'
+    CHRS_JP = [
         ('亜', '蔭'),
         *(
             ((hi<<8)+lr[0], (hi<<8)+lr[1])
@@ -174,47 +241,25 @@ class c_charset_jp(c_charset):
     ]
 
     def __init__(self):
-        self.charset = self._expand_charset()
-        self.charset_rvs = {v: k for k, v in self.charset.items()}
+        super().__init__(True)
+        self.update(
+            self._expand_charset(self.CHRS_JP, self._charset_top()) )
 
-    def _char2code(self, c):
-        return int(c.encode(self.CENC).hex(), 16)
+class c_charset_zh(c_charset_base):
 
-    def _code2char(self, cc):
-        return bytes.fromhex(hex(cc)[2:]).decode(self.CENC)
+    CENC = 'gbk'
+    CHRS_ZH = [
+        *(
+            ((hi << 8) + 0xa1, (hi << 8) + 0xfe)
+            for hi in range(0xb0, 0xd7)
+        ),
+        (0xd7a1, 0xd7d9),
+    ]
 
-    def _expand_charset(self):
-        chrset = {}
-        idx = 0
-        for cs in self.CHRS:
-            if cs is None:
-                idx += 1
-            elif isinstance(cs, str):
-                chrset[idx] = cs
-                idx += 1
-            else:
-                st, ed = cs
-                if st is None:
-                    idx += ed
-                    continue
-                elif isinstance(st, str):
-                    st = self._char2code(st)
-                    ed = self._char2code(ed)
-                for cc in range(st, ed + 1):
-                    chrset[idx] = self._code2char(cc)
-                    idx += 1
-        return chrset
-
-    def dec_char(self, code):
-        return self.charset.get(code, None)
-
-    def enc_char(self, char):
-        return self.charset_rvs.get(char, None)
-
-class c_charset_zh(c_charset):
-
-    def enc_char(self, char):
-        return 50
+    def __init__(self):
+        super().__init__(False)
+        self.update(
+            self._expand_charset(self.CHRS_ZH, self._charset_top()) )
 
 if __name__ == '__main__':
     import pdb
@@ -223,6 +268,7 @@ if __name__ == '__main__':
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
     def tst1():
-        global cs
-        cs = c_charset_jp()
+        global csj, csz
+        csj = c_charset_jp()
+        csz = c_charset_zh()
     tst1()
