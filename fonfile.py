@@ -109,13 +109,6 @@ def font_src(fn):
     fon.parse_size(len(raw), 4)
     return fon
 
-def encode_hzk(c):
-    bs = c.encode('gbk')
-    hc, lc = bs
-    if hc < 0xa1 or not 0xa1 <= lc < 0xff:
-        raise ValueError(f'cannot encode char: {c}')
-    return (hc - 0xa1) * 0x5e + (lc - 0xa1)
-
 def font_hzk(fn):
     with open(fn, 'rb') as fd:
         raw = fd.read()
