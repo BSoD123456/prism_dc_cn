@@ -60,6 +60,7 @@ if __name__ == '__main__':
     from sdcmp import cmp_sdialog
     from scode import c_scode_buf_fd
     from semit import c_semit_program, c_semit_asm_buf_fd
+    from fonmkr import make_font_hzk
     def tst1():
         global ast, cd
         ast = loadobj(r'wktab\ast.pck')
@@ -85,4 +86,9 @@ if __name__ == '__main__':
             with open(r'wktab\escript_mod.bin', 'wb') as fd:
                 emt = c_semit_program(mast, c_semit_asm_buf_fd(fd), conf)
                 emt.gen_code()
+        print('font')
+        dfon = make_font_hzk(
+            r'wktab\FONT.DAT', r'wktab\HZK24S', cd.chrset.ext_chars)
+        with open(r'wktab\font_mod.dat', 'wb') as fd:
+            fd.write(dfon.BYTES())
     tst1()

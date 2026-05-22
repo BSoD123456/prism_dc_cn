@@ -275,6 +275,15 @@ def encode_hzk(c):
         raise ValueError(f'cannot encode char: {c}')
     return (hc - 0xa1) * 0x5e + (lc - 0xa1)
 
+from fonfile import font_src, font_hzk
+def make_font_hzk(sfn, dfn, chars):
+    sfon = font_src(sfn)
+    dsfon = font_hzk(dfn)
+    fsrc = c_font_maker_source_fonfile(dsfon, [255-30, 255-160, 255], encode_hzk)
+    mkr = c_font_maker(fsrc, (0, 0))
+    dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
+    return dfon
+
 if __name__ == '__main__':
     import pdb
     from hexdump import hexdump as hd
@@ -288,7 +297,7 @@ if __name__ == '__main__':
         if high != 0xD7 or low <= 0xD9
     ]
     
-    from fonfile import c_fonfile
+    from fonfile import font_src, font_hzk
     from fondrw import c_font_drawer
 
     def sh(dr, seq):
@@ -298,21 +307,10 @@ if __name__ == '__main__':
 
     def tst1():
         global sfon, sdr, dsfon, dsdr, dfon, ddr
-        fn = r'wktab\FONT.DAT'
-        with open(fn, 'rb') as fd:
-            raw = fd.read()
-        sfon = c_fonfile(raw, 0)
-        #sfon.set_info({'shape': (8, 24, 24, 1)})
-        sfon.set_info({'shape': (8, 12, 24, 1)})
-        sfon.parse_size(len(raw), 4)
+        sfon = font_src(r'wktab\FONT.DAT')
         sdr = c_font_drawer(sfon)
 
-        fn = r'wktab\HZK24S'
-        with open(fn, 'rb') as fd:
-            raw = fd.read()
-        dsfon = c_fonfile(raw, 0)
-        dsfon.set_info({'shape': (2, 12, 24, 1), 'rvsbyt': True})
-        dsfon.parse_size(len(raw), 4)
+        dsfon = font_hzk(r'wktab\HZK24S')
         dsdr = c_font_drawer(dsfon, pal = [
             (255, 255, 255), (80, 80, 80), (200, 200, 200), (0, 0, 0)])
         

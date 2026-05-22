@@ -101,3 +101,25 @@ class c_fonfile(c_sect_tab):
                 f'new font is bigger than old: 0x{rsize:x} <- 0x{self.tsize:x}')
         return rmk, True
 
+def font_src(fn):
+    with open(fn, 'rb') as fd:
+        raw = fd.read()
+    fon = c_fonfile(raw, 0)
+    fon.set_info({'shape': (8, 12, 24, 1)})
+    fon.parse_size(len(raw), 4)
+    return fon
+
+def encode_hzk(c):
+    bs = c.encode('gbk')
+    hc, lc = bs
+    if hc < 0xa1 or not 0xa1 <= lc < 0xff:
+        raise ValueError(f'cannot encode char: {c}')
+    return (hc - 0xa1) * 0x5e + (lc - 0xa1)
+
+def font_hzk(fn):
+    with open(fn, 'rb') as fd:
+        raw = fd.read()
+    fon = c_fonfile(raw, 0)
+    fon.set_info({'shape': (2, 12, 24, 1), 'rvsbyt': True})
+    fon.parse_size(len(raw), 4)
+    return fon
