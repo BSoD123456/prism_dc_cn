@@ -286,7 +286,7 @@ def make_font_hzk(sfn, dfn, chars):
 def make_font_ttf(sfn, dfn, chars):
     sfon = font_src(sfn)
     dsfon = font_hzk(dfn)
-    fsrc = c_font_maker_source_pil1b(dfn, 24, (24, 24, 1), [10, 5, 0])
+    fsrc = c_font_maker_source_pil1b(dfn, 24, (24, 24, 1), [15, 10, 5])
     mkr = c_font_maker(fsrc, (0, 0))
     dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
     return dfon
@@ -322,7 +322,7 @@ if __name__ == '__main__':
             (255, 255, 255), (80, 80, 80), (200, 200, 200), (0, 0, 0)])
         
         dfn = r'wktab\DFYuanW5-GB.ttf'
-        fsrc = c_font_maker_source_pil1b(dfn, 24, (24, 24, 1), [10, 5, 0])
+        fsrc = c_font_maker_source_pil1b(dfn, 24, (24, 24, 1), [15, 10, 5])
         #fsrc = c_font_maker_source_fonfile(dsfon, [16], encode_hzk)
         mkr = c_font_maker(fsrc, (0, 0))
         cs = charset
