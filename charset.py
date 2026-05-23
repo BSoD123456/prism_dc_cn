@@ -134,11 +134,10 @@ class c_charset:
 
 class c_charset_extendable(c_charset):
 
-    def __init__(self, charset, strict):
+    def __init__(self, charset):
         self.charset = charset
         self.charset_rvs = {v: k for k, v in charset.items()}
         self.ext_chars = []
-        self.strict = strict
 
     def _charset_top(self):
         return max(self.charset.keys()) + 1
@@ -146,15 +145,15 @@ class c_charset_extendable(c_charset):
     def dec_char(self, code):
         return self.charset.get(code, None)
 
+    def _chk_extend(self, char):
+        return False
+
     def enc_char(self, char):
         code = self.charset_rvs.get(char, None)
-        if code is None and not char.isascii():
-            if self.strict:
-                code = self.charset_rvs.get('？', 0)
-            else:
-                code = self._charset_top()
-                self.append(char, code)
-                self._warn(f'extend new char: {char}')
+        if code is None and self._chk_extend(char):
+            code = self._charset_top()
+            self.append(char, code)
+            self._warn(f'extend new char: {char}')
         return code
 
     def append(self, char, code):
@@ -188,8 +187,8 @@ class c_charset_base(c_charset_extendable):
         'ワ', 'ヲ', 'ン', 'ヴ',
     ]
 
-    def __init__(self, strict):
-        super().__init__(self._expand_charset(self.CHRS, 0), strict)
+    def __init__(self):
+        super().__init__(self._expand_charset(self.CHRS, 0))
 
     def _char2code(self, c):
         return int(c.encode(self.CENC).hex(), 16)
@@ -254,7 +253,7 @@ class c_charset_jp(c_charset_base):
     ]
 
     def __init__(self):
-        super().__init__(True)
+        super().__init__()
         self.update(
             self._expand_charset(self.CHRS_JP, self._charset_top()) )
 
@@ -270,7 +269,7 @@ class c_charset_zh(c_charset_base):
     ]
 
     def __init__(self):
-        super().__init__(True)
+        super().__init__()
         self.update(
             self._expand_charset(self.CHRS_ZH, self._charset_top()) )
 
