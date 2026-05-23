@@ -134,6 +134,9 @@ class c_charset:
 
 class c_charset_extendable(c_charset):
 
+    WARN_EXT = True
+    WARN_PAD = True
+
     def __init__(self, charset):
         self.charset = charset
         self.charset_rvs = {v: k for k, v in charset.items()}
@@ -155,10 +158,12 @@ class c_charset_extendable(c_charset):
             if ext:
                 code = self._charset_top()
                 self.append(char, code)
-                self._warn(f'extend new char: {char}')
+                if self.WARN_EXT:
+                    self._warn(f'extend new char: {char}')
             elif pad:
                 code = self.charset_rvs.get('？', 1)
-                self._warn(f'padding char: {char}')
+                if self.WARN_PAD:
+                    self._warn(f'padding char: {char}')
         return code
 
     def append(self, char, code):
@@ -262,7 +267,7 @@ class c_charset_jp(c_charset_base):
         self.update(
             self._expand_charset(self.CHRS_JP, self._charset_top()) )
 
-class c_charset_zh(c_charset_base):
+class c_charset_zh_gb2312(c_charset_base):
 
     CENC = 'gbk'
     CHRS_ZH = [
@@ -277,6 +282,23 @@ class c_charset_zh(c_charset_base):
         super().__init__()
         self.update(
             self._expand_charset(self.CHRS_ZH, self._charset_top()) )
+
+    def _chk_extend(self, char):
+        if len(char) != 1:
+            return False, False
+        try:
+            bs = char.encode(self.CENC)
+        except:
+            return False, True
+        if len(bs) != 2:
+            return False, False
+        hi, lo = bs
+        return 0x81 <= hi and 0xa1 <= lo, True
+
+class c_charset_zh_ext(c_charset_base):
+
+    CENC = 'gbk'
+    WARN_EXT = False
 
     def _chk_extend(self, char):
         if len(char) != 1:

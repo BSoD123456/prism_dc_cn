@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from scode import with_anode, c_scode_parser
-from charset import c_charset_zh, c_charset_jp
+from charset import c_charset_zh_ext as c_charset_zh, c_charset_jp
 
 @with_anode()
 class c_smod_program(c_scode_parser):
