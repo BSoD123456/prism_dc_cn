@@ -146,14 +146,19 @@ class c_charset_extendable(c_charset):
         return self.charset.get(code, None)
 
     def _chk_extend(self, char):
-        return False
+        return False, False
 
     def enc_char(self, char):
         code = self.charset_rvs.get(char, None)
-        if code is None and self._chk_extend(char):
-            code = self._charset_top()
-            self.append(char, code)
-            self._warn(f'extend new char: {char}')
+        if code is None:
+            ext, pad = self._chk_extend(char)
+            if ext:
+                code = self._charset_top()
+                self.append(char, code)
+                self._warn(f'extend new char: {char}')
+            elif pad:
+                code = self.charset_rvs.get('？', 1)
+                self._warn(f'padding char: {char}')
         return code
 
     def append(self, char, code):
@@ -272,6 +277,18 @@ class c_charset_zh(c_charset_base):
         super().__init__()
         self.update(
             self._expand_charset(self.CHRS_ZH, self._charset_top()) )
+
+    def _chk_extend(self, char):
+        if len(char) != 1:
+            return False, False
+        try:
+            bs = char.encode(self.CENC)
+        except:
+            return False, True
+        if len(bs) != 2:
+            return False, False
+        hi, lo = bs
+        return 0x81 <= hi and 0xa1 <= lo, True
 
 if __name__ == '__main__':
     import pdb

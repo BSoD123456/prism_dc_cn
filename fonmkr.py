@@ -34,7 +34,6 @@ class c_font_maker_source_pil(c_font_maker_source):
     def _load_font(self, name, size, enc):
         def _iname():
             yield name
-            yield f'wktab\\{name}'
         for dname in _iname():
             try:
                 font = ImageFont.truetype(dname, size, encoding = enc)
@@ -279,7 +278,15 @@ from fonfile import font_src, font_hzk
 def make_font_hzk(sfn, dfn, chars):
     sfon = font_src(sfn)
     dsfon = font_hzk(dfn)
-    fsrc = c_font_maker_source_fonfile(dsfon, [255-30, 255-160, 255], encode_hzk)
+    fsrc = c_font_maker_source_fonfile(dsfon, [16], encode_hzk)
+    mkr = c_font_maker(fsrc, (0, 0))
+    dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
+    return dfon
+
+def make_font_ttf(sfn, dfn, chars):
+    sfon = font_src(sfn)
+    dsfon = font_hzk(dfn)
+    fsrc = c_font_maker_source_pil1b(dfn, 24, (24, 24, 1), [10, 5, 0])
     mkr = c_font_maker(fsrc, (0, 0))
     dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
     return dfon
@@ -314,9 +321,9 @@ if __name__ == '__main__':
         dsdr = c_font_drawer(dsfon, pal = [
             (255, 255, 255), (80, 80, 80), (200, 200, 200), (0, 0, 0)])
         
-        #dfn = 'DFYuanW5-GB.ttf'
-        #fsrc = c_font_maker_source_pil1b(dfn, 22, (12, 24, 1), [250, 100, 50])
-        fsrc = c_font_maker_source_fonfile(dsfon, [16], encode_hzk)
+        dfn = r'wktab\DFYuanW5-GB.ttf'
+        fsrc = c_font_maker_source_pil1b(dfn, 24, (24, 24, 1), [10, 5, 0])
+        #fsrc = c_font_maker_source_fonfile(dsfon, [16], encode_hzk)
         mkr = c_font_maker(fsrc, (0, 0))
         cs = charset
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), range(262)))
