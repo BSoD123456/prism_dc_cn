@@ -31260,10 +31260,10 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 -------------------
 <text: Scene-5fc98/1-Loop/1-Then/1>
 射
-場
-荘
+场
+庄
 司
-俺
+我
 </text>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/1-Then/1>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/2-Then/1>
@@ -31289,8 +31289,8 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 草
 加
 武
-則
-俺
+则
+我
 </text>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/1-Then/1>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/2-Then/1>
@@ -31313,11 +31313,11 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 
 -------------------
 <text: Scene-5fc98/1-Loop/3-Then/1>
-鳴
+鸣
 川
 澄
 香
-私
+我
 </text>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/1-Then/1>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/2-Then/1>
@@ -31340,11 +31340,11 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 
 -------------------
 <text: Scene-5fc98/1-Loop/4-Then/1>
-沢
+泽
 村
 雪
 乃
-私
+我
 </text>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/1-Then/1>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/2-Then/1>
@@ -31372,7 +31372,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 美
 人
 家
-我
+
 </text>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/1-Then/1>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/2-Then/1>
@@ -31402,8 +31402,8 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 世
 里
 我
-自
-身
+
+
 </text>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/1-Then/1>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/2-Then/1>
@@ -31457,7 +31457,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 原
 耕
 一
-私
+我
 </text>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/1-Then/1>
 <next: Scene-5fc98/2-Loop/1-Loop/1-Then/1-Loop/2-Then/1>
