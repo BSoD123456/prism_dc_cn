@@ -21,11 +21,10 @@ class c_font_maker_source_pil(c_font_maker_source):
     PAD_SEP = ' '
 
     def __init__(
-            self, name, size, dshape, dcolors, *,
+            self, name, size, dshape, *,
             scale = 1, enc = 'utf-8'):
         self.size = size
         self.sscale = scale
-        self.dcolors = dcolors
         self.dshape = dshape
         self.dscale = dshape[0] / dshape[1]
         self.wscale = self.dscale / self.sscale
@@ -79,7 +78,8 @@ class c_font_maker_source_pil(c_font_maker_source):
         uwidth = size + sepw
         assert ih == dh and iw % uwidth == 0
         clen = iw // uwidth
-        rs = [[1 for _ in range(dw * dh)] for _ in range(clen)]
+        cwhite = self._clr_white()
+        rs = [[cwhite for _ in range(dw * dh)] for _ in range(clen)]
         for i, v in enumerate(img.getdata()):
             y = i // iw
             lx = i % iw
@@ -87,7 +87,8 @@ class c_font_maker_source_pil(c_font_maker_source):
             cx = lx % uwidth
             scx = int(cx * wscale)
             if scx < dw:
-                rs[ci][scx + y * dw] &= v
+                pi = scx + y * dw
+                rs[ci][pi] = self._clr_add(rs[ci][pi], v)
         return rs
 
     def get_chars_data(self, chars):
@@ -97,6 +98,12 @@ class c_font_maker_source_pil(c_font_maker_source):
     def get_shape(self):
         return self.dshape
 
+    def _clr_white(self):
+        raise NotImplementedError()
+
+    def _clr_add(self, src, dst):
+        raise NotImplementedError()
+
     def _draw_chars_img(self, cline, offset, size, font, anchor):
         raise NotImplementedError()
 
@@ -105,8 +112,18 @@ class c_font_maker_source_pil(c_font_maker_source):
 
 class c_font_maker_source_pil1b(c_font_maker_source_pil):
 
+    def __init__(self, *na, dcolors, **ka):
+        super().__init__(*na, **ka)
+        self.dcolors = dcolors
+
+    def _clr_white(self):
+        return 1
+
+    def _clr_add(self, src, dst):
+        return src & dst
+
     def _draw_chars_img(self, cline, offset, size, font, anchor):
-        img = Image.new("1", size, color=1)
+        img = Image.new("1", size, color = 1)
         idr = ImageDraw.Draw(img)
         idr.text(offset, cline, font = font, anchor = anchor)
         return img
@@ -116,6 +133,36 @@ class c_font_maker_source_pil1b(c_font_maker_source_pil):
             return None
         else:
             return self.dcolors[dst_part]
+
+class c_font_maker_source_pilgrey(c_font_maker_source_pil):
+
+    def __init__(self, *na, colorbw, **ka):
+        super().__init__(*na, **ka)
+        self.colorbw = colorbw
+
+    def _clr_white(self):
+        return 255
+
+    def _clr_add(self, src, dst):
+        return min(255, max(0, src + dst - 255))
+
+    def _draw_chars_img(self, cline, offset, size, font, anchor):
+        img = Image.new("L", size, color = 255)
+        idr = ImageDraw.Draw(img)
+        idr.text(offset, cline, font = font, anchor = anchor)
+        return img
+
+    def get_color(self, src_color, dst_part):
+        if dst_part == 0 and src_color != 255:
+            src_color = 255 - src_color
+            shft = 8 - self.colorbw
+            if shft > 0:
+                src_color >>= shft
+            elif shft < 0:
+                src_color <<= -shft
+            return src_color
+        else:
+            return None
 
 class c_font_maker_source_fonfile(c_font_maker_source):
 
@@ -283,11 +330,20 @@ def make_font_hzk(sfn, dfn, chars):
     dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
     return dfon
 
-def make_font_ttf(sfn, dfn, chars, szreduce = 0):
+def make_font_ttf_deco(sfn, dfn, chars, szreduce = 0):
     sfon = font_src(sfn)
     dsfon = font_hzk(dfn)
     fsrc = c_font_maker_source_pil1b(
-        dfn, 24 - szreduce, (24, 24, 1), [15, 5, 10])
+        dfn, 24 - szreduce, (24, 24, 1), dcolors = [15, 5, 10])
+    mkr = c_font_maker(fsrc, (0, 0))
+    dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
+    return dfon
+
+def make_font_ttf(sfn, dfn, chars, szreduce = 0):
+    sfon = font_src(sfn)
+    dsfon = font_hzk(dfn)
+    fsrc = c_font_maker_source_pilgrey(
+        dfn, 24 - szreduce, (24, 24, 1), colorbw = 4)
     mkr = c_font_maker(fsrc, (0, 0))
     dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
     return dfon
@@ -314,7 +370,7 @@ if __name__ == '__main__':
         return img
 
     def tst1():
-        global sfon, sdr, dsfon, dsdr, dfon, ddr
+        global sfon, sdr, dsfon, dsdr, dfon, ddr, mkr
         sfon = font_src(r'wktab\FONT.DAT')
         sdr = c_font_drawer(sfon)
 
@@ -325,10 +381,11 @@ if __name__ == '__main__':
         #dfn = r'wktab\DFYuanW5-GB.ttf'
         #fsrc = c_font_maker_source_pil1b(dfn, 24, (24, 24, 1), [15, 5, 10])
         dfn = r'wktab\ResourceHanRoundedCN-Regular.ttf'
-        fsrc = c_font_maker_source_pil1b(dfn, 23, (24, 24, 1), [15, 5, 10])
+        #fsrc = c_font_maker_source_pil1b(dfn, 23, (24, 24, 1), dcolors = [15, 5, 10])
+        fsrc = c_font_maker_source_pilgrey(dfn, 23, (24, 24, 1), colorbw = 4)
         #fsrc = c_font_maker_source_fonfile(dsfon, [16], encode_hzk)
         mkr = c_font_maker(fsrc, (0, 0))
-        cs = charset
+        cs = charset#[1000:1020]
         dfon, ddirty = sfon.repack_with((mkr.iter_chars(cs), range(262)))
         ddr = c_font_drawer(dfon)
 
