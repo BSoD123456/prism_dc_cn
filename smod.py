@@ -90,7 +90,8 @@ if __name__ == '__main__':
         #dfon = make_font_hzk(
         #    r'wktab\FONT.DAT', r'wktab\HZK24S', cd.chrset.ext_chars)
         dfon = make_font_ttf(
-            r'wktab\FONT.DAT', r'wktab\DFYuanW5-GB.ttf', cd.chrset.ext_chars)
+        #    r'wktab\FONT.DAT', r'wktab\DFYuanW5-GB.ttf', cd.chrset.ext_chars)
+            r'wktab\FONT.DAT', r'wktab\ResourceHanRoundedCN-Regular.ttf', cd.chrset.ext_chars, 1)
         with open(r'wktab\font_mod.dat', 'wb') as fd:
             fd.write(dfon.BYTES())
     tst1()
