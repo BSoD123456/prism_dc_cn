@@ -301,7 +301,7 @@ if __name__ == '__main__':
         bytes([high, low]).decode('gb2312')
         for high in range(0xB0, 0xD8)
         for low in range(0xA1, 0xFF)
-        if high != 0xD7 or low <= 0xD9
+        if high != 0xD7 or low <= 0xF9
     ]
     
     from fonfile import font_src, font_hzk

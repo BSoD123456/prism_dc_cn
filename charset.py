@@ -270,7 +270,7 @@ class c_charset_zh(c_charset_base):
             ((hi << 8) + 0xa1, (hi << 8) + 0xfe)
             for hi in range(0xb0, 0xd7)
         ),
-        (0xd7a1, 0xd7d9),
+        (0xd7a1, 0xd7f9),
     ]
 
     def __init__(self):
