@@ -105,7 +105,7 @@ def font_src(fn):
     with open(fn, 'rb') as fd:
         raw = fd.read()
     fon = c_fonfile(raw, 0)
-    fon.set_info({'shape': (8, 12, 24, 1)})
+    fon.set_info({'shape': (4, 24, 24, 1)})
     fon.parse_size(len(raw), 4)
     return fon
 
@@ -113,6 +113,6 @@ def font_hzk(fn):
     with open(fn, 'rb') as fd:
         raw = fd.read()
     fon = c_fonfile(raw, 0)
-    fon.set_info({'shape': (2, 12, 24, 1), 'rvsbyt': True})
+    fon.set_info({'shape': (1, 24, 24, 1), 'rvsbyt': True})
     fon.parse_size(len(raw), 4)
     return fon
