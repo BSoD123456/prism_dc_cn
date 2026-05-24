@@ -179,9 +179,9 @@ class c_maker_rule_ast(c_maker_rule_rawfile):
         return pickle.loads(raw)
 
     def mk1(self, path, raw):
-        self._info(f'parse ast to {self.path}')
         import pickle
         from script import c_script_file, c_script_program, SC_PROG_ENTRY
+        self._info(f'parse ast to {self.path}')
         sc = c_script_file(raw, 0)
         sc.parse_size(len(raw), 4)
         prog = c_script_program(sc)
@@ -193,8 +193,8 @@ class c_maker_rule_ast(c_maker_rule_rawfile):
 class c_maker_rule_scode(c_maker_rule_txtfile):
 
     def mk1(self, path, ast):
-        self._info(f'gen code to {self.path}')
         from scode import c_scode_program, c_scode_buf_fd
+        self._info(f'gen code to {self.path}')
         with open(self.path, 'w', encoding = 'utf-8') as fd:
             cgen = c_scode_program(ast, c_scode_buf_fd(fd))
             cgen.gen_code()
@@ -217,6 +217,13 @@ class c_maker_rule_sdialog(c_maker_rule_txtfile):
             cgen.gen_code()
         return self.mk0(path)
 
+class c_maker_rule_rplctxt(c_maker_rule):
+
+    def mk0(self, src, dst, shd):
+        from sdcmp import cmp_sdialog_lines
+        self._info(f'compare texts')
+        return cmp_sdialog_lines(src, dst, shd)
+
 def make_all(paths, rom):
     rules = {}
     rules.update({
@@ -237,9 +244,13 @@ def make_all(paths, rom):
         'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
         'dialog.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
         'dialog.shadow.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
+        'dialog_zh.txt': (c_maker_rule_txtfile, '!trans'),
+        'replace_text': (
+            c_maker_rule_rplctxt,
+            'dialog.txt', 'dialog_zh.txt', 'dialog.shadow.txt'),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'dialog.txt'),
+        'all': (c_maker_rule_alias, 'replace_text'),
     })
     mkr = c_maker(rules)
     mkr.make('all')

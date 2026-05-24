@@ -133,12 +133,27 @@ class c_sdialog_comparer:
             self._feed_line(ln, s, d, h)
         self._treftab_flush()
 
+    def feed_lines(self, srclines, dstlines, shdlines):
+        if not len(srclines) == len(dstlines) == len(shdlines):
+            self._error(0, 'unmatched lines number')
+        for i in range(len(srclines)):
+            s = srclines[i]
+            d = dstlines[i]
+            h = shdlines[i]
+            self._feed_line(i+1, s, d, h)
+        self._treftab_flush()
+
 def cmp_sdialog(srcfn, dstfn, shdfn):
     cmp = c_sdialog_comparer()
     with open(srcfn, 'r', encoding = 'utf-8') as srcfd:
         with open(dstfn, 'r', encoding = 'utf-8') as dstfd:
             with open(shdfn, 'r', encoding = 'utf-8') as shdfd:
                 cmp.feed(srcfd, dstfd, shdfd)
+    return cmp.treftxt
+
+def cmp_sdialog_lines(srclines, dstlines, shdlines):
+    cmp = c_sdialog_comparer()
+    cmp.feed_lines(srclines, dstlines, shdlines)
     return cmp.treftxt
 
 if __name__ == '__main__':
