@@ -74,7 +74,8 @@ if __name__ == '__main__':
 
     def main():
         global cs, st, rcs
-        with open(r'trans\selfvocate.txt', 'r', encoding = 'utf-8') as fd:
+        #with open(r'trans\selfvocate.txt', 'r', encoding = 'utf-8') as fd:
+        with open(r'trans\origname.txt', 'r', encoding = 'utf-8') as fd:
             rcs = read_chars(fd)
         with open(r'wktab\dialog_done2.txt', 'r', encoding = 'utf-8') as sfd:
             with open(r'trans\dialog_zh.txt', 'r', encoding = 'utf-8') as dfd:
