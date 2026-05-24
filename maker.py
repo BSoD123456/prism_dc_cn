@@ -4,6 +4,19 @@
 from report import report
 
 import os, os.path
+import subprocess
+
+def _execmd(cmd):
+    sp = subprocess.Popen(cmd,
+        stderr=subprocess.STDOUT,
+        stdout=subprocess.PIPE,
+        creationflags=subprocess.CREATE_NO_WINDOW,)
+    while True:
+        out = sp.stdout.readline()
+        print(out.decode('mbcs'), end='')
+        if sp.poll() is not None:
+            break
+    return sp.returncode
 
 class err_maker_make(ValueError):
     pass
@@ -64,20 +77,19 @@ class c_maker:
         mkrl, *rnames = self.rules[tarname]
         reqs = []
         for rname in rnames:
-            reqs.append(self.make(rname))
+            if rname.startswith('!'):
+                req = rname[1:]
+            else:
+                req = self.make(rname)
+            reqs.append(req)
         return mkrl.make(reqs)
 
 # === make rules ===
 
-class c_maker_rule_key(c_maker_rule):
+class c_maker_rule_alias(c_maker_rule):
 
-    def mk0(self, key):
-        return key
-
-class c_maker_rule_vir(c_maker_rule):
-
-    def mk0(self):
-        return True
+    def mk0(self, req):
+        return req
 
 class c_maker_rule_path(c_maker_rule):
 
@@ -86,12 +98,12 @@ class c_maker_rule_path(c_maker_rule):
         if not path is None:
             dpath = os.path.join(path, dpath)
         self.path = dpath
+        return dpath
 
 class c_maker_rule_dir(c_maker_rule_path):
 
     def mk0(self, path):
-        super().mk0(path)
-        fn = self.path
+        fn = super().mk0(path)
         if os.path.isdir(fn):
             return fn
         elif os.path.exists(fn):
@@ -99,27 +111,52 @@ class c_maker_rule_dir(c_maker_rule_path):
         os.makedirs(fn)
         return fn
 
-class c_maker_rule_rawfile(c_maker_rule):
+class c_maker_rule_rawfile(c_maker_rule_path):
 
     def mk0(self, path):
-        super().mk0(path)
-        fn = self.path
+        fn = super().mk0(path)
         if not os.path.isfile(fn):
             return None
         with open(fn, 'rb') as fd:
             return fd.read()
 
-def make_all(paths):
+class c_maker_rule_shcmd(c_maker_rule_rawfile):
+
+    def mk1(self, path, cmdline):
+        print(f'sh> {cmdline}')
+        _execmd(cmdline)
+        return self.mk0(path)
+
+class c_maker_rule_extract(c_maker_rule_shcmd):
+
+    def mk1(self, dpath, rom, wpath, cmdpatt):
+        rnsp = os.path.splitext(rom)
+        extname = None
+        if len(rnsp) > 1:
+            extname = rnsp[-1][1:].lower()
+        if not extname in ('cue', 'gdi'):
+            self._error(f'rom should be cue or gdi: {rom}')
+        cmdline = cmdpatt.format(extname, rom, dpath, wpath)
+        return super().mk1(dpath, cmdline)
+
+def make_all(paths, rom):
     rules = {}
     rules.update({
         path: (c_maker_rule_dir,)
         for path in paths.values()
     })
     rules.update({
-        
+        rom: (c_maker_rule_path, paths['source']),
     })
     rules.update({
-        'all': (c_maker_rule_vir, paths['work'], paths['extract']),
+        'SCRIPT.BIN': (
+            c_maker_rule_extract, paths['extract'],
+            rom, paths['work'],
+            '!tools/buildgdi.exe -extract -{0} "{1}" -output "{2}" -ip "{3}/IP.BIN"',
+        ),
+    })
+    rules.update({
+        'all': (c_maker_rule_alias, 'SCRIPT.BIN'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
@@ -130,11 +167,14 @@ if __name__ == '__main__':
     from pprint import pprint
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
+    ROM = 'Prismaticallization (Japan).cue'
     PATHS = {
-        'work': 'wktab2/work',
-        'extract': 'wktab2/extract',
+        'source': r'L:\Resource\Games\emu\dc\roms\Prismaticallization (Japan)',
+        'output': r'',
+        'work': 'wktab/work',
+        'extract': 'wktab/extract',
     }
 
     def main():
-        make_all(PATHS)
+        make_all(PATHS, ROM)
     main()
