@@ -478,6 +478,7 @@ class c_scode_program(c_scode_parser):
         ctx['txtrng'] = []
         self._gen_anode(nd.sub, 'prescan', ctx)
         self._gen_vnode_func_proto(nd, ctx)
+        ctx['func_anum'] = nd.anum
         pbuf = ctx['buf']
         pbuf.write(' {')
         pbuf.newline()
@@ -1159,7 +1160,8 @@ class c_scode_program(c_scode_parser):
         ctx['buf'].write(str(nd))
 
     def _gen_anode_parm(self, nd, ctx):
-        ctx['buf'].write(str(nd))
+        arpr = nd.repr_infunc(ctx['func_anum'])
+        ctx['buf'].write(arpr)
 
     def _gen_anode_inst(self, nd, ctx, *, calc_value = None, **ka):
         val = nd.val

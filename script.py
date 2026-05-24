@@ -38,7 +38,10 @@ class c_script_anode_parm(c_script_anode_leaf):
         self.aidx = aidx
 
     def __repr__(self):
-        return f'arg{self.aidx}'
+        return f'arg-{self.aidx}'
+
+    def repr_infunc(self, anum):
+        return f'arg{anum - self.aidx + 1}'
 
 class c_script_anode_ref(c_script_anode_leaf):
 
