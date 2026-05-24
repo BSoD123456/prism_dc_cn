@@ -124,6 +124,22 @@ class c_maker_rule_rawfile(c_maker_rule_path):
         with open(fn, 'rb') as fd:
             return fd.read()
 
+class c_maker_rule_txtfile(c_maker_rule_path):
+
+    def mk0(self, path):
+        fn = super().mk0(path)
+        if not os.path.isfile(fn):
+            return None
+        self._info(f'load {fn} as text')
+        with open(fn, 'r', encoding = 'utf-8') as fd:
+            rs = []
+            while True:
+                line = fd.readline()
+                if not line:
+                    break
+                rs.append(line)
+            return rs
+
 class c_maker_rule_shcmd(c_maker_rule_rawfile):
 
     def mk1(self, path, cmdline):
@@ -165,6 +181,16 @@ class c_maker_rule_ast(c_maker_rule_rawfile):
             pickle.dump(ast, fd)
         return ast
 
+class c_maker_rule_scode(c_maker_rule_txtfile):
+
+    def mk1(self, path, ast):
+        self._info(f'gen code to {self.path}')
+        from scode import c_scode_program, c_scode_buf_fd
+        with open(self.path, 'w', encoding = 'utf-8') as fd:
+            cgen = c_scode_program(ast, c_scode_buf_fd(fd))
+            cgen.gen_code()
+        return self.mk0(path)
+
 def make_all(paths, rom):
     rules = {}
     rules.update({
@@ -182,10 +208,10 @@ def make_all(paths, rom):
         ),
         'FONT.DAT': (c_maker_rule_rawfile, paths['extract'], 'SCRIPT.BIN'),
         'ast.pck': (c_maker_rule_ast, paths['work'], 'SCRIPT.BIN'),
-        #'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
+        'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'ast.pck'),
+        'all': (c_maker_rule_alias, 'code.txt'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
