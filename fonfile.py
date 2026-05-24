@@ -76,7 +76,7 @@ class c_fonfile(c_sect_tab):
 
     def _repack_with(self, finfo, **ka):
         fdats, rperm = finfo
-        rmin = max(rperm) + 1
+        rmin = max(v for v in rperm if not v is None) + 1
         if not fdats:
             return self, False
         w = self._TAB_WIDTH

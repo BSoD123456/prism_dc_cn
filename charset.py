@@ -139,11 +139,31 @@ class c_charset_extendable(c_charset):
 
     def __init__(self, charset):
         self.charset = charset
-        self.charset_rvs = {v: k for k, v in charset.items()}
+        csr = {}
+        bcs = []
+        for code, char in charset.items():
+            csr[char] = code
+            bcs.append(char)
+        self.charset_rvs = csr
+        self.base_chars = bcs
         self.ext_chars = []
 
     def _charset_top(self):
         return max(self.charset.keys()) + 1
+
+    def compact_info(self, rmchars):
+        bcs = set(rmchars)
+        rperm = []
+        for ci, char in enumerate(self.base_chars):
+            if char in bcs:
+                ci = None
+                bcs.remove(char)
+            rperm.append(ci)
+        if bcs:
+            self._error(f'non-base chars: {bcs}')
+        rchars = [*rmchars]
+        rchars.extend(self.ext_chars)
+        return rchars, rperm
 
     def dec_char(self, code):
         return self.charset.get(code, None)

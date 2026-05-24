@@ -322,30 +322,30 @@ def encode_hzk(c):
     return (hc - 0xa1) * 0x5e + (lc - 0xa1)
 
 from fonfile import font_src, font_hzk
-def make_font_hzk(sfn, dfn, chars):
+def make_font_hzk(sfn, dfn, chars, perms):
     sfon = font_src(sfn)
     dsfon = font_hzk(dfn)
     fsrc = c_font_maker_source_fonfile(dsfon, [16], encode_hzk)
     mkr = c_font_maker(fsrc, (0, 0))
-    dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
+    dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), perms))
     return dfon
 
-def make_font_ttf_deco(sfn, dfn, chars, szreduce = 0):
+def make_font_ttf_deco(sfn, dfn, chars, perms, szreduce = 0):
     sfon = font_src(sfn)
     dsfon = font_hzk(dfn)
     fsrc = c_font_maker_source_pil1b(
         dfn, 24 - szreduce, (24, 24, 1), dcolors = [15, 5, 10])
     mkr = c_font_maker(fsrc, (0, 0))
-    dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
+    dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), perms))
     return dfon
 
-def make_font_ttf(sfn, dfn, chars, szreduce = 0):
+def make_font_ttf(sfn, dfn, chars, perms, szreduce = 0):
     sfon = font_src(sfn)
     dsfon = font_hzk(dfn)
     fsrc = c_font_maker_source_pilgrey(
         dfn, 24 - szreduce, (24, 24, 1), colorbw = 4)
     mkr = c_font_maker(fsrc, (0, 0))
-    dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), range(262)))
+    dfon, ddirty = sfon.repack_with((mkr.iter_chars(chars), perms))
     return dfon
 
 if __name__ == '__main__':

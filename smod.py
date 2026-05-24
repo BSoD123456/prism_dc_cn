@@ -91,7 +91,9 @@ if __name__ == '__main__':
         #    r'wktab\FONT.DAT', r'wktab\HZK24S', cd.chrset.ext_chars)
         dfon = make_font_ttf(
         #    r'wktab\FONT.DAT', r'wktab\DFYuanW5-GB.ttf', cd.chrset.ext_chars)
-            r'wktab\FONT.DAT', r'wktab\ResourceHanRoundedCN-Regular.ttf', cd.chrset.ext_chars, 1)
+            r'wktab\FONT.DAT', r'wktab\ResourceHanRoundedCN-Regular.ttf',
+            *cd.chrset.compact_info('，'),
+            1)
         with open(r'wktab\font_mod.dat', 'wb') as fd:
             fd.write(dfon.BYTES())
     tst1()
