@@ -33,6 +33,9 @@ class c_maker_rule:
     def _warn(self, msg):
         report('war', f'({self.name}) {msg}')
 
+    def _info(self, msg):
+        report('info', f'({self.name}) {msg}')
+
     def make(self, reqs):
         vi = 0
         while True:
@@ -117,6 +120,7 @@ class c_maker_rule_rawfile(c_maker_rule_path):
         fn = super().mk0(path)
         if not os.path.isfile(fn):
             return None
+        self._info(f'load {fn}')
         with open(fn, 'rb') as fd:
             return fd.read()
 
@@ -139,6 +143,27 @@ class c_maker_rule_extract(c_maker_rule_shcmd):
         cmdline = cmdpatt.format(extname, rom, dpath, wpath)
         return super().mk1(dpath, cmdline)
 
+class c_maker_rule_ast(c_maker_rule_rawfile):
+
+    def mk0(self, path):
+        raw = super().mk0(path)
+        if raw is None:
+            return None
+        import pickle
+        return pickle.loads(raw)
+
+    def mk1(self, path, raw):
+        self._info(f'parse ast to {self.path}')
+        import pickle
+        from script import c_script_file, c_script_program, SC_PROG_ENTRY
+        sc = c_script_file(raw, 0)
+        sc.parse_size(len(raw), 4)
+        prog = c_script_program(sc)
+        ast = prog.parse_sect(SC_PROG_ENTRY)
+        with open(self.path, 'wb') as fd:
+            pickle.dump(ast, fd)
+        return ast
+
 def make_all(paths, rom):
     rules = {}
     rules.update({
@@ -154,9 +179,11 @@ def make_all(paths, rom):
             rom, paths['work'],
             '!tools/buildgdi.exe -extract -{0} "{1}" -output "{2}" -ip "{3}/IP.BIN"',
         ),
+        'FONT.DAT': (c_maker_rule_rawfile, paths['extract'], 'SCRIPT.BIN'),
+        'ast.pck': (c_maker_rule_ast, paths['work'], 'SCRIPT.BIN'),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'SCRIPT.BIN'),
+        'all': (c_maker_rule_alias, 'ast.pck'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
@@ -171,8 +198,8 @@ if __name__ == '__main__':
     PATHS = {
         'source': r'L:\Resource\Games\emu\dc\roms\Prismaticallization (Japan)',
         'output': r'',
-        'work': 'wktab/work',
-        'extract': 'wktab/extract',
+        'work': r'wktab\work',
+        'extract': r'wktab\extract',
     }
 
     def main():
