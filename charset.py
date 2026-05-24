@@ -267,6 +267,57 @@ class c_charset_jp(c_charset_base):
         self.update(
             self._expand_charset(self.CHRS_JP, self._charset_top()) )
 
+def _get_gbk_char_type(char):
+    assert len(char) == 1
+    try:
+        bs = char.encode('gbk')
+    except:
+        return 'unknown'
+    if len(bs) == 1:
+        lo, = bs
+        if lo < 0x80:
+            return 'ascii'
+    elif len(bs) == 2:
+        hi, lo = bs
+        if lo < 0x40:
+            pass
+        elif hi < 0x81:
+            pass
+        elif hi < 0xa1:
+            if lo < 0xff and lo != 0x7f:
+                return 'gbk/3'
+        elif hi < 0xa8:
+            if lo < 0xa1 and lo != 0x7f:
+                return 'cust/3'
+            elif lo < 0xff:
+                return 'gbk/1'
+        elif hi < 0xaa:
+            if lo < 0xa1 and lo != 0x7f:
+                return 'gbk/5'
+            elif lo < 0xff:
+                return 'gbk/1'
+        elif hi < 0xb0:
+            if lo < 0xa1 and lo != 0x7f:
+                return 'gbk/4'
+            elif lo < 0xff:
+                return 'cust/1'
+        elif hi < 0xd8:
+            if lo < 0xa1 and lo != 0x7f:
+                return 'gbk/4'
+            elif lo < 0xff:
+                return 'gbk/2/1'
+        elif hi < 0xf8:
+            if lo < 0xa1 and lo != 0x7f:
+                return 'gbk/4'
+            elif lo < 0xff:
+                return 'gbk/2/2'
+        elif hi < 0xff:
+            if lo < 0xa1 and lo != 0x7f:
+                return 'gbk/4'
+            elif lo < 0xff:
+                return 'cust/2'
+    return 'unknown'
+
 class c_charset_zh_gb2312(c_charset_base):
 
     CENC = 'gbk'
@@ -303,14 +354,13 @@ class c_charset_zh_ext(c_charset_base):
     def _chk_extend(self, char):
         if len(char) != 1:
             return False, False
-        try:
-            bs = char.encode(self.CENC)
-        except:
+        ctyp = _get_gbk_char_type(char)
+        if ctyp in ('gbk/2/1', 'gbk/2/2', 'gbk/3',):
+            return True, True
+        elif ctyp in ('gbk/4',):
             return False, True
-        if len(bs) != 2:
+        else:
             return False, False
-        hi, lo = bs
-        return 0x81 <= hi and 0xa1 <= lo, True
 
 if __name__ == '__main__':
     import pdb
