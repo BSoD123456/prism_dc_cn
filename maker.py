@@ -3,12 +3,15 @@
 
 from report import report
 
+import os, os.path
+
 class err_maker_make(ValueError):
     pass
 
 class c_maker_rule:
 
-    def __init__(self, name):
+    def __init__(self, maker, name):
+        self.maker = maker
         self.name = name
 
     def _error(self, msg):
@@ -26,13 +29,12 @@ class c_maker_rule:
             mth = getattr(self, mn, None)
             if not callable(mth):
                 break
-            try:
-                r = mth(*reqs)
-            except TypeError as ex:
-                if 'argument' in ex.args[0]:
-                    self._error(f'unmatched requires: {len(reqs)}')
-                else:
-                    raise
+            if (mth.__code__.co_flags & 0xc) != 0:
+                self._error(f'invalid mk method: {mn}')
+            rnum = f1.__code__.co_argcount
+            if rnum > len(reqs):
+                self._error(f'require {rnum - len(reqs)} more items')
+            r = mth(*reqs[:rnum])
             if not r is None:
                 return r
         self._error(f'nothing made')
@@ -67,14 +69,37 @@ class c_maker_rule_key(c_maker_rule):
     def mk0(self, key):
         return key
 
+class c_maker_rule_vir(c_maker_rule):
+
+    def mk0(self):
+        return True
+
 class c_maker_rule_rawfile(c_maker_rule):
 
     def mk0(self):
-        with open(self.name, 'rb') as fd:
+        fn = self.name
+        if not os.path.isfile(fn):
+            return None
+        with open(fn, 'rb') as fd:
             return fd.read()
 
-def main():
-    pass
+class c_maker_rule_dir(c_maker_rule):
+
+    def mk0(self):
+        fn = self.name
+        if os.path.isdir(fn):
+            return True
+        elif os.path.exists:
+            return None
+        os.makedirs(fn)
+        return True
+
+def make_all(wkpath):
+    mkr = c_maker({
+        wkpath: (c_maker_rule_dir,),
+        'all': (c_maker_rule_vir, wkpath),
+    })
+    mkr.make('all')
 
 if __name__ == '__main__':
     import pdb
