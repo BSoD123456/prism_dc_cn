@@ -321,5 +321,5 @@ if __name__ == '__main__':
     def tst1():
         global csj, csz
         csj = c_charset_jp()
-        csz = c_charset_zh()
+        csz = c_charset_zh_ext()
     tst1()
