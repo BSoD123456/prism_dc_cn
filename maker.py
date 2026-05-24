@@ -36,7 +36,7 @@ class c_maker_rule:
     def _info(self, msg):
         report('info', f'({self.name}) {msg}')
 
-    def make(self, reqs):
+    def make(self, lzreqs):
         vi = 0
         while True:
             mn = f'mk{vi}'
@@ -48,10 +48,10 @@ class c_maker_rule:
                 self._error(f'invalid mk method: {mn}')
             rnum = mth.__code__.co_argcount - 1 # with self
             dreqs = []
-            rlen = len(reqs)
+            rlen = len(lzreqs)
             for i in range(rnum):
                 if i < rlen:
-                    d = reqs[i]
+                    d = lzreqs[i]()
                 else:
                     d = None
                 dreqs.append(d)
@@ -78,14 +78,24 @@ class c_maker:
         if not tarname in self.rules:
             self._error(tarname, f'unknown target')
         mkrl, *rnames = self.rules[tarname]
-        reqs = []
+        lzreqs = []
         for rname in rnames:
-            if rname.startswith('!'):
-                req = rname[1:]
-            else:
-                req = self.make(rname)
-            reqs.append(req)
-        return mkrl.make(reqs)
+            def mklz(rname):
+                if rname.startswith('!'):
+                    cch = rname[1:]
+                    return lambda: cch
+                else:
+                    cch = []
+                    def lz():
+                        if cch:
+                            return cch[0]
+                        else:
+                            val = self.make(rname)
+                            cch.append(val)
+                            return val
+                    return lz
+            lzreqs.append(mklz(rname))
+        return mkrl.make(lzreqs)
 
 # === make rules ===
 
