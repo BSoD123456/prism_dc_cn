@@ -538,7 +538,7 @@
 
 -------------------
 <text: Scene-d27/1-Loop/1-Loop/2-Then/1>
-[SEL:1]内時性確認
+[SEL:1]内时性确认
 
 </text>
 <next: Scene-d27/1-Loop/1-Loop/3>
@@ -2914,7 +2914,7 @@ SE
 
 -------------------
 <text: Scene-3109/1-Loop/1-Loop/2>
-                                  [SEL:1]確認
+                                  [SEL:1]确认
 
 </text>
 <next: Scene-3109/End>
@@ -2935,8 +2935,8 @@ SE
 
 -------------------
 <text: Scene-31f7/1-Loop/1-Loop/1>
-『状態』[CLR:yellow]{fun.3294(var[0xe40 >>5])}[CLR:white]
-{fun.36ee(var[0xe40 >>5])}                                  [SEL:1]確認
+『状态』[CLR:yellow]{fun.3294(var[0xe40 >>5])}[CLR:white]
+{fun.36ee(var[0xe40 >>5])}                                  [SEL:1]确认
 
 </text>
 <next: Scene-31f7/End>
@@ -3117,7 +3117,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/2-Then/1-Loop/4-Then/1>
-勉強進行状況
+勉强进行状况
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3125,7 +3125,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/2-Then/1-Loop/5-Then/1>
-勉強進行状況
+勉强进行状况
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3133,7 +3133,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/2-Then/1-Loop/6-Then/1>
-勉強進行状況
+勉强进行状况
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -20211,7 +20211,7 @@ SE
 
   观众有小朋友，也有大朋友。比例大概是3：7吧。若按体积比，则更大。
 
-[CLR:yellow]観客[CLR:white]
+[CLR:yellow]观众[CLR:white]
 「预～备！{word(澄香)}酱～！！」
 
 [CLR:yellow]{word(澄香)}[CLR:white]
@@ -20222,7 +20222,7 @@ SE
 [CLR:yellow]{word(澄香)}[CLR:white]
 「那么{word(澄香)}！今天最后一首歌，要鼓足干劲唱喵～！」
 
-[CLR:yellow]観客[CLR:white]
+[CLR:yellow]观众[CLR:white]
 「噢噢～！{word(澄香)}酱～！！」
 
   ……{word(俺)}头晕目眩地转身背向那里。
@@ -23709,7 +23709,7 @@ SE
 [CLR:yellow]{word(雪乃)}[CLR:white]
 「为、为什么会在这种地方！？哥哥，备考学习呢……」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「太无聊了，所以我放弃了」
 
 [CLR:yellow]{word(雪乃)}[CLR:white]
@@ -23717,13 +23717,13 @@ SE
 
   听了{word(沢村)}小姐的话，男人漏出像是在忍耐的笑声。
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「总算有办法了。是能做到的。这不是很厉害吗？」
 
 [CLR:yellow]{word(雪乃)}[CLR:white]
 「？……可是，在这种地方，做什么……」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「我担心{word(雪乃)}。一直在监视你。一直」
 
   {word(沢村)}小姐哑口无言。追踪妹妹的哥哥还真少见。
@@ -23733,7 +23733,7 @@ SE
 
   {word(俺)}装作平静地说道。平时的话，{word(俺)}也没心情说到这种地步……
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「哼……随你怎么说」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -23741,7 +23741,7 @@ SE
 
   {word(俺)}从他身上感觉到一种怀揣自私企图的人所具有的、生理上的厌恶感。
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「……不愧是你。我还以为你没有注意到{word(俺)}……」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -23756,7 +23756,7 @@ SE
 
   她像是惊慌失措般，仰望着自己哥哥的脸。
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「……我想差不多该试试看了。
 
   为此，我也做了各种准备。花了很长时间啊」
@@ -23764,7 +23764,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「带着妹妹私奔吗？」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「……差不多吧。不过，我想做到不用逃也可以」
 
 [CLR:yellow]{word(雪乃)}[CLR:white]
@@ -23772,7 +23772,7 @@ SE
 
   你是在生我把你一个人留在家里的气吗？如果是那样，{word(私)}马上就准备回去……」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「……在家里，和{word(雪乃)}两个人待着，很痛苦。
 
   那种无聊的学习，根本做不下去。我觉得，对{word(俺)}来说应该有更有意义的事」
@@ -23785,13 +23785,13 @@ SE
 
   就算觉得无聊，那样也什么都改变不了。……{word(俺)}倒是已经放弃的那类人了」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「那是会改变的。你没注意到吗？」
 
 [CLR:yellow]{word(射場)}[CLR:white]
 「……我没兴趣陪你妄想。{word(俺)}也没那么闲」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「不是妄想。只是你没有注意到罢了。
 
   只要用得好，一切都能改变。应该是这样。我想一点点试下去」
@@ -23801,13 +23801,13 @@ SE
 
   用自己的选择和行动，改变自己的人生。……理所当然的事」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「可是，也有靠那样改变不了的东西」
 
 [CLR:yellow]{word(射場)}[CLR:white]
 「这点我承认。因为个人能做到的事，是有限度的」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「现实是无聊而迟钝的。看看过去就明白。
 
   从那些例子能说的是，今后恐怕也不会有什么好事」
@@ -23817,13 +23817,13 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「……说到底，你想说什么？想做什么？」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「这世上无用之物太多了。必要的，只有{word(雪乃)}」
 
 [CLR:yellow]{word(雪乃)}[CLR:white]
 「哥、哥哥……怎么会……」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「你不这么认为吗……？」
 
   {word(沢村)}小姐一度低下头，然后抬起脸。
@@ -23831,7 +23831,7 @@ SE
 [CLR:yellow]{word(雪乃)}[CLR:white]
 「{word(私)}……觉得世上没有无用的事」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「{word(雪乃)}……？」
 
 [CLR:yellow]{word(雪乃)}[CLR:white]
@@ -23850,7 +23850,7 @@ SE
 
   听了{word(俺)}的话，男人显得不悦，但还是回望着这边。
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「……为了避免变成那样，我已经记录了{word(雪乃)}的感情。
 
   比如刚才那个。它产生影响之后……」
@@ -23858,7 +23858,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「我不知道那是什么，但那是不可能的」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「……你说什么？」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -23866,7 +23866,7 @@ SE
 
   ……要不然，你就试试看好了。试试你说的那个什么」
 
-[CLR:yellow]兄貴[CLR:white]
+[CLR:yellow]兄长[CLR:white]
 「……也是。如果那也不行的话……
 
   ……这大概，就会结束了。因为察觉到了无意义」
@@ -28595,7 +28595,7 @@ SE
 
 -------------------
 <text: Scene-59571/1-Loop/1-Loop/5-Then/1-Loop/1>
-[SEL:1]連続表示
+[SEL:1]连续表示
 [SEL:2]消去
 
 </text>
@@ -30424,7 +30424,7 @@ SE
 
 -------------------
 <text: Scene-59571/1-Loop/1-Loop/10-Then/1-Loop/2-Loop/2-Then/1-Loop/1>
-[SEL:1]記録
+[SEL:1]记录
 [SEL:2]解放
 
 </text>
@@ -31135,7 +31135,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 
   观众有小朋友，也有大朋友。比例大概是3：7吧。按体积比的话，还要更大。
 
-[CLR:yellow]観客[CLR:white]
+[CLR:yellow]观众[CLR:white]
 「预～备！{word(澄香)}酱～！！」
 
 [CLR:yellow]{word(澄香)}[CLR:white]
@@ -31146,7 +31146,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 [CLR:yellow]{word(澄香)}[CLR:white]
 「那么{word(澄香)}！今天最后一首歌，要鼓足干劲唱了喵～！」
 
-[CLR:yellow]観客[CLR:white]
+[CLR:yellow]观众[CLR:white]
 「呜哦～！{word(澄香)}酱～！！」
 
   ……{word(俺)}在眩晕之中，转身背对了那个地方。
