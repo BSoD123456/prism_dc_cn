@@ -53932,12 +53932,12 @@ z
 
 -------------------
 <text: Scene-61c65/1-Loop/1>
-【选择汉字的读音】
-[SEL:1]あ[SEL:2]い[SEL:3]う[SEL:4]え[SEL:5]お  [SEL:6]か[SEL:7]き[SEL:8]く[SEL:9]け[SEL:a]こ
-[SEL:b]さ[SEL:c]し[SEL:d]す[SEL:e]せ[SEL:f]そ  [SEL:10]た[SEL:11]ち[SEL:12]つ[SEL:13]て[SEL:14]と
-[SEL:15]な[SEL:16]に[SEL:17]ぬ[SEL:18]ね[SEL:19]の  [SEL:1a]は[SEL:1b]ひ[SEL:1c]ふ[SEL:1d]へ[SEL:1e]ほ
-[SEL:1f]ま[SEL:20]み[SEL:21]む[SEL:22]め[SEL:23]も  [SEL:24]や  [SEL:25]ゆ  [SEL:26]よ
-[SEL:27]ら[SEL:28]り[SEL:29]る[SEL:2a]れ[SEL:2b]ろ  [SEL:2c]わ  [SEL:2d]其他
+【选择汉字类别】
+[SEL:25]原名    [SEL:11]自称
+
+
+
+
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/1-Then/1-Loop/1-Loop/1-Then/1>
@@ -82173,8 +82173,8 @@ z
 <text: Scene-61c65/1-Loop/2-Loop/17-Then/1-Loop/1-Loop/2-Then/1>
 [SEL:759]女[SEL:75a]子[SEL:75b]娘[SEL:75c]姑[SEL:75d]姐  [SEL:75e]侬[SEL:75f]阿[SEL:760]拉[SEL:761]阮[SEL:762]偶
 [SEL:763]伦[SEL:764]宝[SEL:765]爷[SEL:766]洒[SEL:767]后  [SEL:768]可[SEL:769]卬[SEL:76a]一[SEL:76b]谷[SEL:76c]崖
-[SEL:76d]俄[SEL:76e]？[SEL:76f]？[SEL:770]？[SEL:771]？  [SEL:772]？[SEL:773]？[SEL:774]？[SEL:775]？[SEL:776]？
-[SEL:777]？[SEL:778]？[SEL:779]？[SEL:77a]？[SEL:77b]？  [SEL:77c]？
+[SEL:76d]俄
+
 [SEL:1f5a]前项
 
 </text>
@@ -92295,7 +92295,7 @@ z
 [SEL:aa3]射[SEL:aa4]场[SEL:aa5]庄[SEL:aa6]司[SEL:aa7]草  [SEL:aa8]加[SEL:aa9]武[SEL:aaa]则[SEL:aab]鸣[SEL:aac]川
 [SEL:aad]澄[SEL:aae]香[SEL:aaf]泽[SEL:ab0]村[SEL:ab1]雪  [SEL:ab2]乃[SEL:ab3]柊[SEL:ab4]明[SEL:ab5]美[SEL:ab6]木
 [SEL:ab7]之[SEL:ab8]下[SEL:ab9]沙[SEL:aba]世[SEL:abb]里  [SEL:abc]琴[SEL:abd]原[SEL:abe]由[SEL:abf]耕[SEL:ac0]一
-[SEL:ac1]？[SEL:ac2]？
+
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/37-Then/1-Loop/2-Then/1-Loop/1-Then/1>
