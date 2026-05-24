@@ -82,22 +82,30 @@ class c_fonfile(c_sect_tab):
         w = self._TAB_WIDTH
         rmk = self.repack_copy()
         swk = set()
-        dwk = set()
+        dwk = set(range(rmin))
         for dci, sci in enumerate(rperm):
-            if sci in swk or dci in dwk:
+            if sci is None:
+                continue
+            if sci in swk:
                 raise ValueError(
-                    'retouched cidx in remain perm: {ci:x}')
+                    f'retouched cidx in remain perm: {ci:x}')
             swk.add(sci)
-            dwk.add(dci)
+            dwk.remove(dci)
             bd = self.BYTES(sci * w, w)
             rmk.WBYTES(bd, dci * w)
-        for ci, fdat in enumerate(fdats):
-            ofs = (rmin + ci) * w
+        for dci, fdat in zip(sorted(dwk), fdats):
+            dwk.remove(dci)
             bd = self._repack_char(fdat)
-            rmk.WBYTES(bd, ofs)
-        rsize = ci + rmin + 1
+            rmk.WBYTES(bd, dci * w)
+        if dwk:
+            raise ValueError(f'required {len(dwk)} more chars')
+        fci = -1
+        for fci, fdat in enumerate(fdats):
+            bd = self._repack_char(fdat)
+            rmk.WBYTES(bd, (rmin + fci) * w)
+        rsize = rmin + fci + 1
         if rsize > self.tsize:
-            report('warning',
+            report('war',
                 f'new font is bigger than old: 0x{rsize:x} <- 0x{self.tsize:x}')
         return rmk, True
 
