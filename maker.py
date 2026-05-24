@@ -10,8 +10,7 @@ class err_maker_make(ValueError):
 
 class c_maker_rule:
 
-    def __init__(self, maker, name):
-        self.maker = maker
+    def __init__(self, name):
         self.name = name
 
     def _error(self, msg):
@@ -23,7 +22,7 @@ class c_maker_rule:
 
     def make(self, reqs):
         vi = 0
-        while True
+        while True:
             mn = f'mk{vi}'
             vi += 1
             mth = getattr(self, mn, None)
@@ -31,7 +30,7 @@ class c_maker_rule:
                 break
             if (mth.__code__.co_flags & 0xc) != 0:
                 self._error(f'invalid mk method: {mn}')
-            rnum = f1.__code__.co_argcount
+            rnum = mth.__code__.co_argcount - 1 # with self
             if rnum > len(reqs):
                 self._error(f'require {rnum - len(reqs)} more items')
             r = mth(*reqs[:rnum])
@@ -56,7 +55,7 @@ class c_maker:
     def make(self, tarname):
         if not tarname in self.rules:
             self._error(tarname, f'unknown target')
-        mkrl, *rnames = self.rules(tarname)
+        mkrl, *rnames = self.rules[tarname]
         reqs = []
         for rname in rnames:
             reqs.append(self.make(rname))
@@ -89,16 +88,24 @@ class c_maker_rule_dir(c_maker_rule):
         fn = self.name
         if os.path.isdir(fn):
             return True
-        elif os.path.exists:
+        elif os.path.exists(fn):
             return None
         os.makedirs(fn)
         return True
 
-def make_all(wkpath):
-    mkr = c_maker({
-        wkpath: (c_maker_rule_dir,),
+def make_all(paths):
+    rules = {}
+    rules.update({
+        path: (c_maker_rule_dir,),
+        for path in paths.values()
+    })
+    rules.update({
         'all': (c_maker_rule_vir, wkpath),
     })
+    rules.update({
+        'all': (c_maker_rule_vir, wkpath),
+    })
+    mkr = c_maker(rules)
     mkr.make('all')
 
 if __name__ == '__main__':
@@ -106,3 +113,7 @@ if __name__ == '__main__':
     #from hexdump import hexdump as hd
     from pprint import pprint
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
+
+    def main():
+        make_all('wktab2')
+    main()
