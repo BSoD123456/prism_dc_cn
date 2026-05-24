@@ -150,6 +150,7 @@ class c_maker_rule_ast(c_maker_rule_rawfile):
         if raw is None:
             return None
         import pickle
+        import script
         return pickle.loads(raw)
 
     def mk1(self, path, raw):
@@ -181,6 +182,7 @@ def make_all(paths, rom):
         ),
         'FONT.DAT': (c_maker_rule_rawfile, paths['extract'], 'SCRIPT.BIN'),
         'ast.pck': (c_maker_rule_ast, paths['work'], 'SCRIPT.BIN'),
+        #'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
     })
     rules.update({
         'all': (c_maker_rule_alias, 'ast.pck'),
