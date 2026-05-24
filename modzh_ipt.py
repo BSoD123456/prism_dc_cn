@@ -16,7 +16,7 @@ def read_chars(fd):
                 rcs.append(c)
     return rcs
 
-def modzh_ipt(sfd, dfd, mfd):
+def modzh_ipt(sfd, dfd, mfd, rplc):
     seltab = {}
     tabidx = 0
     lstintab = False
@@ -50,6 +50,10 @@ def modzh_ipt(sfd, dfd, mfd):
                     if sv in seltab:
                         raise ValueError(f'duplicate char: {sv}')
                     mchar = '？'
+                    if tabidx in rplc:
+                        cs = rplc[tabidx]
+                        if cs:
+                            mchar = cs.pop(0)
                     seltab[sv] = (selidx, tabidx, mchar)
                 else:
                     if not sv in seltab:
@@ -64,6 +68,8 @@ def modzh_ipt(sfd, dfd, mfd):
         elif not selidx is None:
             lstintab = True
         mfd.write(''.join(mseq))
+    if any(len(cs) > 0 for cs in rplc.values()):
+        raise ValueError(f'unfinished replace chars: {rplc}')
     return seltab, tabidx
 
 if __name__ == '__main__':
@@ -74,13 +80,17 @@ if __name__ == '__main__':
 
     def main():
         global cs, st, rcs
-        #with open(r'trans\selfvocate.txt', 'r', encoding = 'utf-8') as fd:
+        rplc = {}
+        with open(r'trans\selfvocate.txt', 'r', encoding = 'utf-8') as fd:
+            rcs = read_chars(fd)
+        rplc[16] = rcs.copy()
         with open(r'trans\origname.txt', 'r', encoding = 'utf-8') as fd:
             rcs = read_chars(fd)
+        rplc[36] = rcs.copy()
         with open(r'wktab\dialog_done2.txt', 'r', encoding = 'utf-8') as sfd:
             with open(r'trans\dialog_zh.txt', 'r', encoding = 'utf-8') as dfd:
                 with open(r'trans\dialog_zh_mod_ipt.txt', 'w', encoding = 'utf-8') as mfd:
-                    st, tn = modzh_ipt(sfd, dfd, mfd)
+                    st, tn = modzh_ipt(sfd, dfd, mfd, rplc)
         cs = []
         cdmin = float('inf')
         cdi = None
