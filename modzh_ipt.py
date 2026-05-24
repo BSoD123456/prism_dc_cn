@@ -5,6 +5,17 @@ from charset import _get_gbk_char_type
 
 import re
 
+def read_chars(fd):
+    rcs = []
+    while True:
+        line = fd.readline()
+        if not line:
+            break
+        for c in line.strip():
+            if not c in rcs:
+                rcs.append(c)
+    return rcs
+
 def modzh_ipt(sfd, dfd, mfd):
     seltab = {}
     tabidx = 0
@@ -62,12 +73,22 @@ if __name__ == '__main__':
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
     def main():
-        global cs, st
+        global cs, st, rcs
+        with open(r'trans\selfvocate.txt', 'r', encoding = 'utf-8') as fd:
+            rcs = read_chars(fd)
         with open(r'wktab\dialog_done2.txt', 'r', encoding = 'utf-8') as sfd:
             with open(r'trans\dialog_zh.txt', 'r', encoding = 'utf-8') as dfd:
                 with open(r'trans\dialog_zh_mod_ipt.txt', 'w', encoding = 'utf-8') as mfd:
                     st, tn = modzh_ipt(sfd, dfd, mfd)
         cs = []
+        cdmin = float('inf')
+        cdi = None
         for i in range(tn):
-            cs.append([c for c, (_, t, v) in st.items() if t == i])
+            scs = [c for c, (_, t, v) in st.items() if t == i]
+            cs.append(scs)
+            cd = len(scs) - len(rcs)
+            if 0 <= cd < cdmin:
+                cdmin = cd
+                cdi = i
+        print(f'most matched: {cdi}')
     main()
