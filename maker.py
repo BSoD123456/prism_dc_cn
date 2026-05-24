@@ -64,7 +64,7 @@ class c_maker:
 
     def __init__(self, rules):
         self.rules = {
-            dname: (cls(dname), *rnames)
+            dname: (cls(dname.split('@')[0]), *rnames)
             for dname, (cls, *rnames) in rules.items() }
 
     def _error(self, tar, msg):
@@ -230,7 +230,31 @@ class c_maker_rule_modast(c_maker_rule):
         from smod import c_smod_program
         self._info(f'modify ast')
         cgen = c_smod_program(ast)
-        return cgen.modify(rtxt)
+        ast = cgen.modify(rtxt)
+        return ast, cgen.chrset
+
+class c_maker_rule_emit(c_maker_rule_path):
+
+    def mk0(self, path, modinfo):
+        from script import SC_PROG_ENTRY
+        from scode import c_scode_buf_fd
+        from semit import c_semit_program, c_semit_asm_buf_fd
+        fn = super().mk0(path)
+        ast, _ = modinfo
+        conf = {
+            'entries': SC_PROG_ENTRY,
+            'padding': False }
+        if os.path.splitext(fn)[1].lower() == '.txt':
+            self._info(f'emit ast to {fn} as text')
+            with open(fn, 'w', encoding = 'utf-8') as fd:
+                emt = c_semit_program(ast, c_scode_buf_fd(fd), conf)
+                emt.gen_code()
+        else:
+            self._info(f'emit ast to {fn}')
+            with open(fn, 'wb') as fd:
+                emt = c_semit_program(ast, c_semit_asm_buf_fd(fd), conf)
+                emt.gen_code()
+        return True
 
 def make_all(paths, rom):
     rules = {}
@@ -258,9 +282,11 @@ def make_all(paths, rom):
             'dialog.txt', 'dialog_zh.txt', 'dialog.shadow.txt'
         ),
         'mod_ast': (c_maker_rule_modast, 'ast.pck', 'replace_text'),
+        'SCRIPT.BIN@mod': (c_maker_rule_emit, paths['work'], 'mod_ast'),
+        'SCRIPT.TXT': (c_maker_rule_emit, paths['work'], 'mod_ast'),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'mod_ast'),
+        'all': (c_maker_rule_alias, 'SCRIPT.BIN@mod'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
