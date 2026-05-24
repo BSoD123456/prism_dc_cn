@@ -31921,7 +31921,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 [SEL:15]な[SEL:16]に[SEL:17]ぬ[SEL:18]ね[SEL:19]の  [SEL:1a]は[SEL:1b]ひ[SEL:1c]ふ[SEL:1d]へ[SEL:1e]ほ
 [SEL:1f]ま[SEL:20]み[SEL:21]む[SEL:22]め[SEL:23]も  [SEL:24]や  [SEL:25]ゆ  [SEL:26]よ
 [SEL:27]ら[SEL:28]り[SEL:29]る[SEL:2a]れ[SEL:2b]ろ  [SEL:2c]わ  [SEL:2d]を  [SEL:2e]ん
-                  [SEL:62]下一项
+                  [SEL:62]次项
 
 </text>
 <next: Scene-60c79/1-Loop/2-Then/1>
@@ -32016,7 +32016,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 [SEL:35]ゃ  [SEL:36]ゅ  [SEL:37]ょ  [SEL:38]が[SEL:39]ぎ[SEL:3a]ぐ[SEL:3b]げ[SEL:3c]ご
 [SEL:3d]ざ[SEL:3e]じ[SEL:3f]ず[SEL:40]ぜ[SEL:41]ぞ  [SEL:42]だ[SEL:43]ぢ[SEL:44]づ[SEL:45]で[SEL:46]ど
 [SEL:47]ば[SEL:48]び[SEL:49]ぶ[SEL:4a]べ[SEL:4b]ぼ  [SEL:4c]ぱ[SEL:4d]ぴ[SEL:4e]ぷ[SEL:4f]ぺ[SEL:50]ぽ
-[SEL:63]前一项
+[SEL:63]前项
 
 </text>
 <next: Scene-60c79/1-Loop/3-Loop/1-Then/1>
@@ -39401,7 +39401,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 [SEL:15]ナ[SEL:16]ニ[SEL:17]ヌ[SEL:18]ネ[SEL:19]ノ  [SEL:1a]ハ[SEL:1b]ヒ[SEL:1c]フ[SEL:1d]ヘ[SEL:1e]ホ
 [SEL:1f]マ[SEL:20]ミ[SEL:21]ム[SEL:22]メ[SEL:23]モ  [SEL:24]ヤ  [SEL:25]ユ  [SEL:26]ヨ
 [SEL:27]ラ[SEL:28]リ[SEL:29]ル[SEL:2a]レ[SEL:2b]ロ  [SEL:2c]ワ  [SEL:2d]ヲ  [SEL:2e]ン
-                  [SEL:62]下一项
+                  [SEL:62]次项
 
 </text>
 <next: Scene-611d4/1-Loop/2-Then/1>
@@ -39496,7 +39496,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 [SEL:35]ャ  [SEL:36]ュ  [SEL:37]ョ  [SEL:38]ガ[SEL:39]ギ[SEL:3a]グ[SEL:3b]ゲ[SEL:3c]ゴ
 [SEL:3d]ザ[SEL:3e]ジ[SEL:3f]ズ[SEL:40]ゼ[SEL:41]ゾ  [SEL:42]ダ[SEL:43]ヂ[SEL:44]ヅ[SEL:45]デ[SEL:46]ド
 [SEL:47]バ[SEL:48]ビ[SEL:49]ブ[SEL:4a]ベ[SEL:4b]ボ  [SEL:4c]パ[SEL:4d]ピ[SEL:4e]プ[SEL:4f]ペ[SEL:50]ポ
-[SEL:63]前一项
+[SEL:63]前项
 
 </text>
 <next: Scene-611d4/1-Loop/3-Loop/1-Then/1>
@@ -46879,7 +46879,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 [SEL:17]W[SEL:18]X[SEL:19]Y[SEL:1a]Z              
 [SEL:1b]a[SEL:1c]b[SEL:1d]c[SEL:1e]d[SEL:1f]e[SEL:20]f[SEL:21]g[SEL:22]h[SEL:23]i[SEL:24]j[SEL:25]k
 [SEL:26]l[SEL:27]m[SEL:28]n[SEL:29]o[SEL:2a]p[SEL:2b]q[SEL:2c]r[SEL:2d]s[SEL:2e]t[SEL:2f]u[SEL:30]v
-[SEL:31]w[SEL:32]x[SEL:33]y[SEL:34]z          [SEL:62]下一项
+[SEL:31]w[SEL:32]x[SEL:33]y[SEL:34]z          [SEL:62]次项
 
 </text>
 <next: Scene-6172f/1-Loop/2-Then/1>
@@ -46971,7 +46971,7 @@ engrave＿renew＿check（）：{fun.a7c(0x0, 0x1, fun.2cff())}
 [SEL:35]0[SEL:36]1[SEL:37]2[SEL:38]3[SEL:39]4[SEL:3a]5[SEL:3b]6[SEL:3c]7[SEL:3d]8[SEL:3e]9  
 [SEL:3f]  [SEL:40]＿[SEL:41]ー[SEL:42]～[SEL:43]…[SEL:44]！[SEL:45]？[SEL:46]♪[SEL:47]※[SEL:48]＊[SEL:49]＆
 [SEL:4a]☆[SEL:4b]★[SEL:4c]○[SEL:4d]●[SEL:4e]＠
-[SEL:63]前一项
+[SEL:63]前项
 
 </text>
 <next: Scene-6172f/1-Loop/3-Loop/1-Then/1>
@@ -57520,7 +57520,7 @@ z
 [SEL:3e]緯[SEL:3f]胃[SEL:40]萎[SEL:41]衣[SEL:42]謂  [SEL:43]違[SEL:44]遺[SEL:45]医[SEL:46]井[SEL:47]亥
 [SEL:48]域[SEL:49]育[SEL:4a]郁[SEL:4b]磯[SEL:4c]一  [SEL:4d]壱[SEL:4e]溢[SEL:4f]逸[SEL:50]稲[SEL:51]茨
 [SEL:52]芋[SEL:53]鰯[SEL:54]允[SEL:55]印[SEL:56]咽  [SEL:57]員[SEL:58]因[SEL:59]姻[SEL:5a]引[SEL:5b]飲
-                  [SEL:1f03]下一项
+                  [SEL:1f03]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/2-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -57591,7 +57591,7 @@ z
 -------------------
 <text: Scene-61c65/1-Loop/2-Loop/2-Then/1-Loop/1-Loop/2-Then/1>
 [SEL:5c]淫[SEL:5d]胤[SEL:5e]蔭[SEL:5f]院[SEL:60]陰  [SEL:61]隠[SEL:62]韻[SEL:63]吋
-[SEL:1f04]前一项
+[SEL:1f04]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/2-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -58481,7 +58481,7 @@ z
 [SEL:94]疫[SEL:95]益[SEL:96]駅[SEL:97]悦[SEL:98]謁  [SEL:99]越[SEL:9a]閲[SEL:9b]榎[SEL:9c]厭[SEL:9d]円
 [SEL:9e]園[SEL:9f]堰[SEL:a0]奄[SEL:a1]宴[SEL:a2]延  [SEL:a3]怨[SEL:a4]掩[SEL:a5]援[SEL:a6]沿[SEL:a7]演
 [SEL:a8]炎[SEL:a9]焔[SEL:aa]煙[SEL:ab]燕[SEL:ac]猿  [SEL:ad]縁[SEL:ae]艶[SEL:af]苑[SEL:b0]薗[SEL:b1]遠
-                  [SEL:1f09]下一项
+                  [SEL:1f09]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/4-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -58547,7 +58547,7 @@ z
 -------------------
 <text: Scene-61c65/1-Loop/2-Loop/4-Then/1-Loop/1-Loop/2-Then/1>
 [SEL:b2]鉛[SEL:b3]鴛[SEL:b4]塩
-[SEL:1f0a]前一项
+[SEL:1f0a]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/4-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -59458,7 +59458,7 @@ z
 [SEL:ec]火[SEL:ed]珂[SEL:ee]禍[SEL:ef]禾[SEL:f0]稼  [SEL:f1]箇[SEL:f2]花[SEL:f3]苛[SEL:f4]茄[SEL:f5]荷
 [SEL:f6]華[SEL:f7]菓[SEL:f8]蝦[SEL:f9]課[SEL:fa]嘩  [SEL:fb]貨[SEL:fc]迦[SEL:fd]過[SEL:fe]霞[SEL:ff]蚊
 [SEL:100]俄[SEL:101]峨[SEL:102]我[SEL:103]牙[SEL:104]画  [SEL:105]臥[SEL:106]芽[SEL:107]蛾[SEL:108]賀[SEL:109]雅
-                  [SEL:1f0f]下一项
+                  [SEL:1f0f]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/6-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -59713,7 +59713,7 @@ z
 [SEL:11e]海[SEL:11f]灰[SEL:120]界[SEL:121]皆[SEL:122]絵  [SEL:123]芥[SEL:124]蟹[SEL:125]開[SEL:126]階[SEL:127]貝
 [SEL:128]凱[SEL:129]劾[SEL:12a]外[SEL:12b]咳[SEL:12c]害  [SEL:12d]崖[SEL:12e]慨[SEL:12f]概[SEL:130]涯[SEL:131]碍
 [SEL:132]蓋[SEL:133]街[SEL:134]該[SEL:135]鎧[SEL:136]骸  [SEL:137]浬[SEL:138]馨[SEL:139]蛙[SEL:13a]垣[SEL:13b]柿
-[SEL:1f10]前一项              [SEL:1f11]下一项
+[SEL:1f10]前项              [SEL:1f11]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/6-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -59968,7 +59968,7 @@ z
 [SEL:150]隔[SEL:151]革[SEL:152]学[SEL:153]岳[SEL:154]楽  [SEL:155]額[SEL:156]顎[SEL:157]掛[SEL:158]笠[SEL:159]樫
 [SEL:15a]橿[SEL:15b]梶[SEL:15c]鰍[SEL:15d]潟[SEL:15e]割  [SEL:15f]喝[SEL:160]恰[SEL:161]括[SEL:162]活[SEL:163]渇
 [SEL:164]滑[SEL:165]葛[SEL:166]褐[SEL:167]轄[SEL:168]且  [SEL:169]鰹[SEL:16a]叶[SEL:16b]椛[SEL:16c]樺[SEL:16d]鞄
-[SEL:1f12]前一项              [SEL:1f13]下一项
+[SEL:1f12]前项              [SEL:1f13]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/6-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -60223,7 +60223,7 @@ z
 [SEL:182]勘[SEL:183]勧[SEL:184]巻[SEL:185]喚[SEL:186]堪  [SEL:187]姦[SEL:188]完[SEL:189]官[SEL:18a]寛[SEL:18b]干
 [SEL:18c]幹[SEL:18d]患[SEL:18e]感[SEL:18f]慣[SEL:190]憾  [SEL:191]換[SEL:192]敢[SEL:193]柑[SEL:194]桓[SEL:195]棺
 [SEL:196]款[SEL:197]歓[SEL:198]汗[SEL:199]漢[SEL:19a]澗  [SEL:19b]潅[SEL:19c]環[SEL:19d]甘[SEL:19e]監[SEL:19f]看
-[SEL:1f14]前一项              [SEL:1f15]下一项
+[SEL:1f14]前项              [SEL:1f15]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/6-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -60477,7 +60477,7 @@ z
 [SEL:1aa]諌[SEL:1ab]貫[SEL:1ac]還[SEL:1ad]鑑[SEL:1ae]間  [SEL:1af]閑[SEL:1b0]関[SEL:1b1]陥[SEL:1b2]韓[SEL:1b3]館
 [SEL:1b4]舘[SEL:1b5]丸[SEL:1b6]含[SEL:1b7]岸[SEL:1b8]巌  [SEL:1b9]玩[SEL:1ba]癌[SEL:1bb]眼[SEL:1bc]岩[SEL:1bd]翫
 [SEL:1be]贋[SEL:1bf]雁[SEL:1c0]頑[SEL:1c1]顔[SEL:1c2]願  
-[SEL:1f16]前一项
+[SEL:1f16]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/6-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -62847,7 +62847,7 @@ z
 [SEL:1d7]機[SEL:1d8]帰[SEL:1d9]毅[SEL:1da]気[SEL:1db]汽  [SEL:1dc]畿[SEL:1dd]祈[SEL:1de]季[SEL:1df]稀[SEL:1e0]紀
 [SEL:1e1]徽[SEL:1e2]規[SEL:1e3]記[SEL:1e4]貴[SEL:1e5]起  [SEL:1e6]軌[SEL:1e7]輝[SEL:1e8]飢[SEL:1e9]騎[SEL:1ea]鬼
 [SEL:1eb]亀[SEL:1ec]偽[SEL:1ed]儀[SEL:1ee]妓[SEL:1ef]宜  [SEL:1f0]戯[SEL:1f1]技[SEL:1f2]擬[SEL:1f3]欺[SEL:1f4]犠
-                  [SEL:1f19]下一项
+                  [SEL:1f19]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/7-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -63048,7 +63048,7 @@ z
 [SEL:209]脚[SEL:20a]虐[SEL:20b]逆[SEL:20c]丘[SEL:20d]久  [SEL:20e]仇[SEL:20f]休[SEL:210]及[SEL:211]吸[SEL:212]宮
 [SEL:213]弓[SEL:214]急[SEL:215]救[SEL:216]朽[SEL:217]求  [SEL:218]汲[SEL:219]泣[SEL:21a]灸[SEL:21b]球[SEL:21c]究
 [SEL:21d]窮[SEL:21e]笈[SEL:21f]級[SEL:220]糾[SEL:221]給  [SEL:222]旧[SEL:223]牛[SEL:224]去[SEL:225]居[SEL:226]巨
-[SEL:1f1a]前一项              [SEL:1f1b]下一项
+[SEL:1f1a]前项              [SEL:1f1b]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/7-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -63249,7 +63249,7 @@ z
 [SEL:23b]凶[SEL:23c]協[SEL:23d]匡[SEL:23e]卿[SEL:23f]叫  [SEL:240]喬[SEL:241]境[SEL:242]峡[SEL:243]強[SEL:244]彊
 [SEL:245]怯[SEL:246]恐[SEL:247]恭[SEL:248]挟[SEL:249]教  [SEL:24a]橋[SEL:24b]況[SEL:24c]狂[SEL:24d]狭[SEL:24e]矯
 [SEL:24f]胸[SEL:250]脅[SEL:251]興[SEL:252]蕎[SEL:253]郷  [SEL:254]鏡[SEL:255]響[SEL:256]饗[SEL:257]驚[SEL:258]仰
-[SEL:1f1c]前一项              [SEL:1f1d]下一项
+[SEL:1f1c]前项              [SEL:1f1d]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/7-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -63449,7 +63449,7 @@ z
 [SEL:263]僅[SEL:264]勤[SEL:265]均[SEL:266]巾[SEL:267]錦  [SEL:268]斤[SEL:269]欣[SEL:26a]欽[SEL:26b]琴[SEL:26c]禁
 [SEL:26d]禽[SEL:26e]筋[SEL:26f]緊[SEL:270]芹[SEL:271]菌  [SEL:272]衿[SEL:273]襟[SEL:274]謹[SEL:275]近[SEL:276]金
 [SEL:277]吟[SEL:278]銀
-[SEL:1f1e]前一项
+[SEL:1f1e]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/7-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -65763,7 +65763,7 @@ z
 [SEL:2bb]敬[SEL:2bc]景[SEL:2bd]桂[SEL:2be]渓[SEL:2bf]畦  [SEL:2c0]稽[SEL:2c1]系[SEL:2c2]経[SEL:2c3]継[SEL:2c4]繋
 [SEL:2c5]罫[SEL:2c6]茎[SEL:2c7]荊[SEL:2c8]蛍[SEL:2c9]計  [SEL:2ca]詣[SEL:2cb]警[SEL:2cc]軽[SEL:2cd]頚[SEL:2ce]鶏
 [SEL:2cf]芸[SEL:2d0]迎[SEL:2d1]鯨[SEL:2d2]劇[SEL:2d3]戟  [SEL:2d4]撃[SEL:2d5]激[SEL:2d6]隙[SEL:2d7]桁[SEL:2d8]傑
-                  [SEL:1f23]下一项
+                  [SEL:1f23]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/9-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -65889,7 +65889,7 @@ z
 [SEL:2ed]憲[SEL:2ee]懸[SEL:2ef]拳[SEL:2f0]捲[SEL:2f1]検  [SEL:2f2]権[SEL:2f3]牽[SEL:2f4]犬[SEL:2f5]献[SEL:2f6]研
 [SEL:2f7]硯[SEL:2f8]絹[SEL:2f9]県[SEL:2fa]肩[SEL:2fb]見  [SEL:2fc]謙[SEL:2fd]賢[SEL:2fe]軒[SEL:2ff]遣[SEL:300]鍵
 [SEL:301]険[SEL:302]顕[SEL:303]験[SEL:304]鹸[SEL:305]元  [SEL:306]原[SEL:307]厳[SEL:308]幻[SEL:309]弦[SEL:30a]減
-[SEL:1f24]前一项              [SEL:1f25]下一项
+[SEL:1f24]前项              [SEL:1f25]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/9-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -66011,7 +66011,7 @@ z
 -------------------
 <text: Scene-61c65/1-Loop/2-Loop/9-Then/1-Loop/1-Loop/3-Then/1>
 [SEL:30b]源[SEL:30c]玄[SEL:30d]現[SEL:30e]絃[SEL:30f]舷  [SEL:310]言[SEL:311]諺[SEL:312]限
-[SEL:1f26]前一项
+[SEL:1f26]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/9-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -67109,7 +67109,7 @@ z
 [SEL:327]虎[SEL:328]誇[SEL:329]跨[SEL:32a]鈷[SEL:32b]雇  [SEL:32c]顧[SEL:32d]鼓[SEL:32e]五[SEL:32f]互[SEL:330]伍
 [SEL:331]午[SEL:332]呉[SEL:333]吾[SEL:334]娯[SEL:335]後  [SEL:336]御[SEL:337]悟[SEL:338]梧[SEL:339]檎[SEL:33a]瑚
 [SEL:33b]碁[SEL:33c]語[SEL:33d]誤[SEL:33e]護[SEL:33f]醐  [SEL:340]乞[SEL:341]鯉[SEL:342]交[SEL:343]佼[SEL:344]侯
-                  [SEL:1f29]下一项
+                  [SEL:1f29]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/10-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -67300,7 +67300,7 @@ z
 [SEL:359]巷[SEL:35a]幸[SEL:35b]広[SEL:35c]庚[SEL:35d]康  [SEL:35e]弘[SEL:35f]恒[SEL:360]慌[SEL:361]抗[SEL:362]拘
 [SEL:363]控[SEL:364]攻[SEL:365]昂[SEL:366]晃[SEL:367]更  [SEL:368]杭[SEL:369]校[SEL:36a]梗[SEL:36b]構[SEL:36c]江
 [SEL:36d]洪[SEL:36e]浩[SEL:36f]港[SEL:370]溝[SEL:371]甲  [SEL:372]皇[SEL:373]硬[SEL:374]稿[SEL:375]糠[SEL:376]紅
-[SEL:1f2a]前一项              [SEL:1f2b]下一项
+[SEL:1f2a]前项              [SEL:1f2b]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/10-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -67491,7 +67491,7 @@ z
 [SEL:38b]鋼[SEL:38c]閤[SEL:38d]降[SEL:38e]項[SEL:38f]香  [SEL:390]高[SEL:391]鴻[SEL:392]剛[SEL:393]劫[SEL:394]号
 [SEL:395]合[SEL:396]壕[SEL:397]拷[SEL:398]濠[SEL:399]豪  [SEL:39a]轟[SEL:39b]麹[SEL:39c]克[SEL:39d]刻[SEL:39e]告
 [SEL:39f]国[SEL:3a0]穀[SEL:3a1]酷[SEL:3a2]鵠[SEL:3a3]黒  [SEL:3a4]獄[SEL:3a5]漉[SEL:3a6]腰[SEL:3a7]甑[SEL:3a8]忽
-[SEL:1f2c]前一项              [SEL:1f2d]下一项
+[SEL:1f2c]前项              [SEL:1f2d]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/10-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -67680,7 +67680,7 @@ z
 [SEL:3a9]惚[SEL:3aa]骨[SEL:3ab]狛[SEL:3ac]込[SEL:3ad]此  [SEL:3ae]頃[SEL:3af]今[SEL:3b0]困[SEL:3b1]坤[SEL:3b2]墾
 [SEL:3b3]婚[SEL:3b4]恨[SEL:3b5]懇[SEL:3b6]昏[SEL:3b7]昆  [SEL:3b8]根[SEL:3b9]梱[SEL:3ba]混[SEL:3bb]痕[SEL:3bc]紺
 [SEL:3bd]艮[SEL:3be]魂
-[SEL:1f2e]前一项
+[SEL:1f2e]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/10-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -69419,7 +69419,7 @@ z
 [SEL:3d3]最[SEL:3d4]哉[SEL:3d5]塞[SEL:3d6]妻[SEL:3d7]宰  [SEL:3d8]彩[SEL:3d9]才[SEL:3da]採[SEL:3db]栽[SEL:3dc]歳
 [SEL:3dd]済[SEL:3de]災[SEL:3df]采[SEL:3e0]犀[SEL:3e1]砕  [SEL:3e2]砦[SEL:3e3]祭[SEL:3e4]斎[SEL:3e5]細[SEL:3e6]菜
 [SEL:3e7]裁[SEL:3e8]載[SEL:3e9]際[SEL:3ea]剤[SEL:3eb]在  [SEL:3ec]材[SEL:3ed]罪[SEL:3ee]財[SEL:3ef]冴[SEL:3f0]坂
-                  [SEL:1f31]下一项
+                  [SEL:1f31]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/11-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -69549,7 +69549,7 @@ z
 [SEL:405]桜[SEL:406]鮭[SEL:407]笹[SEL:408]匙[SEL:409]冊  [SEL:40a]刷[SEL:40b]察[SEL:40c]拶[SEL:40d]撮[SEL:40e]擦
 [SEL:40f]札[SEL:410]殺[SEL:411]薩[SEL:412]雑[SEL:413]皐  [SEL:414]鯖[SEL:415]捌[SEL:416]錆[SEL:417]鮫[SEL:418]皿
 [SEL:419]晒[SEL:41a]三[SEL:41b]傘[SEL:41c]参[SEL:41d]山  [SEL:41e]惨[SEL:41f]撒[SEL:420]散[SEL:421]桟[SEL:422]燦
-[SEL:1f32]前一项              [SEL:1f33]下一项
+[SEL:1f32]前项              [SEL:1f33]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/11-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -69676,7 +69676,7 @@ z
 <text: Scene-61c65/1-Loop/2-Loop/11-Then/1-Loop/1-Loop/3-Then/1>
 [SEL:423]珊[SEL:424]産[SEL:425]算[SEL:426]纂[SEL:427]蚕  [SEL:428]讃[SEL:429]賛[SEL:42a]酸[SEL:42b]餐[SEL:42c]斬
 [SEL:42d]暫[SEL:42e]残
-[SEL:1f34]前一项
+[SEL:1f34]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/11-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -70814,7 +70814,7 @@ z
 [SEL:443]支[SEL:444]孜[SEL:445]斯[SEL:446]施[SEL:447]旨  [SEL:448]枝[SEL:449]止[SEL:44a]死[SEL:44b]氏[SEL:44c]獅
 [SEL:44d]祉[SEL:44e]私[SEL:44f]糸[SEL:450]紙[SEL:451]紫  [SEL:452]肢[SEL:453]脂[SEL:454]至[SEL:455]視[SEL:456]詞
 [SEL:457]詩[SEL:458]試[SEL:459]誌[SEL:45a]諮[SEL:45b]資  [SEL:45c]賜[SEL:45d]雌[SEL:45e]飼[SEL:45f]歯[SEL:460]事
-                  [SEL:1f37]下一项
+                  [SEL:1f37]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/12-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -71234,7 +71234,7 @@ z
 [SEL:475]辞[SEL:476]汐[SEL:477]鹿[SEL:478]式[SEL:479]識  [SEL:47a]鴫[SEL:47b]竺[SEL:47c]軸[SEL:47d]宍[SEL:47e]雫
 [SEL:47f]七[SEL:480]叱[SEL:481]執[SEL:482]失[SEL:483]嫉  [SEL:484]室[SEL:485]悉[SEL:486]湿[SEL:487]漆[SEL:488]疾
 [SEL:489]質[SEL:48a]実[SEL:48b]蔀[SEL:48c]篠[SEL:48d]偲  [SEL:48e]柴[SEL:48f]芝[SEL:490]屡[SEL:491]蕊[SEL:492]縞
-[SEL:1f38]前一项              [SEL:1f39]下一项
+[SEL:1f38]前项              [SEL:1f39]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/12-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -71654,7 +71654,7 @@ z
 [SEL:4a7]爵[SEL:4a8]酌[SEL:4a9]釈[SEL:4aa]錫[SEL:4ab]若  [SEL:4ac]寂[SEL:4ad]弱[SEL:4ae]惹[SEL:4af]主[SEL:4b0]取
 [SEL:4b1]守[SEL:4b2]手[SEL:4b3]朱[SEL:4b4]殊[SEL:4b5]狩  [SEL:4b6]珠[SEL:4b7]種[SEL:4b8]腫[SEL:4b9]趣[SEL:4ba]酒
 [SEL:4bb]首[SEL:4bc]儒[SEL:4bd]受[SEL:4be]呪[SEL:4bf]寿  [SEL:4c0]授[SEL:4c1]樹[SEL:4c2]綬[SEL:4c3]需[SEL:4c4]囚
-[SEL:1f3a]前一项              [SEL:1f3b]下一项
+[SEL:1f3a]前项              [SEL:1f3b]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/12-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -72074,7 +72074,7 @@ z
 [SEL:4d9]蹴[SEL:4da]輯[SEL:4db]週[SEL:4dc]酋[SEL:4dd]酬  [SEL:4de]集[SEL:4df]醜[SEL:4e0]什[SEL:4e1]住[SEL:4e2]充
 [SEL:4e3]十[SEL:4e4]従[SEL:4e5]戎[SEL:4e6]柔[SEL:4e7]汁  [SEL:4e8]渋[SEL:4e9]獣[SEL:4ea]縦[SEL:4eb]重[SEL:4ec]銃
 [SEL:4ed]叔[SEL:4ee]夙[SEL:4ef]宿[SEL:4f0]淑[SEL:4f1]祝  [SEL:4f2]縮[SEL:4f3]粛[SEL:4f4]塾[SEL:4f5]熟[SEL:4f6]出
-[SEL:1f3c]前一项              [SEL:1f3d]下一项
+[SEL:1f3c]前项              [SEL:1f3d]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/12-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -72494,7 +72494,7 @@ z
 [SEL:50b]遵[SEL:50c]醇[SEL:50d]順[SEL:50e]処[SEL:50f]初  [SEL:510]所[SEL:511]暑[SEL:512]曙[SEL:513]渚[SEL:514]庶
 [SEL:515]緒[SEL:516]署[SEL:517]書[SEL:518]薯[SEL:519]藷  [SEL:51a]諸[SEL:51b]助[SEL:51c]叙[SEL:51d]女[SEL:51e]序
 [SEL:51f]徐[SEL:520]恕[SEL:521]鋤[SEL:522]除[SEL:523]傷  [SEL:524]償[SEL:525]勝[SEL:526]匠[SEL:527]升[SEL:528]召
-[SEL:1f3e]前一项              [SEL:1f3f]下一项
+[SEL:1f3e]前项              [SEL:1f3f]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/12-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -72914,7 +72914,7 @@ z
 [SEL:53d]捷[SEL:53e]昇[SEL:53f]昌[SEL:540]昭[SEL:541]晶  [SEL:542]松[SEL:543]梢[SEL:544]樟[SEL:545]樵[SEL:546]沼
 [SEL:547]消[SEL:548]渉[SEL:549]湘[SEL:54a]焼[SEL:54b]焦  [SEL:54c]照[SEL:54d]症[SEL:54e]省[SEL:54f]硝[SEL:550]礁
 [SEL:551]祥[SEL:552]称[SEL:553]章[SEL:554]笑[SEL:555]粧  [SEL:556]紹[SEL:557]肖[SEL:558]菖[SEL:559]蒋[SEL:55a]蕉
-[SEL:1f40]前一项              [SEL:1f41]下一项
+[SEL:1f40]前项              [SEL:1f41]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/12-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -73334,7 +73334,7 @@ z
 [SEL:56f]城[SEL:570]場[SEL:571]壌[SEL:572]嬢[SEL:573]常  [SEL:574]情[SEL:575]擾[SEL:576]条[SEL:577]杖[SEL:578]浄
 [SEL:579]状[SEL:57a]畳[SEL:57b]穣[SEL:57c]蒸[SEL:57d]譲  [SEL:57e]醸[SEL:57f]錠[SEL:580]嘱[SEL:581]埴[SEL:582]飾
 [SEL:583]拭[SEL:584]植[SEL:585]殖[SEL:586]燭[SEL:587]織  [SEL:588]職[SEL:589]色[SEL:58a]触[SEL:58b]食[SEL:58c]蝕
-[SEL:1f42]前一项              [SEL:1f43]下一项
+[SEL:1f42]前项              [SEL:1f43]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/12-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -73754,7 +73754,7 @@ z
 [SEL:5a1]真[SEL:5a2]神[SEL:5a3]秦[SEL:5a4]紳[SEL:5a5]臣  [SEL:5a6]芯[SEL:5a7]薪[SEL:5a8]親[SEL:5a9]診[SEL:5aa]身
 [SEL:5ab]辛[SEL:5ac]進[SEL:5ad]針[SEL:5ae]震[SEL:5af]人  [SEL:5b0]仁[SEL:5b1]刃[SEL:5b2]塵[SEL:5b3]壬[SEL:5b4]尋
 [SEL:5b5]甚[SEL:5b6]尽[SEL:5b7]腎[SEL:5b8]訊[SEL:5b9]迅  [SEL:5ba]陣[SEL:5bb]靭
-[SEL:1f44]前一项
+[SEL:1f44]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/12-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -78161,7 +78161,7 @@ z
 [SEL:5f8]生[SEL:5f9]盛[SEL:5fa]精[SEL:5fb]聖[SEL:5fc]声  [SEL:5fd]製[SEL:5fe]西[SEL:5ff]誠[SEL:600]誓[SEL:601]請
 [SEL:602]逝[SEL:603]醒[SEL:604]青[SEL:605]静[SEL:606]斉  [SEL:607]税[SEL:608]脆[SEL:609]隻[SEL:60a]席[SEL:60b]惜
 [SEL:60c]戚[SEL:60d]斥[SEL:60e]昔[SEL:60f]析[SEL:610]石  [SEL:611]積[SEL:612]籍[SEL:613]績[SEL:614]脊[SEL:615]責
-                  [SEL:1f49]下一项
+                  [SEL:1f49]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/14-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -78294,7 +78294,7 @@ z
 [SEL:62a]占[SEL:62b]宣[SEL:62c]専[SEL:62d]尖[SEL:62e]川  [SEL:62f]戦[SEL:630]扇[SEL:631]撰[SEL:632]栓[SEL:633]栴
 [SEL:634]泉[SEL:635]浅[SEL:636]洗[SEL:637]染[SEL:638]潜  [SEL:639]煎[SEL:63a]煽[SEL:63b]旋[SEL:63c]穿[SEL:63d]箭
 [SEL:63e]線[SEL:63f]繊[SEL:640]羨[SEL:641]腺[SEL:642]舛  [SEL:643]船[SEL:644]薦[SEL:645]詮[SEL:646]賎[SEL:647]践
-[SEL:1f4a]前一项              [SEL:1f4b]下一项
+[SEL:1f4a]前项              [SEL:1f4b]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/14-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -78424,7 +78424,7 @@ z
 <text: Scene-61c65/1-Loop/2-Loop/14-Then/1-Loop/1-Loop/3-Then/1>
 [SEL:648]選[SEL:649]遷[SEL:64a]銭[SEL:64b]銑[SEL:64c]閃  [SEL:64d]鮮[SEL:64e]前[SEL:64f]善[SEL:650]漸[SEL:651]然
 [SEL:652]全[SEL:653]禅[SEL:654]繕[SEL:655]膳[SEL:656]糎  
-[SEL:1f4c]前一项
+[SEL:1f4c]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/14-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -79592,7 +79592,7 @@ z
 [SEL:66b]鼠[SEL:66c]僧[SEL:66d]創[SEL:66e]双[SEL:66f]叢  [SEL:670]倉[SEL:671]喪[SEL:672]壮[SEL:673]奏[SEL:674]爽
 [SEL:675]宋[SEL:676]層[SEL:677]匝[SEL:678]惣[SEL:679]想  [SEL:67a]捜[SEL:67b]掃[SEL:67c]挿[SEL:67d]掻[SEL:67e]操
 [SEL:67f]早[SEL:680]曹[SEL:681]巣[SEL:682]槍[SEL:683]槽  [SEL:684]漕[SEL:685]燥[SEL:686]争[SEL:687]痩[SEL:688]相
-                  [SEL:1f4f]下一项
+                  [SEL:1f4f]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/15-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -79708,7 +79708,7 @@ z
 [SEL:69d]臓[SEL:69e]蔵[SEL:69f]贈[SEL:6a0]造[SEL:6a1]促  [SEL:6a2]側[SEL:6a3]則[SEL:6a4]即[SEL:6a5]息[SEL:6a6]捉
 [SEL:6a7]束[SEL:6a8]測[SEL:6a9]足[SEL:6aa]速[SEL:6ab]俗  [SEL:6ac]属[SEL:6ad]賊[SEL:6ae]族[SEL:6af]続[SEL:6b0]卒
 [SEL:6b1]袖[SEL:6b2]其[SEL:6b3]揃[SEL:6b4]存[SEL:6b5]孫  [SEL:6b6]尊[SEL:6b7]損[SEL:6b8]村[SEL:6b9]遜
-[SEL:1f50]前一项
+[SEL:1f50]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/15-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -80715,7 +80715,7 @@ z
 [SEL:6ce]岱[SEL:6cf]帯[SEL:6d0]待[SEL:6d1]怠[SEL:6d2]態  [SEL:6d3]戴[SEL:6d4]替[SEL:6d5]泰[SEL:6d6]滞[SEL:6d7]胎
 [SEL:6d8]腿[SEL:6d9]苔[SEL:6da]袋[SEL:6db]貸[SEL:6dc]退  [SEL:6dd]逮[SEL:6de]隊[SEL:6df]黛[SEL:6e0]鯛[SEL:6e1]代
 [SEL:6e2]台[SEL:6e3]大[SEL:6e4]第[SEL:6e5]醍[SEL:6e6]題  [SEL:6e7]鷹[SEL:6e8]滝[SEL:6e9]瀧[SEL:6ea]卓[SEL:6eb]啄
-                  [SEL:1f53]下一项
+                  [SEL:1f53]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/16-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -80842,7 +80842,7 @@ z
 [SEL:700]脱[SEL:701]巽[SEL:702]竪[SEL:703]辿[SEL:704]棚  [SEL:705]谷[SEL:706]狸[SEL:707]鱈[SEL:708]樽[SEL:709]誰
 [SEL:70a]丹[SEL:70b]単[SEL:70c]嘆[SEL:70d]坦[SEL:70e]担  [SEL:70f]探[SEL:710]旦[SEL:711]歎[SEL:712]淡[SEL:713]湛
 [SEL:714]炭[SEL:715]短[SEL:716]端[SEL:717]箪[SEL:718]綻  [SEL:719]耽[SEL:71a]胆[SEL:71b]蛋[SEL:71c]誕[SEL:71d]鍛
-[SEL:1f54]前一项              [SEL:1f55]下一项
+[SEL:1f54]前项              [SEL:1f55]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/16-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -80965,7 +80965,7 @@ z
 -------------------
 <text: Scene-61c65/1-Loop/2-Loop/16-Then/1-Loop/1-Loop/3-Then/1>
 [SEL:71e]団[SEL:71f]壇[SEL:720]弾[SEL:721]断[SEL:722]暖  [SEL:723]檀[SEL:724]段[SEL:725]男[SEL:726]談
-[SEL:1f56]前一项
+[SEL:1f56]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/16-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -82073,7 +82073,7 @@ z
 [SEL:73b]秩[SEL:73c]窒[SEL:73d]茶[SEL:73e]嫡[SEL:73f]着  [SEL:740]中[SEL:741]仲[SEL:742]宙[SEL:743]忠[SEL:744]抽
 [SEL:745]昼[SEL:746]柱[SEL:747]注[SEL:748]虫[SEL:749]衷  [SEL:74a]註[SEL:74b]酎[SEL:74c]鋳[SEL:74d]駐[SEL:74e]樗
 [SEL:74f]瀦[SEL:750]猪[SEL:751]苧[SEL:752]著[SEL:753]貯  [SEL:754]丁[SEL:755]兆[SEL:756]凋[SEL:757]喋[SEL:758]寵
-                  [SEL:1f59]下一项
+                  [SEL:1f59]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/17-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -82175,7 +82175,7 @@ z
 [SEL:763]朝[SEL:764]潮[SEL:765]牒[SEL:766]町[SEL:767]眺  [SEL:768]聴[SEL:769]脹[SEL:76a]腸[SEL:76b]蝶[SEL:76c]調
 [SEL:76d]諜[SEL:76e]超[SEL:76f]跳[SEL:770]銚[SEL:771]長  [SEL:772]頂[SEL:773]鳥[SEL:774]勅[SEL:775]捗[SEL:776]直
 [SEL:777]朕[SEL:778]沈[SEL:779]珍[SEL:77a]賃[SEL:77b]鎮  [SEL:77c]陳
-[SEL:1f5a]前一项
+[SEL:1f5a]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/17-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -83355,7 +83355,7 @@ z
 [SEL:7ae]碇[SEL:7af]禎[SEL:7b0]程[SEL:7b1]締[SEL:7b2]艇  [SEL:7b3]訂[SEL:7b4]諦[SEL:7b5]蹄[SEL:7b6]逓[SEL:7b7]邸
 [SEL:7b8]鄭[SEL:7b9]釘[SEL:7ba]鼎[SEL:7bb]泥[SEL:7bc]摘  [SEL:7bd]擢[SEL:7be]敵[SEL:7bf]滴[SEL:7c0]的[SEL:7c1]笛
 [SEL:7c2]適[SEL:7c3]鏑[SEL:7c4]溺[SEL:7c5]哲[SEL:7c6]徹  [SEL:7c7]撤[SEL:7c8]轍[SEL:7c9]迭[SEL:7ca]鉄[SEL:7cb]典
-                  [SEL:1f5f]下一项
+                  [SEL:1f5f]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -83435,7 +83435,7 @@ z
 <text: Scene-61c65/1-Loop/2-Loop/19-Then/1-Loop/1-Loop/2-Then/1>
 [SEL:7cc]填[SEL:7cd]天[SEL:7ce]展[SEL:7cf]店[SEL:7d0]添  [SEL:7d1]纏[SEL:7d2]甜[SEL:7d3]貼[SEL:7d4]転[SEL:7d5]顛
 [SEL:7d6]点[SEL:7d7]伝[SEL:7d8]殿[SEL:7d9]澱[SEL:7da]田  [SEL:7db]電
-[SEL:1f60]前一项
+[SEL:1f60]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/19-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -84112,7 +84112,7 @@ z
 [SEL:7f0]土[SEL:7f1]奴[SEL:7f2]怒[SEL:7f3]倒[SEL:7f4]党  [SEL:7f5]冬[SEL:7f6]凍[SEL:7f7]刀[SEL:7f8]唐[SEL:7f9]塔
 [SEL:7fa]塘[SEL:7fb]套[SEL:7fc]宕[SEL:7fd]島[SEL:7fe]嶋  [SEL:7ff]悼[SEL:800]投[SEL:801]搭[SEL:802]東[SEL:803]桃
 [SEL:804]梼[SEL:805]棟[SEL:806]盗[SEL:807]淘[SEL:808]湯  [SEL:809]涛[SEL:80a]灯[SEL:80b]燈[SEL:80c]当[SEL:80d]痘
-                  [SEL:1f63]下一项
+                  [SEL:1f63]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/20-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -84250,7 +84250,7 @@ z
 [SEL:822]闘[SEL:823]働[SEL:824]動[SEL:825]同[SEL:826]堂  [SEL:827]導[SEL:828]憧[SEL:829]撞[SEL:82a]洞[SEL:82b]瞳
 [SEL:82c]童[SEL:82d]胴[SEL:82e]萄[SEL:82f]道[SEL:830]銅  [SEL:831]峠[SEL:832]鴇[SEL:833]匿[SEL:834]得[SEL:835]徳
 [SEL:836]涜[SEL:837]特[SEL:838]督[SEL:839]禿[SEL:83a]篤  [SEL:83b]毒[SEL:83c]独[SEL:83d]読[SEL:83e]栃[SEL:83f]橡
-[SEL:1f64]前一项              [SEL:1f65]下一项
+[SEL:1f64]前项              [SEL:1f65]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/20-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -84385,7 +84385,7 @@ z
 <text: Scene-61c65/1-Loop/2-Loop/20-Then/1-Loop/1-Loop/3-Then/1>
 [SEL:840]凸[SEL:841]突[SEL:842]椴[SEL:843]届[SEL:844]鳶  [SEL:845]苫[SEL:846]寅[SEL:847]酉[SEL:848]瀞[SEL:849]噸
 [SEL:84a]屯[SEL:84b]惇[SEL:84c]敦[SEL:84d]沌[SEL:84e]豚  [SEL:84f]遁[SEL:850]頓[SEL:851]呑[SEL:852]曇[SEL:853]鈍
-[SEL:1f66]前一项
+[SEL:1f66]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/20-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -86312,7 +86312,7 @@ z
 [SEL:8a9]牌[SEL:8aa]背[SEL:8ab]肺[SEL:8ac]輩[SEL:8ad]配  [SEL:8ae]倍[SEL:8af]培[SEL:8b0]媒[SEL:8b1]梅[SEL:8b2]楳
 [SEL:8b3]煤[SEL:8b4]狽[SEL:8b5]買[SEL:8b6]売[SEL:8b7]賠  [SEL:8b8]陪[SEL:8b9]這[SEL:8ba]蝿[SEL:8bb]秤[SEL:8bc]矧
 [SEL:8bd]萩[SEL:8be]伯[SEL:8bf]剥[SEL:8c0]博[SEL:8c1]拍  [SEL:8c2]柏[SEL:8c3]泊[SEL:8c4]白[SEL:8c5]箔[SEL:8c6]粕
-                  [SEL:1f73]下一项
+                  [SEL:1f73]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/26-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -86448,7 +86448,7 @@ z
 [SEL:8db]畠[SEL:8dc]八[SEL:8dd]鉢[SEL:8de]溌[SEL:8df]発  [SEL:8e0]醗[SEL:8e1]髪[SEL:8e2]伐[SEL:8e3]罰[SEL:8e4]抜
 [SEL:8e5]筏[SEL:8e6]閥[SEL:8e7]鳩[SEL:8e8]噺[SEL:8e9]塙  [SEL:8ea]蛤[SEL:8eb]隼[SEL:8ec]伴[SEL:8ed]判[SEL:8ee]半
 [SEL:8ef]反[SEL:8f0]叛[SEL:8f1]帆[SEL:8f2]搬[SEL:8f3]斑  [SEL:8f4]板[SEL:8f5]氾[SEL:8f6]汎[SEL:8f7]版[SEL:8f8]犯
-[SEL:1f74]前一项              [SEL:1f75]下一项
+[SEL:1f74]前项              [SEL:1f75]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/26-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -86581,7 +86581,7 @@ z
 <text: Scene-61c65/1-Loop/2-Loop/26-Then/1-Loop/1-Loop/3-Then/1>
 [SEL:8f9]班[SEL:8fa]畔[SEL:8fb]繁[SEL:8fc]般[SEL:8fd]藩  [SEL:8fe]販[SEL:8ff]範[SEL:900]釆[SEL:901]煩[SEL:902]頒
 [SEL:903]飯[SEL:904]挽[SEL:905]晩[SEL:906]番[SEL:907]盤  [SEL:908]磐[SEL:909]蕃[SEL:90a]蛮
-[SEL:1f76]前一项
+[SEL:1f76]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/26-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -87779,7 +87779,7 @@ z
 [SEL:91f]被[SEL:920]誹[SEL:921]費[SEL:922]避[SEL:923]非  [SEL:924]飛[SEL:925]樋[SEL:926]簸[SEL:927]備[SEL:928]尾
 [SEL:929]微[SEL:92a]枇[SEL:92b]毘[SEL:92c]琵[SEL:92d]眉  [SEL:92e]美[SEL:92f]鼻[SEL:930]柊[SEL:931]稗[SEL:932]匹
 [SEL:933]疋[SEL:934]髭[SEL:935]彦[SEL:936]膝[SEL:937]菱  [SEL:938]肘[SEL:939]弼[SEL:93a]必[SEL:93b]畢[SEL:93c]筆
-                  [SEL:1f79]下一项
+                  [SEL:1f79]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/27-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -87882,7 +87882,7 @@ z
 [SEL:947]氷[SEL:948]漂[SEL:949]瓢[SEL:94a]票[SEL:94b]表  [SEL:94c]評[SEL:94d]豹[SEL:94e]廟[SEL:94f]描[SEL:950]病
 [SEL:951]秒[SEL:952]苗[SEL:953]錨[SEL:954]鋲[SEL:955]蒜  [SEL:956]蛭[SEL:957]鰭[SEL:958]品[SEL:959]彬[SEL:95a]斌
 [SEL:95b]浜[SEL:95c]瀕[SEL:95d]貧[SEL:95e]賓[SEL:95f]頻  [SEL:960]敏[SEL:961]瓶
-[SEL:1f7a]前一项
+[SEL:1f7a]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/27-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -88769,7 +88769,7 @@ z
 [SEL:976]譜[SEL:977]負[SEL:978]賦[SEL:979]赴[SEL:97a]阜  [SEL:97b]附[SEL:97c]侮[SEL:97d]撫[SEL:97e]武[SEL:97f]舞
 [SEL:980]葡[SEL:981]蕪[SEL:982]部[SEL:983]封[SEL:984]楓  [SEL:985]風[SEL:986]葺[SEL:987]蕗[SEL:988]伏[SEL:989]副
 [SEL:98a]復[SEL:98b]幅[SEL:98c]服[SEL:98d]福[SEL:98e]腹  [SEL:98f]複[SEL:990]覆[SEL:991]淵[SEL:992]弗[SEL:993]払
-                  [SEL:1f7d]下一项
+                  [SEL:1f7d]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/28-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -88851,7 +88851,7 @@ z
 <text: Scene-61c65/1-Loop/2-Loop/28-Then/1-Loop/1-Loop/2-Then/1>
 [SEL:994]沸[SEL:995]仏[SEL:996]物[SEL:997]鮒[SEL:998]分  [SEL:999]吻[SEL:99a]噴[SEL:99b]墳[SEL:99c]憤[SEL:99d]扮
 [SEL:99e]焚[SEL:99f]奮[SEL:9a0]粉[SEL:9a1]糞[SEL:9a2]紛  [SEL:9a3]雰[SEL:9a4]文[SEL:9a5]聞
-[SEL:1f7e]前一项
+[SEL:1f7e]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/28-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -89912,7 +89912,7 @@ z
 [SEL:9dd]包[SEL:9de]呆[SEL:9df]報[SEL:9e0]奉[SEL:9e1]宝  [SEL:9e2]峰[SEL:9e3]峯[SEL:9e4]崩[SEL:9e5]庖[SEL:9e6]抱
 [SEL:9e7]捧[SEL:9e8]放[SEL:9e9]方[SEL:9ea]朋[SEL:9eb]法  [SEL:9ec]泡[SEL:9ed]烹[SEL:9ee]砲[SEL:9ef]縫[SEL:9f0]胞
 [SEL:9f1]芳[SEL:9f2]萌[SEL:9f3]蓬[SEL:9f4]蜂[SEL:9f5]褒  [SEL:9f6]訪[SEL:9f7]豊[SEL:9f8]邦[SEL:9f9]鋒[SEL:9fa]飽
-                  [SEL:1f83]下一项
+                  [SEL:1f83]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/30-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -90026,7 +90026,7 @@ z
 [SEL:a0f]謀[SEL:a10]貌[SEL:a11]貿[SEL:a12]鉾[SEL:a13]防  [SEL:a14]吠[SEL:a15]頬[SEL:a16]北[SEL:a17]僕[SEL:a18]卜
 [SEL:a19]墨[SEL:a1a]撲[SEL:a1b]朴[SEL:a1c]牧[SEL:a1d]睦  [SEL:a1e]穆[SEL:a1f]釦[SEL:a20]勃[SEL:a21]没[SEL:a22]殆
 [SEL:a23]堀[SEL:a24]幌[SEL:a25]奔[SEL:a26]本[SEL:a27]翻  [SEL:a28]凡[SEL:a29]盆
-[SEL:1f84]前一项
+[SEL:1f84]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/30-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -93247,7 +93247,7 @@ z
 [SEL:b12]流[SEL:b13]溜[SEL:b14]琉[SEL:b15]留[SEL:b16]硫  [SEL:b17]粒[SEL:b18]隆[SEL:b19]竜[SEL:b1a]龍[SEL:b1b]侶
 [SEL:b1c]慮[SEL:b1d]旅[SEL:b1e]虜[SEL:b1f]了[SEL:b20]亮  [SEL:b21]僚[SEL:b22]両[SEL:b23]凌[SEL:b24]寮[SEL:b25]料
 [SEL:b26]梁[SEL:b27]涼[SEL:b28]猟[SEL:b29]療[SEL:b2a]瞭  [SEL:b2b]稜[SEL:b2c]糧[SEL:b2d]良[SEL:b2e]諒[SEL:b2f]遼
-                  [SEL:1f99]下一项
+                  [SEL:1f99]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/40-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -93327,7 +93327,7 @@ z
 <text: Scene-61c65/1-Loop/2-Loop/40-Then/1-Loop/1-Loop/2-Then/1>
 [SEL:b30]量[SEL:b31]陵[SEL:b32]領[SEL:b33]力[SEL:b34]緑  [SEL:b35]倫[SEL:b36]厘[SEL:b37]林[SEL:b38]淋[SEL:b39]燐
 [SEL:b3a]琳[SEL:b3b]臨[SEL:b3c]輪[SEL:b3d]隣[SEL:b3e]鱗  [SEL:b3f]麟
-[SEL:1f9a]前一项
+[SEL:1f9a]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/40-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -94914,7 +94914,7 @@ z
 [SEL:baa]峙[SEL:bab]憑[SEL:bac]憫[SEL:bad]懺[SEL:bae]拗  [SEL:baf]拮[SEL:bb0]揉[SEL:bb1]攣[SEL:bb2]曖[SEL:bb3]朦
 [SEL:bb4]朧[SEL:bb5]杞[SEL:bb6]枷[SEL:bb7]栞[SEL:bb8]棘  [SEL:bb9]鬱[SEL:bba]洸[SEL:bbb]洵[SEL:bbc]洒[SEL:bbd]涎
 [SEL:bbe]澹[SEL:bbf]猜[SEL:bc0]猥[SEL:bc1]瑶[SEL:bc2]璧  [SEL:bc3]痒[SEL:bc4]痙[SEL:bc5]痺[SEL:bc6]瘍[SEL:bc7]癇
-                  [SEL:1fa5]下一项
+                  [SEL:1fa5]次项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/45-Then/1-Loop/2-Then/1-Loop/1-Then/1>
@@ -95025,7 +95025,7 @@ z
 [SEL:bdc]訝[SEL:bdd]諍[SEL:bde]譚[SEL:bdf]貪[SEL:be0]贄  [SEL:be1]贅[SEL:be2]赳[SEL:be3]蹙[SEL:be4]踪[SEL:be5]躇
 [SEL:be6]躊[SEL:be7]躾[SEL:be8]軋[SEL:be9]轢[SEL:bea]辣  [SEL:beb]迪[SEL:bec]邏[SEL:bed]靱[SEL:bee]頌[SEL:bef]頷
 [SEL:bf0]頽[SEL:bf1]顰[SEL:bf2]騙[SEL:bf3]遙
-[SEL:1fa6]前一项
+[SEL:1fa6]前项
 
 </text>
 <next: Scene-61c65/1-Loop/2-Loop/45-Then/1-Loop/2-Then/1-Loop/1-Then/1>

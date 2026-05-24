@@ -68,10 +68,9 @@ if __name__ == '__main__':
         cd = c_smod_program(ast)
         print('cmp')
         rtxt = cmp_sdialog(
-            r'wktab\dialog_trim.txt',
-            #r'wktab\dialog_trim.txt',
-            r'trans\dialog_trim_zh.txt',
-            r'wktab\dialog_trim.shadow.txt')
+            r'wktab\dialog_done2.txt',
+            r'trans\dialog_zh.txt',
+            r'wktab\dialog_done2.shadow.txt')
         print('mod')
         mast = cd.modify(rtxt)
         print('emit')
