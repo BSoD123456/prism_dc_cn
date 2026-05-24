@@ -224,6 +224,14 @@ class c_maker_rule_rplctxt(c_maker_rule):
         self._info(f'compare texts')
         return cmp_sdialog_lines(src, dst, shd)
 
+class c_maker_rule_modast(c_maker_rule):
+
+    def mk0(self, ast, rtxt):
+        from smod import c_smod_program
+        self._info(f'modify ast')
+        cgen = c_smod_program(ast)
+        return cgen.modify(rtxt)
+
 def make_all(paths, rom):
     rules = {}
     rules.update({
@@ -247,10 +255,12 @@ def make_all(paths, rom):
         'dialog_zh.txt': (c_maker_rule_txtfile, '!trans'),
         'replace_text': (
             c_maker_rule_rplctxt,
-            'dialog.txt', 'dialog_zh.txt', 'dialog.shadow.txt'),
+            'dialog.txt', 'dialog_zh.txt', 'dialog.shadow.txt'
+        ),
+        'mod_ast': (c_maker_rule_modast, 'ast.pck', 'replace_text'),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'replace_text'),
+        'all': (c_maker_rule_alias, 'mod_ast'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
