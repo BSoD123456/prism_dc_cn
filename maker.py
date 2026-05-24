@@ -150,10 +150,9 @@ class c_maker_rule_shcmd(c_maker_rule_rawfile):
 class c_maker_rule_extract(c_maker_rule_shcmd):
 
     def mk1(self, dpath, rom, wpath, cmdpatt):
-        rnsp = os.path.splitext(rom)
-        extname = None
-        if len(rnsp) > 1:
-            extname = rnsp[-1][1:].lower()
+        _, extname = os.path.splitext(rom)
+        if extname:
+            extname = extname[1:].lower()
         if not extname in ('cue', 'gdi'):
             self._error(f'rom should be cue or gdi: {rom}')
         cmdline = cmdpatt.format(extname, rom, dpath, wpath)
@@ -191,6 +190,23 @@ class c_maker_rule_scode(c_maker_rule_txtfile):
             cgen.gen_code()
         return self.mk0(path)
 
+class c_maker_rule_sdialog(c_maker_rule_txtfile):
+
+    def mk1(self, path, ast):
+        from scode import c_scode_program, c_scode_buf_fd
+        from sdialog import bind_sdialog_buf, bind_shadow_buf
+        fn = self.path
+        bsfn, extfn = os.path.splitext(fn)
+        if os.path.splitext(bsfn)[1] == '.shadow':
+            bind_buf = bind_shadow_buf
+        else:
+            bind_buf = bind_sdialog_buf
+        self._info(f'gen dialog to {fn}')
+        with open(fn, 'w', encoding = 'utf-8') as fd:
+            cgen = c_scode_program(ast, bind_buf(c_scode_buf_fd(fd)))
+            cgen.gen_code()
+        return self.mk0(path)
+
 def make_all(paths, rom):
     rules = {}
     rules.update({
@@ -209,9 +225,11 @@ def make_all(paths, rom):
         'FONT.DAT': (c_maker_rule_rawfile, paths['extract'], 'SCRIPT.BIN'),
         'ast.pck': (c_maker_rule_ast, paths['work'], 'SCRIPT.BIN'),
         'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
+        'dialog.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
+        'dialog.shadow.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'code.txt'),
+        'all': (c_maker_rule_alias, 'dialog.txt'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
