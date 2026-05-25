@@ -106,17 +106,19 @@ class c_maker_rule_alias(c_maker_rule):
 
 class c_maker_rule_path(c_maker_rule):
 
-    def mk0(self, path):
+    def getpath(self, path):
         dpath = self.name
         if not path is None:
             dpath = os.path.join(path, dpath)
-        self.path = dpath
         return dpath
+
+    def mk0(self, path):
+        return self.getpath(path)
 
 class c_maker_rule_dir(c_maker_rule_path):
 
     def mk0(self, path):
-        fn = super().mk0(path)
+        fn = self.getpath(path)
         if os.path.isdir(fn):
             return fn
         elif os.path.exists(fn):
@@ -127,7 +129,7 @@ class c_maker_rule_dir(c_maker_rule_path):
 class c_maker_rule_rawfile(c_maker_rule_path):
 
     def mk0(self, path):
-        fn = super().mk0(path)
+        fn = self.getpath(path)
         if not os.path.isfile(fn):
             return None
         self._info(f'load {fn}')
@@ -137,7 +139,7 @@ class c_maker_rule_rawfile(c_maker_rule_path):
 class c_maker_rule_txtfile(c_maker_rule_path):
 
     def mk0(self, path):
-        fn = super().mk0(path)
+        fn = self.getpath(path)
         if not os.path.isfile(fn):
             return None
         self._info(f'load {fn} as text')
@@ -181,12 +183,13 @@ class c_maker_rule_ast(c_maker_rule_rawfile):
     def mk1(self, path, raw):
         import pickle
         from script import c_script_file, c_script_program, SC_PROG_ENTRY
-        self._info(f'parse ast to {self.path}')
+        fn = self.getpath(path)
+        self._info(f'parse ast to {fn}')
         sc = c_script_file(raw, 0)
         sc.parse_size(len(raw), 4)
         prog = c_script_program(sc)
         ast = prog.parse_sect(SC_PROG_ENTRY)
-        with open(self.path, 'wb') as fd:
+        with open(fn, 'wb') as fd:
             pickle.dump(ast, fd)
         return ast
 
@@ -194,8 +197,9 @@ class c_maker_rule_scode(c_maker_rule_txtfile):
 
     def mk1(self, path, ast):
         from scode import c_scode_program, c_scode_buf_fd
-        self._info(f'gen code to {self.path}')
-        with open(self.path, 'w', encoding = 'utf-8') as fd:
+        fn = self.getpath(path)
+        self._info(f'gen code to {fn}')
+        with open(fn, 'w', encoding = 'utf-8') as fd:
             cgen = c_scode_program(ast, c_scode_buf_fd(fd))
             cgen.gen_code()
         return self.mk0(path)
@@ -205,7 +209,7 @@ class c_maker_rule_sdialog(c_maker_rule_txtfile):
     def mk1(self, path, ast):
         from scode import c_scode_program, c_scode_buf_fd
         from sdialog import bind_sdialog_buf, bind_shadow_buf
-        fn = self.path
+        fn = self.getpath(path)
         bsfn, extfn = os.path.splitext(fn)
         if os.path.splitext(bsfn)[1] == '.shadow':
             bind_buf = bind_shadow_buf
@@ -239,7 +243,7 @@ class c_maker_rule_emit(c_maker_rule_path):
         from script import SC_PROG_ENTRY
         from scode import c_scode_buf_fd
         from semit import c_semit_program, c_semit_asm_buf_fd
-        fn = super().mk0(path)
+        fn = self.getpath(path)
         ast, _ = modinfo
         conf = {
             'entries': SC_PROG_ENTRY,
