@@ -37,24 +37,36 @@ class c_maker_rule:
         report('info', f'({self.name}) {msg}')
 
     def make(self, lzreqs):
+        rlen = len(lzreqs)
+        rmax = 0
         vi = 0
         while True:
             mn = f'mk{vi}'
             vi += 1
             mth = getattr(self, mn, None)
             if not callable(mth):
+                upd = False
+                while rmax < rlen:
+                    _, upd = lzreqs[rmax]()
+                    if upd:
+                        break
+                    rmax += 1
+                if upd:
+                    vi = 0
+                    continue
                 break
             if (mth.__code__.co_flags & 0xc) != 0:
                 self._error(f'invalid mk method: {mn}')
             rnum = mth.__code__.co_argcount - 1 # with self
             dreqs = []
-            rlen = len(lzreqs)
             for i in range(rnum):
                 if i < rlen:
-                    d = lzreqs[i]()
+                    d, _ = lzreqs[i]()
                 else:
                     d = None
                 dreqs.append(d)
+            if rnum > rmax:
+                rmax = rnum
             r = mth(*dreqs)
             if not r is None:
                 return r
@@ -75,27 +87,30 @@ class c_maker:
     def _warn(self, tar, msg):
         report('war', f'({tar}) {msg}')
 
-    def make(self, tarname):
+    def _make(self, tarname):
         if not tarname in self.rules:
             self._error(tarname, f'unknown target')
         if tarname in self.cch:
-            return self.cch[tarname]
+            return self.cch[tarname], False
         mkrl, *rnames = self.rules[tarname]
         lzreqs = []
         for rname in rnames:
             def mklz(rname):
                 if rname.startswith('&'):
                     val = rname[1:]
-                    return lambda: val
+                    return lambda: val, False
                 elif rname.startswith('!'):
                     val = self.make(rname[1:])
-                    return lambda: val
+                    return lambda: val, False
                 else:
-                    return lambda: self.make(rname)
+                    return lambda: self._make(rname)
             lzreqs.append(mklz(rname))
         tar = mkrl.make(lzreqs)
         self.cch[tarname] = tar
-        return tar
+        return tar, True
+
+    def make(self, tarname):
+        return self._make(tarname)[0]
 
 # === make rules ===
 
