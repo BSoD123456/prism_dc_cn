@@ -114,6 +114,11 @@ class c_maker:
 
 # === make rules ===
 
+class c_maker_rule_vir(c_maker_rule):
+
+    def mk0(self):
+        return True
+
 class c_maker_rule_alias(c_maker_rule):
 
     def mk0(self, req):
@@ -189,23 +194,25 @@ class c_maker_rule_txtfile(c_maker_rule_rawfile):
                 rs.append(line)
             return rs
 
-class c_maker_rule_shcmd(c_maker_rule_rawfile):
+class c_maker_rule_shcmd(c_maker_rule):
 
-    def mk1(self, path, cmdline):
+    def mk0(self, cmdline):
         print(f'sh> {cmdline}')
         _execmd(cmdline)
-        return self.mk0(path)
+        return True
 
 class c_maker_rule_extract(c_maker_rule_shcmd):
 
-    def mk1(self, dpath, rom, wpath, cmdpatt):
+    def mk0(self, rom, dpath, xpath):
+        cmdpatt = 'tools/buildgdi.exe -extract -{0} "{1}" -output "{2}" -ip "{3}/IP.BIN"'
+        self._info(f'extract rom')
         _, extname = os.path.splitext(rom)
         if extname:
             extname = extname[1:].lower()
         if not extname in ('cue', 'gdi'):
             self._error(f'rom should be cue or gdi: {rom}')
-        cmdline = cmdpatt.format(extname, rom, dpath, wpath)
-        return super().mk1(dpath, cmdline)
+        cmdline = cmdpatt.format(extname, rom, dpath, xpath)
+        return super().mk0(cmdline)
 
 class c_maker_rule_ast(c_maker_rule_rawfile):
 
@@ -333,14 +340,14 @@ def make_all(paths, rom):
         rom: (c_maker_rule_path, paths['source']),
     })
     rules.update({
-        'SCRIPT.BIN@src': (
-            c_maker_rule_extract, paths['data'],
-            rom, paths['extract'],
-            '&tools/buildgdi.exe -extract -{0} "{1}" -output "{2}" -ip "{3}/IP.BIN"',
+        'extract': (
+            c_maker_rule_extract,
+            rom, paths['data'], paths['extract'],
         ),
-        'script_src.bin': (c_maker_rule_copyfile, paths['work'], 'SCRIPT.BIN@src'),
-        'FONT.DAT@src': (c_maker_rule_rawfile, paths['data'], '!SCRIPT.BIN@src'),
-        'font_src.bin': (c_maker_rule_copyfile, paths['work'], 'FONT.DAT@src'),
+        'SCRIPT.BIN@src': (c_maker_rule_rawfile, paths['data'], 'extract'),
+        'script_src.bin': (c_maker_rule_copyfile, paths['srcbak'], 'SCRIPT.BIN@src'),
+        'FONT.DAT@src': (c_maker_rule_rawfile, paths['data'], 'extract'),
+        'font_src.bin': (c_maker_rule_copyfile, paths['srcbak'], 'FONT.DAT@src'),
         'ast.pck': (c_maker_rule_ast, paths['work'], 'script_src.bin'),
         'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
         'dialog.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
@@ -362,7 +369,7 @@ def make_all(paths, rom):
         'FONT.DAT@mod': (c_maker_rule_copyfile_force, paths['data'], 'font_mod.dat'),
     })
     rules.update({
-        'all': (c_maker_rule_alias, '!SCRIPT.BIN@mod', '!FONT.DAT@mod'),
+        'all': (c_maker_rule_vir, '!SCRIPT.BIN@mod', '!FONT.DAT@mod'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
@@ -380,6 +387,7 @@ if __name__ == '__main__':
         'work': r'wktab\work',
         'extract': r'wktab\extract',
         'data': r'wktab\extract\data',
+        'srcbak': r'wktab\srcbak',
     }
 
     def main():
