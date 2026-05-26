@@ -171,7 +171,7 @@ class c_maker:
             lzreqs.append(lzreq)
             reqnames.append(reqname)
         rnum = self.rules[tarname][0].clean(lzreqs)
-        defer.extend(reqnames[:rnum])
+        defer.extend(n for n in reqnames[:rnum] if not n is None)
 
     def _clean_ref(self, tarname, wk, defer):
         if not tarname in self.rules_ref:
@@ -245,6 +245,8 @@ class c_maker_rule_dir(c_maker_rule_path):
 
 class c_maker_rule_rawfile(c_maker_rule_path):
 
+    READONLY = False
+
     def mk0(self, path):
         fn = self.getpath(path)
         if not os.path.isfile(fn):
@@ -254,8 +256,18 @@ class c_maker_rule_rawfile(c_maker_rule_path):
             return fd.read()
 
     def cln(self, path):
+        if self.READONLY:
+            self._warn(f'readonly')
+            return
         fn = self.getpath(path)
-        print(f'remove {fn}')
+        if not os.path.isfile(fn):
+            return
+        self._info(f'remove {fn}')
+        os.remove(fn)
+
+class c_maker_rule_rawfile_readonly(c_maker_rule_rawfile):
+    
+    READONLY = True
 
 class c_maker_rule_copyfile(c_maker_rule_rawfile):
 
@@ -294,6 +306,10 @@ class c_maker_rule_txtfile(c_maker_rule_rawfile):
                     break
                 rs.append(line)
             return rs
+
+class c_maker_rule_txtfile_readonly(c_maker_rule_txtfile):
+    
+    READONLY = True
 
 class c_maker_rule_shcmd(c_maker_rule):
 
@@ -453,7 +469,7 @@ def make_maker(paths, rom):
         'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
         'dialog.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
         'dialog.shadow.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
-        'dialog_zh.txt': (c_maker_rule_txtfile, '&trans'),
+        'dialog_zh.txt': (c_maker_rule_txtfile_readonly, '&trans'),
         'replace_text': (
             c_maker_rule_rplctxt,
             'dialog.txt', 'dialog_zh.txt', 'dialog.shadow.txt',
