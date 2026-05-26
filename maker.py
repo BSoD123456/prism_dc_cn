@@ -336,7 +336,7 @@ class c_maker_rule_extract(c_maker_rule_shcmd):
 class c_maker_rule_package(c_maker_rule_shcmd):
 
     def mk0(self, rom, opath, dpath, xpath, spath):
-        cmdpatt = 'tools/buildgdi.exe -data "{0}" -ip "{1}/IP.BIN" -output "{2}" -gdi "{3}" -CDDA "{4}/track4.raw"'
+        cmdpatt = 'tools/buildgdi.exe -data "{0}" -ip "{1}/IP.BIN" -output "{2}" -CDDA "{4}/Prismaticallization (Japan) (Track 4).bin"'
         self._info(f'package rom')
         _, extname = os.path.splitext(rom)
         if extname:
@@ -500,9 +500,11 @@ def make_maker(paths, src_rom, dst_rom):
             'mod_ast',
         ),
         'FONT.DAT@mod': (c_maker_rule_copyfile_force, paths['data'], 'font_mod.dat'),
+        'modify': (c_maker_rule_vir, '!SCRIPT.BIN@mod', '!FONT.DAT@mod'),
         'package': (
             c_maker_rule_package,
             dst_rom, paths['output'], paths['data'], paths['extract'], paths['source'],
+            '!modify',
         ),
     })
     rules.update({
