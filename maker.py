@@ -81,9 +81,12 @@ class c_maker:
         lzreqs = []
         for rname in rnames:
             def mklz(rname):
-                if rname.startswith('!'):
-                    cch = rname[1:]
-                    return lambda: cch
+                if rname.startswith('&'):
+                    val = rname[1:]
+                    return lambda: val
+                elif rname.startswith('!'):
+                    val = self.make(rname[1:])
+                    return lambda: val
                 else:
                     cch = []
                     def lz():
@@ -143,6 +146,17 @@ class c_maker_rule_copyfile(c_maker_rule_rawfile):
         if os.path.exists(fn):
             return None
         self._info(f'copy to {fn}')
+        with open(fn, 'wb') as fd:
+            fd.write(raw)
+        return raw
+
+class c_maker_rule_copyfile_force(c_maker_rule_rawfile):
+
+    def mk0(self, path, raw):
+        fn = self.getpath(path)
+        if os.path.isdir(fn):
+            return None
+        self._info(f'force copy to {fn}')
         with open(fn, 'wb') as fd:
             fd.write(raw)
         return raw
@@ -281,6 +295,11 @@ class c_maker_rule_emit_txt(c_maker_rule_txtfile):
             emt.gen_code()
         return self.mk0(path)
 
+class c_maker_rule_font(c_maker_rule_rawfile):
+
+    def mk1(self, path, modinfo):
+        pass
+
 def make_all(paths, rom):
     rules = {}
     rules.update({
@@ -294,15 +313,16 @@ def make_all(paths, rom):
         'SCRIPT.BIN@src': (
             c_maker_rule_extract, paths['data'],
             rom, paths['extract'],
-            '!tools/buildgdi.exe -extract -{0} "{1}" -output "{2}" -ip "{3}/IP.BIN"',
+            '&tools/buildgdi.exe -extract -{0} "{1}" -output "{2}" -ip "{3}/IP.BIN"',
         ),
         'script_src.bin': (c_maker_rule_copyfile, paths['work'], 'SCRIPT.BIN@src'),
-        'FONT.DAT': (c_maker_rule_rawfile, paths['data'], 'script_src.bin'),
+        'FONT.DAT@src': (c_maker_rule_rawfile, paths['data'], '!SCRIPT.BIN@src'),
+        'font_src.bin': (c_maker_rule_copyfile, paths['work'], 'FONT.DAT@src'),
         'ast.pck': (c_maker_rule_ast, paths['work'], 'script_src.bin'),
         'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
         'dialog.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
         'dialog.shadow.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
-        'dialog_zh.txt': (c_maker_rule_txtfile, '!trans'),
+        'dialog_zh.txt': (c_maker_rule_txtfile, '&trans'),
         'replace_text': (
             c_maker_rule_rplctxt,
             'dialog.txt', 'dialog_zh.txt', 'dialog.shadow.txt'
@@ -310,10 +330,11 @@ def make_all(paths, rom):
         'mod_ast': (c_maker_rule_modast, 'ast.pck', 'replace_text'),
         'script_mod.bin': (c_maker_rule_emit, paths['work'], 'mod_ast'),
         'script_mod.txt': (c_maker_rule_emit_txt, paths['work'], 'mod_ast'),
-        'SCRIPT.BIN@mod': (c_maker_rule_copyfile, paths['data'], 'script_mod.bin'),
+        'SCRIPT.BIN@mod': (c_maker_rule_copyfile_force, paths['data'], 'script_mod.bin'),
+        #'font_mod.dat': (),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'script_mod.bin'),
+        'all': (c_maker_rule_alias, 'font_src.bin'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
