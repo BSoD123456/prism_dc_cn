@@ -98,10 +98,10 @@ class c_maker:
             def mklz(rname):
                 if rname.startswith('&'):
                     val = rname[1:]
-                    return lambda: val, False
+                    return lambda: (val, False)
                 elif rname.startswith('!'):
                     val = self.make(rname[1:])
-                    return lambda: val, False
+                    return lambda: (val, False)
                 else:
                     return lambda: self._make(rname)
             lzreqs.append(mklz(rname))
