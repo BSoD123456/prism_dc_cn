@@ -297,8 +297,19 @@ class c_maker_rule_emit_txt(c_maker_rule_txtfile):
 
 class c_maker_rule_font(c_maker_rule_rawfile):
 
-    def mk1(self, path, modinfo):
-        pass
+    def mk1(self, path, src_font, used_font, modinfo):
+        from fonmkr import make_font_ttf
+        fn = self.getpath(path)
+        _, chrset = modinfo
+        self._info(f'make font to {fn}')
+        dfon = make_font_ttf(
+            src_font, used_font,
+            *chrset.compact_info('，'),
+            1)
+        draw = dfon.BYTES()
+        with open(fn, 'wb') as fd:
+            fd.write(draw)
+        return draw
 
 def make_all(paths, rom):
     rules = {}
@@ -325,16 +336,20 @@ def make_all(paths, rom):
         'dialog_zh.txt': (c_maker_rule_txtfile, '&trans'),
         'replace_text': (
             c_maker_rule_rplctxt,
-            'dialog.txt', 'dialog_zh.txt', 'dialog.shadow.txt'
+            'dialog.txt', 'dialog_zh.txt', 'dialog.shadow.txt',
         ),
         'mod_ast': (c_maker_rule_modast, 'ast.pck', 'replace_text'),
         'script_mod.bin': (c_maker_rule_emit, paths['work'], 'mod_ast'),
         'script_mod.txt': (c_maker_rule_emit_txt, paths['work'], 'mod_ast'),
         'SCRIPT.BIN@mod': (c_maker_rule_copyfile_force, paths['data'], 'script_mod.bin'),
-        #'font_mod.dat': (),
+        'font_mod.dat': (
+            c_maker_rule_font, paths['work'],
+            'font_src.bin', '&assets/ResourceHanRoundedCN-Regular.ttf',
+            'mod_ast',
+        ),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'font_src.bin'),
+        'all': (c_maker_rule_alias, 'font_mod.dat'),
     })
     mkr = c_maker(rules)
     mkr.make('all')

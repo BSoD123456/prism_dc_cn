@@ -110,16 +110,22 @@ class c_fonfile(c_sect_tab):
         return rmk, True
 
 def font_src(fn):
-    with open(fn, 'rb') as fd:
-        raw = fd.read()
+    if isinstance(fn, str):
+        with open(fn, 'rb') as fd:
+            raw = fd.read()
+    elif isinstance(fn, bytes):
+        raw = fn
     fon = c_fonfile(raw, 0)
     fon.set_info({'shape': (4, 24, 24, 1)})
     fon.parse_size(len(raw), 4)
     return fon
 
 def font_hzk(fn):
-    with open(fn, 'rb') as fd:
-        raw = fd.read()
+    if isinstance(fn, str):
+        with open(fn, 'rb') as fd:
+            raw = fd.read()
+    elif isinstance(fn, bytes):
+        raw = fn
     fon = c_fonfile(raw, 0)
     fon.set_info({'shape': (1, 24, 24, 1), 'rvsbyt': True})
     fon.parse_size(len(raw), 4)
