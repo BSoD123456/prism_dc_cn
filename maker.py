@@ -204,6 +204,8 @@ class c_maker:
         self._clean_defer(wk, defer)
 
     def dirty(self, tarname):
+        if not tarname in self.rules_ref:
+            self._chkrl(tarname)
         wk = set()
         defer = []
         self._clean_ref(tarname, wk, defer)
@@ -464,7 +466,7 @@ def make_maker(paths, rom):
         'SCRIPT.BIN@src': (c_maker_rule_rawfile, paths['data'], 'extract'),
         'script_src.bin': (c_maker_rule_copyfile, paths['srcbak'], 'SCRIPT.BIN@src'),
         'FONT.DAT@src': (c_maker_rule_rawfile, paths['data'], 'extract'),
-        'font_src.bin': (c_maker_rule_copyfile, paths['srcbak'], 'FONT.DAT@src'),
+        'font_src.dat': (c_maker_rule_copyfile, paths['srcbak'], 'FONT.DAT@src'),
         'ast.pck': (c_maker_rule_ast, paths['work'], 'script_src.bin'),
         'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
         'dialog.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
@@ -480,7 +482,7 @@ def make_maker(paths, rom):
         'SCRIPT.BIN@mod': (c_maker_rule_copyfile_force, paths['data'], 'script_mod.bin'),
         'font_mod.dat': (
             c_maker_rule_font, paths['work'],
-            'font_src.bin', '&assets/ResourceHanRoundedCN-Regular.ttf',
+            'font_src.dat', '&assets/ResourceHanRoundedCN-Regular.ttf',
             'mod_ast',
         ),
         'FONT.DAT@mod': (c_maker_rule_copyfile_force, paths['data'], 'font_mod.dat'),
@@ -507,7 +509,7 @@ if __name__ == '__main__':
     }
 
     def main():
-        global mkr
         mkr = make_maker(PATHS, ROM)
         mkr.make('all')
-    main()
+        return mkr
+    mkr = main()
