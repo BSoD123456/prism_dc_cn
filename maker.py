@@ -136,6 +136,17 @@ class c_maker_rule_rawfile(c_maker_rule_path):
         with open(fn, 'rb') as fd:
             return fd.read()
 
+class c_maker_rule_copyfile(c_maker_rule_rawfile):
+
+    def mk1(self, path, raw):
+        fn = self.getpath(path)
+        if os.path.exists(fn):
+            return None
+        self._info(f'copy to {fn}')
+        with open(fn, 'wb') as fd:
+            fd.write(raw)
+        return raw
+
 class c_maker_rule_txtfile(c_maker_rule_path):
 
     def mk0(self, path):
@@ -237,28 +248,38 @@ class c_maker_rule_modast(c_maker_rule):
         ast = cgen.modify(rtxt)
         return ast, cgen.chrset
 
-class c_maker_rule_emit(c_maker_rule_path):
+class c_maker_rule_emit(c_maker_rule_rawfile):
 
-    def mk0(self, path, modinfo):
+    def mk1(self, path, modinfo):
         from script import SC_PROG_ENTRY
-        from scode import c_scode_buf_fd
         from semit import c_semit_program, c_semit_asm_buf_fd
         fn = self.getpath(path)
         ast, _ = modinfo
         conf = {
             'entries': SC_PROG_ENTRY,
             'padding': False }
-        if os.path.splitext(fn)[1].lower() == '.txt':
-            self._info(f'emit ast to {fn} as text')
-            with open(fn, 'w', encoding = 'utf-8') as fd:
-                emt = c_semit_program(ast, c_scode_buf_fd(fd), conf)
-                emt.gen_code()
-        else:
-            self._info(f'emit ast to {fn}')
-            with open(fn, 'wb') as fd:
-                emt = c_semit_program(ast, c_semit_asm_buf_fd(fd), conf)
-                emt.gen_code()
-        return True
+        self._info(f'emit ast to {fn}')
+        with open(fn, 'wb') as fd:
+            emt = c_semit_program(ast, c_semit_asm_buf_fd(fd), conf)
+            emt.gen_code()
+        return self.mk0(path)
+
+class c_maker_rule_emit_txt(c_maker_rule_txtfile):
+
+    def mk1(self, path, modinfo):
+        from script import SC_PROG_ENTRY
+        from scode import c_scode_buf_fd
+        from semit import c_semit_program
+        fn = self.getpath(path)
+        ast, _ = modinfo
+        conf = {
+            'entries': SC_PROG_ENTRY,
+            'padding': False }
+        self._info(f'emit ast to {fn} as text')
+        with open(fn, 'w', encoding = 'utf-8') as fd:
+            emt = c_semit_program(ast, c_scode_buf_fd(fd), conf)
+            emt.gen_code()
+        return self.mk0(path)
 
 def make_all(paths, rom):
     rules = {}
@@ -270,13 +291,14 @@ def make_all(paths, rom):
         rom: (c_maker_rule_path, paths['source']),
     })
     rules.update({
-        'SCRIPT.BIN': (
-            c_maker_rule_extract, paths['extract'],
-            rom, paths['work'],
+        'SCRIPT.BIN@src': (
+            c_maker_rule_extract, paths['data'],
+            rom, paths['extract'],
             '!tools/buildgdi.exe -extract -{0} "{1}" -output "{2}" -ip "{3}/IP.BIN"',
         ),
-        'FONT.DAT': (c_maker_rule_rawfile, paths['extract'], 'SCRIPT.BIN'),
-        'ast.pck': (c_maker_rule_ast, paths['work'], 'SCRIPT.BIN'),
+        'script_src.bin': (c_maker_rule_copyfile, paths['work'], 'SCRIPT.BIN@src'),
+        'FONT.DAT': (c_maker_rule_rawfile, paths['data'], 'script_src.bin'),
+        'ast.pck': (c_maker_rule_ast, paths['work'], 'script_src.bin'),
         'code.txt': (c_maker_rule_scode, paths['work'], 'ast.pck'),
         'dialog.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
         'dialog.shadow.txt': (c_maker_rule_sdialog, paths['work'], 'ast.pck'),
@@ -286,11 +308,12 @@ def make_all(paths, rom):
             'dialog.txt', 'dialog_zh.txt', 'dialog.shadow.txt'
         ),
         'mod_ast': (c_maker_rule_modast, 'ast.pck', 'replace_text'),
-        'SCRIPT.BIN@mod': (c_maker_rule_emit, paths['work'], 'mod_ast'),
-        'SCRIPT.TXT': (c_maker_rule_emit, paths['work'], 'mod_ast'),
+        'script_mod.bin': (c_maker_rule_emit, paths['work'], 'mod_ast'),
+        'script_mod.txt': (c_maker_rule_emit_txt, paths['work'], 'mod_ast'),
+        'SCRIPT.BIN@mod': (c_maker_rule_copyfile, paths['data'], 'script_mod.bin'),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'SCRIPT.BIN@mod'),
+        'all': (c_maker_rule_alias, 'script_mod.bin'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
@@ -307,6 +330,7 @@ if __name__ == '__main__':
         'output': r'',
         'work': r'wktab\work',
         'extract': r'wktab\extract',
+        'data': r'wktab\extract\data',
     }
 
     def main():
