@@ -188,7 +188,7 @@ class c_maker:
         if defer:
             ndefer = []
             for tarname in defer:
-                self._clean(tarname, wk, ndefer)
+                self._clean_item(tarname, wk, ndefer)
             if len(defer) == len(ndefer) and set(defer) == set(ndefer):
                 self._error(f'looped clean')
             self._clean_defer(wk, ndefer)
