@@ -66,6 +66,7 @@ class c_maker:
         self.rules = {
             dname: (cls(dname.split('@')[0]), *rnames)
             for dname, (cls, *rnames) in rules.items() }
+        self.cch = {}
 
     def _error(self, tar, msg):
         report('err', f'({tar}) {msg}')
@@ -77,6 +78,8 @@ class c_maker:
     def make(self, tarname):
         if not tarname in self.rules:
             self._error(tarname, f'unknown target')
+        if tarname in self.cch:
+            return self.cch[tarname]
         mkrl, *rnames = self.rules[tarname]
         lzreqs = []
         for rname in rnames:
@@ -88,17 +91,11 @@ class c_maker:
                     val = self.make(rname[1:])
                     return lambda: val
                 else:
-                    cch = []
-                    def lz():
-                        if cch:
-                            return cch[0]
-                        else:
-                            val = self.make(rname)
-                            cch.append(val)
-                            return val
-                    return lz
+                    return lambda: self.make(rname)
             lzreqs.append(mklz(rname))
-        return mkrl.make(lzreqs)
+        tar = mkrl.make(lzreqs)
+        self.cch[tarname] = tar
+        return tar
 
 # === make rules ===
 
