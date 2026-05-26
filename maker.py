@@ -36,6 +36,17 @@ class c_maker_rule:
     def _info(self, msg):
         report('info', f'({self.name}) {msg}')
 
+    def _get_mth(self, mn):
+        mth = getattr(self, mn, None)
+        if not callable(mth):
+            return None, -1
+        if (mth.__code__.co_flags & 0xc) != 0:
+            self._error(f'invalid mk method: {mn}')
+        rnum = mth.__code__.co_argcount - 1 # with self
+        if rnum < 0:
+            self._error(f'unbouded mk method: {mn}')
+        return mth, rnum
+
     def make(self, lzreqs):
         rlen = len(lzreqs)
         rmax = 0
@@ -43,8 +54,8 @@ class c_maker_rule:
         while True:
             mn = f'mk{vi}'
             vi += 1
-            mth = getattr(self, mn, None)
-            if not callable(mth):
+            mth, rnum = self._get_mth(mn)
+            if mth is None:
                 upd = False
                 while rmax < rlen:
                     _, upd = lzreqs[rmax]()
@@ -55,9 +66,6 @@ class c_maker_rule:
                     vi = 0
                     continue
                 break
-            if (mth.__code__.co_flags & 0xc) != 0:
-                self._error(f'invalid mk method: {mn}')
-            rnum = mth.__code__.co_argcount - 1 # with self
             dreqs = []
             for i in range(rnum):
                 if i < rlen:
@@ -72,12 +80,40 @@ class c_maker_rule:
                 return r
         self._error(f'nothing made')
 
+    def cln(self):
+        pass
+
+    def clean(self, lzreqs):
+        mth, rnum = self._get_mth('cln')
+        rlen = len(lzreqs)
+        dreqs = []
+        for i in range(rnum):
+            if i < rlen:
+                d, _ = lzreqs[i]()
+            else:
+                d = None
+            dreqs.append(d)
+        mth(*dreqs)
+        return rnum
+
 class c_maker:
 
     def __init__(self, rules):
-        self.rules = {
-            dname: (cls(dname.split('@')[0]), *rnames)
-            for dname, (cls, *rnames) in rules.items() }
+        rl = {}
+        rl_ref = {}
+        for dname, (cls, *rnames) in rules.items():
+            rl[dname] = (cls(dname.split('@')[0]), *rnames)
+            for rname in rnames:
+                if rname.startswith('!'):
+                    rname = rname[1:]
+                if rname in rl_ref:
+                    rseq = rl_ref[rname]
+                else:
+                    rseq = rl_ref[rname] = []
+                if not dname in rseq:
+                    rseq.append(dname)
+        self.rules = rl
+        self.rules_ref = rl_ref
         self.cch = {}
 
     def _error(self, tar, msg):
@@ -87,9 +123,12 @@ class c_maker:
     def _warn(self, tar, msg):
         report('war', f'({tar}) {msg}')
 
-    def _make(self, tarname):
+    def _chkrl(self, tarname):
         if not tarname in self.rules:
             self._error(tarname, f'unknown target')
+
+    def _make(self, tarname):
+        self._chkrl(tarname)
         if tarname in self.cch:
             return self.cch[tarname], False
         mkrl, *rnames = self.rules[tarname]
@@ -111,6 +150,64 @@ class c_maker:
 
     def make(self, tarname):
         return self._make(tarname)[0]
+
+    def _clean_item(self, tarname, wk, defer):
+        if tarname in wk:
+            return
+        wk.add(tarname)
+        mkrl, *rnames = self.rules[tarname]
+        lzreqs = []
+        reqnames = []
+        for rname in rnames:
+            if rname.startswith('!'):
+                rname = rname[1:]
+            def mklz(rname):
+                if rname.startswith('&'):
+                    val = rname[1:]
+                    return lambda: (val, False), None
+                else:
+                    return lambda: self._make(rname), rname
+            lzreq, reqname = mklz(rname)
+            lzreqs.append(lzreq)
+            reqnames.append(reqname)
+        rnum = self.rules[tarname][0].clean(lzreqs)
+        defer.extend(reqnames[:rnum])
+
+    def _clean_ref(self, tarname, wk, defer):
+        if not tarname in self.rules_ref:
+            return
+        for rtar in self.rules_ref[tarname]:
+            self._clean(rtar, wk, defer)
+
+    def _clean(self, tarname, wk, defer):
+        self._chkrl(tarname)
+        self._clean_ref(tarname, wk, defer)
+        self._clean_item(tarname, wk, defer)
+
+    def _clean_defer(self, wk, defer):
+        if defer:
+            ndefer = []
+            for tarname in defer:
+                self._clean(tarname, wk, ndefer)
+            if len(defer) == len(ndefer) and set(defer) == set(ndefer):
+                self._error(f'looped clean')
+            self._clean_defer(wk, ndefer)
+        else:
+            for tarname in wk:
+                if tarname in self.cch:
+                    self.cch.pop(tarname)
+
+    def clean(self, tarname):
+        wk = set()
+        defer = []
+        self._clean(tarname, wk, defer)
+        self._clean_defer(wk, defer)
+
+    def dirty(self, tarname):
+        wk = set()
+        defer = []
+        self._clean_ref(tarname, wk, defer)
+        self._clean_defer(wk, defer)
 
 # === make rules ===
 
@@ -155,6 +252,10 @@ class c_maker_rule_rawfile(c_maker_rule_path):
         self._info(f'load {fn}')
         with open(fn, 'rb') as fd:
             return fd.read()
+
+    def cln(self, path):
+        fn = self.getpath(path)
+        print(f'remove {fn}')
 
 class c_maker_rule_copyfile(c_maker_rule_rawfile):
 
@@ -330,7 +431,7 @@ class c_maker_rule_font(c_maker_rule_rawfile):
             fd.write(draw)
         return draw
 
-def make_all(paths, rom):
+def make_maker(paths, rom):
     rules = {}
     rules.update({
         path: (c_maker_rule_dir,)
@@ -369,10 +470,9 @@ def make_all(paths, rom):
         'FONT.DAT@mod': (c_maker_rule_copyfile_force, paths['data'], 'font_mod.dat'),
     })
     rules.update({
-        'all': (c_maker_rule_vir, '!SCRIPT.BIN@mod', '!FONT.DAT@mod'),
+        'all': (c_maker_rule_vir, '!script_mod.bin', '!font_mod.dat'),
     })
-    mkr = c_maker(rules)
-    mkr.make('all')
+    return c_maker(rules)
 
 if __name__ == '__main__':
     import pdb
@@ -391,5 +491,7 @@ if __name__ == '__main__':
     }
 
     def main():
-        make_all(PATHS, ROM)
+        global mkr
+        mkr = make_maker(PATHS, ROM)
+        mkr.make('all')
     main()
