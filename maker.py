@@ -161,7 +161,7 @@ class c_maker_rule_copyfile_force(c_maker_rule_rawfile):
             fd.write(raw)
         return raw
 
-class c_maker_rule_txtfile(c_maker_rule_path):
+class c_maker_rule_txtfile(c_maker_rule_rawfile):
 
     def mk0(self, path):
         fn = self.getpath(path)
@@ -347,9 +347,10 @@ def make_all(paths, rom):
             'font_src.bin', '&assets/ResourceHanRoundedCN-Regular.ttf',
             'mod_ast',
         ),
+        'FONT.DAT@mod': (c_maker_rule_copyfile_force, paths['data'], 'font_mod.dat'),
     })
     rules.update({
-        'all': (c_maker_rule_alias, 'font_mod.dat'),
+        'all': (c_maker_rule_alias, '!SCRIPT.BIN@mod', '!FONT.DAT@mod'),
     })
     mkr = c_maker(rules)
     mkr.make('all')
