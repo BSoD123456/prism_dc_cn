@@ -333,6 +333,19 @@ class c_maker_rule_extract(c_maker_rule_shcmd):
         cmdline = cmdpatt.format(extname, rom, dpath, xpath)
         return super().mk0(cmdline)
 
+class c_maker_rule_package(c_maker_rule_shcmd):
+
+    def mk0(self, rom, opath, dpath, xpath, spath):
+        cmdpatt = 'tools/buildgdi.exe -data "{0}" -ip "{1}/IP.BIN" -output "{2}" -gdi "{3}" -CDDA "{4}/track4.raw"'
+        self._info(f'package rom')
+        _, extname = os.path.splitext(rom)
+        if extname:
+            extname = extname[1:].lower()
+        if not extname == 'gdi':
+            self._error(f'rom should be gdi: {rom}')
+        cmdline = cmdpatt.format(dpath, xpath, opath, rom, spath)
+        return super().mk0(cmdline)
+
 class c_maker_rule_ast(c_maker_rule_rawfile):
 
     def mk0(self, path):
@@ -449,19 +462,20 @@ class c_maker_rule_font(c_maker_rule_rawfile):
             fd.write(draw)
         return draw
 
-def make_maker(paths, rom):
+def make_maker(paths, src_rom, dst_rom):
     rules = {}
     rules.update({
         path: (c_maker_rule_dir,)
         for path in paths.values()
     })
     rules.update({
-        rom: (c_maker_rule_path, paths['source']),
+        src_rom: (c_maker_rule_path, paths['source']),
+        dst_rom: (c_maker_rule_path, paths['output']),
     })
     rules.update({
         'extract': (
             c_maker_rule_extract,
-            rom, paths['data'], paths['extract'],
+            src_rom, paths['data'], paths['extract'],
         ),
         'SCRIPT.BIN@src': (c_maker_rule_rawfile, paths['data'], 'extract'),
         'script_src.bin': (c_maker_rule_copyfile, paths['srcbak'], 'SCRIPT.BIN@src'),
@@ -486,9 +500,13 @@ def make_maker(paths, rom):
             'mod_ast',
         ),
         'FONT.DAT@mod': (c_maker_rule_copyfile_force, paths['data'], 'font_mod.dat'),
+        'package': (
+            c_maker_rule_package,
+            dst_rom, paths['output'], paths['data'], paths['extract'], paths['source'],
+        ),
     })
     rules.update({
-        'all': (c_maker_rule_vir, '!script_mod.bin', '!font_mod.dat'),
+        'all': (c_maker_rule_vir, '!package'),
     })
     return c_maker(rules)
 
@@ -498,10 +516,11 @@ if __name__ == '__main__':
     from pprint import pprint
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
-    ROM = 'Prismaticallization (Japan).cue'
+    ROM_JP = 'Prismaticallization (Japan).cue'
+    ROM_ZH = 'Prismaticallization (ZH).gdi'
     PATHS = {
         'source': r'L:\Resource\Games\emu\dc\roms\Prismaticallization (Japan)',
-        'output': r'',
+        'output': r'wktab\output',
         'work': r'wktab\work',
         'extract': r'wktab\extract',
         'data': r'wktab\extract\data',
@@ -509,7 +528,7 @@ if __name__ == '__main__':
     }
 
     def main():
-        mkr = make_maker(PATHS, ROM)
+        mkr = make_maker(PATHS, ROM_JP, ROM_ZH)
         mkr.make('all')
         return mkr
     mkr = main()
