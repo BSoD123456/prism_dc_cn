@@ -468,8 +468,7 @@ class c_maker_rule_rom_gdi(c_maker_rule_txtfile):
         if extname:
             extname = extname[1:].lower()
         if not extname == 'gdi':
-            self._warn(f'only support gdi rom')
-            return None
+            self._error(f'only support gdi rom')
         lines = super().mk0(path)
         if lines is None:
             return None
@@ -585,6 +584,6 @@ if __name__ == '__main__':
 
     def main():
         mkr = make_maker(PATHS, ROM_JP, ROM_ZH)
-        mkr.make('all')
+        #mkr.make('all')
         return mkr
     mkr = main()
