@@ -576,7 +576,7 @@ if __name__ == '__main__':
     ROM_ZH = 'Prismaticallization (ZH).gdi'
     PATHS = {
         'source': r'L:\Resource\Games\emu\dc\roms\Prismaticallization (Japan)\GDI',
-        'output': r'wktab\output',
+        'output': r'L:\Resource\Games\emu\dc\roms\Prismaticallization (Japan)\OUTPUT',
         'work': r'wktab\work',
         'extract': r'wktab\extract',
         'data': r'wktab\extract\data',
