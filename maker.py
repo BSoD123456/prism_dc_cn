@@ -5,6 +5,7 @@ from report import report
 
 import os, os.path
 import subprocess
+import shutil
 
 def _execmd(cmd):
     sp = subprocess.Popen(cmd,
@@ -322,28 +323,26 @@ class c_maker_rule_shcmd(c_maker_rule):
 
 class c_maker_rule_extract(c_maker_rule_shcmd):
 
-    def mk0(self, rom, dpath, xpath):
-        cmdpatt = 'tools/buildgdi.exe -extract -{0} "{1}" -output "{2}" -ip "{3}/IP.BIN"'
+    def mk0(self, gdi, dpath, xpath):
+        cmdpatt = 'tools/buildgdi.exe -extract -gdi "{}" -output "{}" -ip "{}/IP.BIN"'
         self._info(f'extract rom')
-        _, extname = os.path.splitext(rom)
-        if extname:
-            extname = extname[1:].lower()
-        if not extname in ('cue', 'gdi'):
-            self._error(f'rom should be cue or gdi: {rom}')
-        cmdline = cmdpatt.format(extname, rom, dpath, xpath)
+        gdifn = gdi[0][0]
+        cmdline = cmdpatt.format(gdifn, dpath, xpath)
         return super().mk0(cmdline)
 
 class c_maker_rule_package(c_maker_rule_shcmd):
 
-    def mk0(self, rom, opath, dpath, xpath, spath):
-        cmdpatt = 'tools/buildgdi.exe -data "{0}" -ip "{1}/IP.BIN" -output "{2}" -CDDA "{4}/Prismaticallization (Japan) (Track 4).bin"'
+    def mk0(self, sgdi, dpath, xpath, dgdi, opath):
+        cmdpatt = 'tools/buildgdi.exe -gdi "{}" -data "{}" -ip "{}/IP.BIN" -output "{}"'
         self._info(f'package rom')
-        _, extname = os.path.splitext(rom)
-        if extname:
-            extname = extname[1:].lower()
-        if not extname == 'gdi':
-            self._error(f'rom should be gdi: {rom}')
-        cmdline = cmdpatt.format(dpath, xpath, opath, rom, spath)
+        gdifn = dgdi[0][0]
+        cdda = []
+        for fn, _, crit in sgdi:
+            if crit:
+                cdda.append(f'"{fn}"')
+        cmdline = cmdpatt.format(gdifn, dpath, xpath, opath)
+        if cdda:
+            cmdline = ' '.join([cmdline, '-cdda', *cdda])
         return super().mk0(cmdline)
 
 class c_maker_rule_ast(c_maker_rule_rawfile):
@@ -462,6 +461,61 @@ class c_maker_rule_font(c_maker_rule_rawfile):
             fd.write(draw)
         return draw
 
+class c_maker_rule_rom_gdi(c_maker_rule_txtfile):
+
+    def mk0(self, path):
+        _, extname = os.path.splitext(self.name)
+        if extname:
+            extname = extname[1:].lower()
+        if not extname == 'gdi':
+            self._warn(f'only support gdi rom')
+            return None
+        lines = super().mk0(path)
+        if lines is None:
+            return None
+        tracks = [(self.getpath(path), True, False)]
+        for ln, line in enumerate(lines):
+            if ln == 0 or line == '\n':
+                continue
+            ts = line.split()
+            try:
+                tt = int(ts[2].strip())
+                tn = ts[4].strip()
+            except:
+                return None
+            track = os.path.join(path, tn)
+            if not os.path.isfile(track):
+                self._warn(f'track not found {track}')
+                return None
+            ti = len(tracks)
+            tracks.append((
+                track,
+                ti < 3 or tt != 4,
+                ti > 3 and tt != 4 ))
+        return tracks
+
+class c_maker_rule_rom_gdi_copy(c_maker_rule_rom_gdi):
+
+    def mk1(self, path, sgdi):
+        fn = self.getpath(path)
+        gdi = []
+        for i, (track, crit, _) in enumerate(sgdi):
+            if i == 0:
+                dst = fn
+            else:
+                bn = os.path.split(track)[-1]
+                dst = os.path.join(path, bn)
+            gdi.append((dst, crit))
+            if crit:
+                if os.path.exists(dst):
+                    if os.path.isfile(dst):
+                        continue
+                    self._warn(f'invalid track {dst}')
+                    return None
+                self._info(f'copy from {track}')
+                shutil.copy2(track, dst)
+        return gdi
+
 def make_maker(paths, src_rom, dst_rom):
     rules = {}
     rules.update({
@@ -469,8 +523,8 @@ def make_maker(paths, src_rom, dst_rom):
         for path in paths.values()
     })
     rules.update({
-        src_rom: (c_maker_rule_path, paths['source']),
-        dst_rom: (c_maker_rule_path, paths['output']),
+        src_rom: (c_maker_rule_rom_gdi, paths['source']),
+        dst_rom: (c_maker_rule_rom_gdi_copy, paths['output'], src_rom),
     })
     rules.update({
         'extract': (
@@ -503,7 +557,7 @@ def make_maker(paths, src_rom, dst_rom):
         'modify': (c_maker_rule_vir, '!SCRIPT.BIN@mod', '!FONT.DAT@mod'),
         'package': (
             c_maker_rule_package,
-            dst_rom, paths['output'], paths['data'], paths['extract'], paths['source'],
+            src_rom, paths['data'], paths['extract'], dst_rom, paths['output'],
             '!modify',
         ),
     })
@@ -518,10 +572,10 @@ if __name__ == '__main__':
     from pprint import pprint
     ppr = lambda *a, **ka: pprint(*a, **ka, sort_dicts = False)
 
-    ROM_JP = 'Prismaticallization (Japan).cue'
+    ROM_JP = 'Prismaticallization (Japan).gdi'
     ROM_ZH = 'Prismaticallization (ZH).gdi'
     PATHS = {
-        'source': r'L:\Resource\Games\emu\dc\roms\Prismaticallization (Japan)',
+        'source': r'L:\Resource\Games\emu\dc\roms\Prismaticallization (Japan)\GDI',
         'output': r'wktab\output',
         'work': r'wktab\work',
         'extract': r'wktab\extract',
