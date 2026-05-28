@@ -207,6 +207,8 @@ class c_maker:
     def dirty(self, tarname):
         if not tarname in self.rules_ref:
             self._chkrl(tarname)
+        if tarname in self.cch:
+            self.cch.pop(tarname)
         wk = set()
         defer = []
         self._clean_ref(tarname, wk, defer)
@@ -293,6 +295,9 @@ class c_maker_rule_copyfile_force(c_maker_rule_rawfile):
         with open(fn, 'wb') as fd:
             fd.write(raw)
         return raw
+
+    def cln(self):
+        pass
 
 class c_maker_rule_txtfile(c_maker_rule_rawfile):
 
