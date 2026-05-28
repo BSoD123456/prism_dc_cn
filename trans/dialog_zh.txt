@@ -3061,7 +3061,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/1-Then/1-Loop/8-Then/1>
-与{word(澄香)}的谈话内容
+{word(澄香)}的谈话内容
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3149,7 +3149,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/2-Then/1-Loop/8-Then/1>
-与{word(みゆ)}的谈话内容
+{word(みゆ)}的谈话内容
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3301,7 +3301,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/4-Then/1-Loop/5-Then/1>
-与{word(雪乃)}遭遇
+{word(雪乃)}的遭遇
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3309,7 +3309,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/4-Then/1-Loop/6-Then/1>
-与{word(澄香)}玩水
+{word(澄香)}一起玩水
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3317,7 +3317,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/4-Then/1-Loop/7-Then/1>
-与{word(雪乃)}玩水
+{word(雪乃)}一起玩水
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3325,7 +3325,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/4-Then/1-Loop/8-Then/1>
-与{word(明美)}玩水
+{word(明美)}一起玩水
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3333,7 +3333,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/4-Then/1-Loop/9-Then/1>
-与{word(さより)}玩水
+{word(さより)}一起玩水
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3341,7 +3341,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/4-Then/1-Loop/10-Then/1>
-与{word(みゆ)}玩水
+{word(みゆ)}一起玩水
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3365,7 +3365,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/5-Then/1-Loop/2-Then/1>
-与{word(澄香)}遭遇
+{word(澄香)}的遭遇
 </text>
 <next: Scene-3294/End>
 --------------------
@@ -3373,7 +3373,7 @@ SE
 
 -------------------
 <text: Scene-3294/1-Loop/1-Then/1-Loop/5-Then/1-Loop/3-Then/1>
-与{word(明美)}两人独处
+{word(明美)}两人独处
 </text>
 <next: Scene-3294/End>
 --------------------

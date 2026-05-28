@@ -79,9 +79,7 @@ class c_sdialog_comparer:
         if tti is None:
             if not txt:
                 return
-            if not rmtref:
-                self._error(ln, 'textref not enough')
-            trs = rmtref.pop()
+            self._error(ln, f'textref not enough for {txt}')
         else:
             trs = tgrp[tti]
             rmtref.extend(tgrp[:tti])
@@ -143,18 +141,21 @@ class c_sdialog_comparer:
             self._feed_line(i+1, s, d, h)
         self._treftab_flush()
 
+    def result(self):
+        return self.treftxt
+
 def cmp_sdialog(srcfn, dstfn, shdfn):
     cmp = c_sdialog_comparer()
     with open(srcfn, 'r', encoding = 'utf-8') as srcfd:
         with open(dstfn, 'r', encoding = 'utf-8') as dstfd:
             with open(shdfn, 'r', encoding = 'utf-8') as shdfd:
                 cmp.feed(srcfd, dstfd, shdfd)
-    return cmp.treftxt
+    return cmp.result()
 
 def cmp_sdialog_lines(srclines, dstlines, shdlines):
     cmp = c_sdialog_comparer()
     cmp.feed_lines(srclines, dstlines, shdlines)
-    return cmp.treftxt
+    return cmp.result()
 
 if __name__ == '__main__':
     import pdb
