@@ -24,8 +24,6 @@ class err_maker_make(ValueError):
 
 class c_maker_rule:
 
-    FORCE = False
-
     def __init__(self, name):
         self.name = name
 
@@ -184,9 +182,6 @@ class c_maker:
 
     def _clean(self, tarname, wk, defer):
         self._chkrl(tarname)
-        mr = self.rules[tarname][0]
-        if mr.FORCE:
-            return
         self._clean_ref(tarname, wk, defer)
         self._clean_item(tarname, wk, defer)
 
@@ -289,8 +284,6 @@ class c_maker_rule_copyfile(c_maker_rule_rawfile):
         return raw
 
 class c_maker_rule_copyfile_force(c_maker_rule_rawfile):
-
-    FORCE = True
 
     def mk0(self, path, raw):
         fn = self.getpath(path)
