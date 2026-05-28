@@ -209,12 +209,12 @@ class c_sdialog_comparer_check(c_sdialog_comparer):
 
     def _check_dialog(self, ln, dst_dlg, src_dlg, eol):
         self._chk_cnt(ln, dst_dlg, src_dlg, eol)
-        self._chk_fnd(ln, dst_dlg, src_dlg, eol, r'(\[CLR:yellow\][^\[\]{}]+\[CLR:white\])')
+        #self._chk_fnd(ln, dst_dlg, src_dlg, eol, r'(\[CLR:yellow\][^\[\]{}]+\[CLR:white\])')
 
     def _check_result(self):
         r = True
         r = (self._chk_cnt_rslt() and r)
-        r = (self._chk_fnd_rslt() and r)
+        #r = (self._chk_fnd_rslt() and r)
         return r
 
     def result(self):

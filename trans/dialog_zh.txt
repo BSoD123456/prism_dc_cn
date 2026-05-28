@@ -4139,7 +4139,7 @@ SE
 
   ……在远处道路的前方，一个姑娘从树林里跑了出来。
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「呜欸～」
 
   然后就那样穿过道路，冲进了对面树林的深处……
@@ -4222,7 +4222,7 @@ SE
 
   ……就在那时，我看见了站在树林中的男人身影。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「…………」
 
   他像是不愿与{word(俺)}对上目光，消失在了树林深处。
@@ -5256,7 +5256,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「我中套了啊……」
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「你在嘀嘀咕咕说什么呢！」
 
   咚！
@@ -5357,12 +5357,12 @@ SE
 
   非常容易理解。{word(俺)}是……
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……原来如此」
 
   {word(俺)}还以为只有自己，却有个男人在。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……会变成这样啊」
 
   男人叹了口气。他坐下，垂下肩膀。
@@ -5370,18 +5370,18 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「……你说什么？」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「谁知道呢。既然记忆还残留着……」
 
   他抬起脸，环视四周。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「至少可以确定，已经和至今为止不同了」
 
 [CLR:yellow]{word(射場)}[CLR:white]
 「……至今为止，是什么意思？」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……你没有注意到吗？
 
   我看你即便如此，也像是感到了可疑。你在树干上，刻过伤痕吧。
@@ -5391,13 +5391,13 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「……然后呢？」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「也就是说，我明白了过去是可以改变的」
 
 [CLR:yellow]{word(射場)}[CLR:white]
 「荒唐。那种事，只是记错了吧」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「当然，应该并不准确。所谓过去，是排列在时间轴上的记录……
 
   也就是说，只要时间线的轨迹改变，认知上的世界就会改变。
@@ -5411,12 +5411,12 @@ SE
 
   它在太阳光下闪烁。复杂地分散着光。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「那东西会造成影响。大概。不……也许不是。说不定……」
 
   男人眯起眼，凝视着{word(俺)}手中那半透明的物体。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「它本身就是过去。过去的结晶。世界本身」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -5424,7 +5424,7 @@ SE
 
   过去会被积蓄起来这种概念，也并不罕见。毕竟，这个世界本身，就是那种累积」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「不只是过去……说不定，那是所有可能存在的要素。
 
   从内含各种信息之处，就能取出各种东西。
@@ -5442,7 +5442,7 @@ SE
 
   男人再次吐出一口气，兴致缺缺地晃着脚。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「应该在某处吧……不，是曾经在某时吗。
 
   啊啊……这样啊。我现在才注意到。……那东西，是一个」
@@ -5450,7 +5450,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「什么？」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「那块玻璃啊。我还以为有两块……不是的。
 
   最初是{word(俺)}捡到的。然后她拿走了。之后她大概弄丢了……再由你捡到」
@@ -5458,7 +5458,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「……时间前后颠倒了吧」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「所以说，时间没有关系。大概，这就是它循环的理由。
 
   ……这样一来，就能出去了。缠结已经解开了。记忆会连续，也是因为这个」
@@ -5470,7 +5470,7 @@ SE
 
   ……因为我已经约好了，之后会过去」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……这样啊。不过{word(俺)}帮不了你。那只在你手中」
 
   男人站起身。然后背过身去，一边离开，一边朝{word(俺)}微微举了举手。
@@ -6150,13 +6150,13 @@ SE
 
   从外表看，她似乎比{word(俺)}们稍微年幼一点。然后她注意到这边，深深低下了头。
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「啊……你好。你们是住那边房间的客人吗？」
 
 [CLR:yellow]{word(明美)}[CLR:white]
 「嗯，对对。……呃～你是先到的客人，对吧？」
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「是的。我叫{word(沢村)}{word(雪乃)}。初次见面」
 
   她再次低下头。
@@ -6175,12 +6175,12 @@ SE
 
   听见了跑上楼梯的声音。是{word(みゆ)}回来了吗……
 
-[CLR:yellow]娘2[CLR:white]
+[CLR:yellow]女孩2[CLR:white]
 「唔～！{word(雪乃)}酱好慢～！……咦，咦？」
 
   不是。看来是{word(沢村)}小姐的同伴。
 
-[CLR:yellow]娘2[CLR:white]
+[CLR:yellow]女孩2[CLR:white]
 「……你们是哪位？」
 
 [CLR:yellow]{word(雪乃)}[CLR:white]
@@ -6197,7 +6197,7 @@ SE
 
   {word(柊)}朝她们耸了耸肩。传来轻轻的笑声。
 
-[CLR:yellow]娘2[CLR:white]
+[CLR:yellow]女孩2[CLR:white]
 「啊！呃，{word(私)}是{word(鳴川)}{word(澄香)}！」
 
   她轻轻鞠了一躬。
@@ -6380,21 +6380,21 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「细节，你喂……」
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「咦～？」
 
   突然响起的、像是泄了气般的女孩声音。{word(俺)}朝声音来源看去。
 
   房门半开着，从那里有个陌生的女孩正一脸疑惑地探出脸来。
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「呃～那个……嗯？」
 
   她看了看自己的双手。恐怕是在想，拿筷子的那边，拿饭碗的那边……之类的。
 
   ……然后，她像是猛然反应过来似的抬起头。
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「啊！不好意思～！我好像走错房间了……
 
   哎呀～失败失败！一不小心就……」
@@ -6404,7 +6404,7 @@ SE
 [CLR:yellow]{word(明美)}[CLR:white]
 「啊，完全没关系哦。……呃～你是隔壁房间的客人？」
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「是的！我是{word(鳴川)}{word(澄香)}！高中一年级！还有……」
 
   她一手扶着门，转向走廊那边。
@@ -6414,7 +6414,7 @@ SE
 
   ……过了一会儿，另一个女孩怯生生地现身了。
 
-[CLR:yellow]娘2[CLR:white]
+[CLR:yellow]女孩2[CLR:white]
 「那个……是不是做了什么失礼的事……」
 
 [CLR:yellow]{word(澄香)}[CLR:white]
@@ -6424,7 +6424,7 @@ SE
 
   {word(鳴川)}小姐用力拉住仍停在走廊里的同伴的手。
 
-[CLR:yellow]娘2[CLR:white]
+[CLR:yellow]女孩2[CLR:white]
 「啊，我是{word(沢村)}{word(雪乃)}。和{word(澄香)}酱是同班同学」
 
   她刚回答完，{word(鳴川)}小姐就不满地噘起嘴。
@@ -7520,7 +7520,7 @@ SE
 
   而恐怕，剩下的座位是隔壁房间的……
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「啊～！是新的客人吗！？」
 
   年轻女孩的声音。{word(俺)}们回过头。
@@ -7529,7 +7529,7 @@ SE
 
   另一个女孩，则似乎在为同伴的举动操心。
 
-[CLR:yellow]娘2[CLR:white]
+[CLR:yellow]女孩2[CLR:white]
 「那个……不好意思，这么冒失……」
 
   她深深低下头。
@@ -7537,7 +7537,7 @@ SE
 [CLR:yellow]{word(明美)}[CLR:white]
 「不会，完全没关系哦。你们是隔壁房间的客人？」
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「是！虽然是从昨天开始的。
 
   ……不过，说是客人，其实是因为{word(雪乃)}酱的关系啦……」
@@ -7553,12 +7553,12 @@ SE
 [CLR:yellow]{word(雪乃)}[CLR:white]
 「是这样啊……」
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「唔唔唔？……也就是说……」
 
   比较积极的那个女孩把食指竖在额头上，沉吟起来。
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「在这里的大家，都是熟人的熟人的又熟人，之类的……
 
   也就是说，是某种有缘分的关系，对吧……？」
@@ -7569,24 +7569,24 @@ SE
 [CLR:yellow]{word(明美)}[CLR:white]
 「啊，包括{word(さより)}小姐和{word(みゆ)}酱在内，是吧」
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「对！该怎么说呢，这种……
 
   有种命运感！对吧！？」
 
   她有力地寻求认同。……她是在期待吐槽吗。
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「那么，首先自我介绍！来吧！」
 
   她挺直背，咳哼一声清了清嗓子。
 
-[CLR:yellow]娘[CLR:white]
+[CLR:yellow]女孩[CLR:white]
 「呃～{word(私)}是{word(鳴川)}{word(澄香)}。青春活力的高中一年级！然后……」
 
   她看向身旁的同伴。
 
-[CLR:yellow]娘2[CLR:white]
+[CLR:yellow]女孩2[CLR:white]
 「啊，我是{word(沢村)}{word(雪乃)}。和{word(澄香)}酱是同班同学」
 
   她刚回答完，{word(鳴川)}小姐就不满地嘟起嘴。
@@ -8823,7 +8823,7 @@ SE
 
   脚步声理所当然地跑过走廊，随后是门打开的声音。和预想一样。
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「呼ー……呼ー……」
 
   突然，像猫威吓般的声音从背后传来，{word(俺)}打了个寒战回头看去。
@@ -10604,7 +10604,7 @@ SE
 
   ……在某个遥远的地方，听见了某人的喊声……
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「喂，{word(荘司)}！醒醒！」
 
   脸上传来疼痛。是耳光。啪啪地，毫不留情的攻击持续着。
@@ -10891,7 +10891,7 @@ SE
 
 -------------------
 <text: Scene-19c9d/1-Loop/2-Then/2-Then/2-Then/2-Else/1>
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「唔～嗯～……」
 
   突然从背后传来呻吟声。回头一看，{word(澄香)}正托着腮，瞪着这边。
@@ -15788,7 +15788,7 @@ SE
 
   {word(さより)}小姐从门口疑惑地看着这边，{word(俺)}用手势示意她等一下。
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「啊？……啊，不，打扰了……
 
   ……请问那边有没有一位姓{word(沢村)}的住客？」
@@ -15800,7 +15800,7 @@ SE
 
   大致上应该和想象的一样。恐怕他是……
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「……失礼了。我是{word(沢村)}{word(雪乃)}的哥哥……」
 
   猜中了。从{word(沢村)}小姐的话里，我知道他和{word(俺)}同年。
@@ -15812,13 +15812,13 @@ SE
 
   {word(俺)}故意说了句失礼的话。让人操心的元凶就是他。多少也在意一下吧。
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「……啊，啊啊……是……你为什么知道？」
 
 [CLR:yellow]{word(射場)}[CLR:white]
 「小心点。你的行动，也可能会让别人哭」
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「…………
 
   ……让我妹妹接电话」
@@ -17537,7 +17537,7 @@ SE
 
   ……睁开眼。也许是又睡了一觉，脑子迟钝而混浊。
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「啊，醒了」
 
   传到{word(俺)}耳边的声音。这一次，确实是{word(柊)}。
@@ -17604,7 +17604,7 @@ SE
 <text: Scene-36764/1-Loop/1-Then/1-Else/1>
   睁开眼。身体很沉。{word(俺)}按着眼角，撑起肩膀。
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「啊，醒了」
 
   被突如其来的声音吓到而回头一看，那里有{word(柊)}。她是什么时候进来的……
@@ -19547,18 +19547,18 @@ SE
 
   ……想来真是短暂的人生。{word(俺)}要在这种地方，被变态侵犯然后结束吗……
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「可疑分子，束手就擒吧～！」
 
   女性的声音？难道在人生最后，能稍微留下点美好的回忆吗……？
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「竟敢盯上{word(雪乃)}酱和{word(私)}，真是罪大恶极！斩首示众！」
 
 [CLR:yellow]{word(射場)}[CLR:white]
 「啊゛？{word(澄香)}……？」
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「咦？……前辈？」
 
   对方就这样以{word(俺)}的脖子为轴，晃悠悠地绕到前面来。
@@ -20882,7 +20882,7 @@ SE
 
   ……{word(私)}……不知道。但是，大概……」
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「哎呀？……{word(荘司)}，你房间里有人吗？」
 
   突然，房间外传来了声音。是{word(さより)}女士。{word(俺)}的声音大概漏到外面去了吧。
@@ -21443,12 +21443,12 @@ SE
 <text: Scene-44d26/1-Loop/3-Then/1>
   脑中透进淡淡的日光。混浊灰暗的觉醒。被迫醒来。
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「{word(荘司)}……醒醒……」
 
   身体被摇晃着。血液不顾心跳地流动。迟钝的头痛。
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「对不起，{word(荘司)}……可是，有点……」
 
   柔软的手。按在{word(俺)}身上的那只手，催促着我醒来。
@@ -21628,7 +21628,7 @@ SE
 
   还是有别的理由。这里是山林。也可能用了什么来路可疑的食材……
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「……嗯……」
 
   细小的呻吟打断了{word(俺)}的思考。……是{word(さより)}小姐。
@@ -21908,12 +21908,12 @@ SE
 
 -------------------
 <text: Scene-46602/1-Loop/7-Then/1>
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「{word(荘司)}！喂！起来！」
 
   并不清爽的醒来。不知为何侧腹感到钝痛。
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「已经早上了！一直睡下去，对太阳公公太失礼了！」
 
   ……是{word(柊)}。{word(柊)}。和昨天一样的调子。砰砰地打着{word(俺)}……
@@ -22148,7 +22148,7 @@ SE
 
   为什么要逃？可是反应是{word(俺)}更快。转眼间便追上了。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「呀、呀啊……是你啊」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -22156,7 +22156,7 @@ SE
 
   ……是昨晚遇见的男人。他像是在什么地方绊倒摔了一跤，一边拍着裤子一边站起来。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「你突然跑过来，我还以为是野狗呢。什么夏日之犬之类的」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -22164,7 +22164,7 @@ SE
 
   他扶正滑下来的眼镜位置，看向{word(俺)}。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「要扑上来的话，希望你先确认对方不是男人再说」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -22174,12 +22174,12 @@ SE
 
   他像是有些惊讶地回看{word(俺)}。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……真敏锐啊。是女孩子吧？她的话，往那边……」
 
   他指向山庄的方向。……是吗，回去了啊。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「有什么隐情吗？」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -22732,7 +22732,7 @@ SE
 [CLR:yellow]{word(みゆ)}[CLR:white]
 「我一直在找你……因为你一直藏着，所以我才找不到……」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「{word(俺)}也有自己的目的啊……
 
   ……不过，就连察觉到现在究竟是什么状态，也需要偶然」
@@ -22742,7 +22742,7 @@ SE
 
   这也许是{word(私)}的梦……只是，一个疯狂的」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「一切都不过是自己的主观，这种想法我承认。
 
   无论是谁，都可以认为这个世界是为了自己而存在的。
@@ -22752,7 +22752,7 @@ SE
 [CLR:yellow]{word(みゆ)}[CLR:white]
 「可是，那是可以改变的……不是吗？」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「不知道。仅凭{word(俺)}一个人并不完整。理解还很浅。现在还」
 
 [CLR:yellow]{word(みゆ)}[CLR:white]
@@ -22766,7 +22766,7 @@ SE
 
   即便如此，也并不知道自己在找什么。……总是这种事」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「可是，如果能像你这样，让记忆持续下去的话……
 
   这个就能被更加有效地利用。确实，你是必要的。你提出合作的请求，我接受。
@@ -22776,7 +22776,7 @@ SE
 [CLR:yellow]{word(みゆ)}[CLR:white]
 「{word(私)}只是……想和全家人在一起……」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……是吗。那{word(俺)}也一样」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -22789,7 +22789,7 @@ SE
 
   {word(みゆ)}回过头来。然而她的表情中，能看出失望与沮丧，是错觉吗？
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……也就是说，他持有另一个。恐怕是」
 
   男人转向{word(俺)}，像估价般打量着，而这一点被{word(みゆ)}看在眼里。
@@ -22797,13 +22797,13 @@ SE
 [CLR:yellow]{word(みゆ)}[CLR:white]
 「哥哥没有关系」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「那可不行。要是让他擅自行动，我们会很困扰」
 
 [CLR:yellow]{word(みゆ)}[CLR:white]
 「就是因为不想给哥哥添麻烦，我才来找你商量的」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「可是他的行动，确实会造成我们预料之外的影响。
 
   ……算了，只要能让他把持有的东西交出来，那就行了」
@@ -22813,7 +22813,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「……{word(俺)}不知道你们在说什么……」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「装糊涂可让我为难。我也不想动粗啊……」
 
   男人靠近{word(俺)}，粗暴地揪住胸口。
@@ -22821,7 +22821,7 @@ SE
 [CLR:yellow]{word(みゆ)}[CLR:white]
 「请住手！不然我就不合作了！」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……你不是会白白葬送难得机会的蠢货。
 
   一旦没有选择余地，就只能妥协了」
@@ -22838,7 +22838,7 @@ SE
 [CLR:yellow]{word(みゆ)}[CLR:white]
 「哥哥！」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……别废话，快交出来。
   没时间了。既然她牵涉其中，就不能重来了……」
 
@@ -22850,7 +22850,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「{word(みゆ)}，危险，退后」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「啧，所以说小鬼就是……」
 
   男人甩开{word(みゆ)}，就这样对她……
@@ -22939,7 +22939,7 @@ SE
 
   但总觉得那里还有没有说出口的其他理由。关于{word(みゆ)}的某些事……
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「呜欸……」
 
   突如其来的奇怪声音让{word(俺)}吃了一惊。发出声音的是……{word(みゆ)}。
@@ -23238,13 +23238,13 @@ SE
 
   ……而那个男人的身旁，也有{word(みゆ)}的身影。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「嗯……也就是说，她说想协助{word(俺)}」
 
 [CLR:yellow]{word(さより)}[CLR:white]
 「{word(みゆ)}，你要做什么？……如果是什么坏事的话……」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「不用担心那些奇怪的事。{word(俺)}没有那种兴趣。
 
   她聪慧，而且是个特殊的女孩。只要她肯帮忙，就什么都能做到。理应如此」
@@ -23304,7 +23304,7 @@ SE
 
   {word(さより)}小姐含糊其辞……然而她的样子中，言外之意已经明显地流露出来。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「嗯……看来你们那边也有不少事啊。虽然和{word(俺)}无关……
 
   总之，她我会带走。就让我有效地利用她吧」
@@ -23321,7 +23321,7 @@ SE
 
   {word(さより)}小姐瞪着男人。男人一脸平静，但{word(みゆ)}开始动摇了。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……善恶并不是问题。是谁规定了它？
 
   ……谁也不是。归根结底，每个人都只是在擅自发表自己的说法。那就是其集合体。
@@ -23337,7 +23337,7 @@ SE
 
   ……可是，我不后悔那件事。因为喜欢上一个人，根本不需要理由」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……这点，我同意」
 
 [CLR:yellow]{word(さより)}[CLR:white]
@@ -23350,13 +23350,13 @@ SE
 
   {word(みゆ)}像是想说什么似的，一边看向这边，一边呻吟。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「可是，决定这件事的，是她自己的意志。不是{word(俺)}……」
 
 [CLR:yellow]{word(みゆ)}[CLR:white]
 「……{word(私)}……想再稍微……想一想……」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……你说什么？」
 
   男人像是怯了一下，转向{word(みゆ)}。
@@ -23369,7 +23369,7 @@ SE
 [CLR:yellow]{word(さより)}[CLR:white]
 「{word(みゆ)}！」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「可恶！竟然被说动了！
 
   不行。{word(俺)}已经决定了。事情已经决定了。过来」
@@ -23494,7 +23494,7 @@ SE
 
   {word(俺)}望着它……然后注意到，从建筑物后方，出现了一名女性。
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「啊，欢迎～！{word(荘司)}！」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -23696,7 +23696,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「等等……那可……」
 
-[CLR:yellow]声[CLR:white]
+[CLR:yellow]声音[CLR:white]
 「……我等的就是这句话，{word(雪乃)}」
 
   突然响起的声音。望过去，树林里有个陌生男人的身影。其他女孩们是先走了吗，看不见。
@@ -24200,7 +24200,7 @@ SE
 
   {word(俺)}沿着她跑去的方向，慢慢走去。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……哟」
 
   突然，身后有人搭话。回头一看，那里站着一个不熟悉的男人。
@@ -24215,12 +24215,12 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「你是谁来着。不好意思，{word(俺)}……」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……是吗。到头来，你还是没能理解啊」
 
   男人像是失望般摇了摇头。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「不过，{word(俺)}也一样……即便如此，我想多少还是看见了一点。
 
   问题在于，如何让记忆持续下去。现在，只能依靠偶然。
@@ -24228,7 +24228,7 @@ SE
   毕竟不能期待每次都能察觉状况。虽说贤者一日便能抵达真理……」
   男人不知在嘟囔些什么。是个危险的男人吗？
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「总之现在，要尽可能做能做的事。也许不会再有下一次了。
 
   ……交出来。并不期待你。由{word(俺)}来做」
@@ -24236,7 +24236,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「你在说什么。如果是新型敲诈的话……」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「不明白吗？{word(俺)}们得到了变革这个世界的术。
 
   虽然大概只是暂定的。不过，应该能做到。什么都能。{word(俺)}要用它来……」
@@ -24244,7 +24244,7 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「不好意思，我对宗教没兴趣。政治也是」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……我还以为你是更敏锐的男人」
 
   {word(俺)}对他的话感到烦躁。刻意做作，又偏离重点的说法。
@@ -24256,14 +24256,14 @@ SE
 [CLR:yellow]{word(射場)}[CLR:white]
 「……你说交出来吧。交什么」
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「不知道名字。是捡来的东西。只是，我注意到这东西有关」
 
   男人从裤子口袋里拿出什么，示给{word(俺)}看。
 
   闪耀的透明矿石……玻璃柱吗？看做工精巧，像是什么装饰品……
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……你也应该有。
 
   {word(俺)}拿着两个，虽然不知道会发生什么……但总比停滞不前要好」
@@ -24285,7 +24285,7 @@ SE
 
   必须小心。尤其是，不能让他靠近山庄。她们有危险。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「……没时间了。不一定还能再做一次同样的事。快点」
 
   男人没有回答问题，伸出手。那里有他拿着的那个东西。在阳光下，闪闪发亮。
@@ -24295,7 +24295,7 @@ SE
 
   背后传来{word(澄香)}的声音。男人被她吸引注意的瞬间，{word(俺)}一脚踢向他。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「呃！」
 
   物件从他的手中落下。{word(俺)}迅速捡起它，转身扔给{word(澄香)}。
@@ -24305,7 +24305,7 @@ SE
 
   {word(澄香)}虽然困惑，却慌忙抓住了{word(俺)}扔出的矿石。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「可恶！做这种蠢事……还来！」
 
 [CLR:yellow]{word(射場)}[CLR:white]
@@ -24313,7 +24313,7 @@ SE
 
   男人想朝{word(澄香)}冲去，{word(俺)}拦住他，随即，反击的拳头飞了过来。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「别碍事！」
 
   被人说别碍事，也不能就此停手。只能相信觉得似乎会出问题的直觉。
@@ -24335,7 +24335,7 @@ SE
 
   男人相当习惯打架。对{word(俺)}不利。撑不了太久。
 
-[CLR:yellow]男[CLR:white]
+[CLR:yellow]男人[CLR:white]
 「可恶！蠢女人！把那个还来！」
 
   男人越过{word(俺)}的肩膀，朝{word(澄香)}伸出手。
