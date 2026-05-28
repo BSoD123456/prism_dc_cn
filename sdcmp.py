@@ -161,15 +161,19 @@ class c_sdialog_comparer_check(c_sdialog_comparer):
 
     def _cnt_chars(self, dlg):
         assert dlg and dlg[-1] == '\n'
-        rtxt, pcnt = re.subn(r'{[^{}]*}', '', dlg)
+        rtxt, pcnt = re.subn(r'{[^{}]*}', '', dlg[:-1])
         rtxt = re.sub(r'\[[^{}]*\]', '', rtxt)
         rtxt = rtxt.replace('  ', '_')
         if ' ' in rtxt:
             return None, False
-        return len(rtxt) - 1, pcnt
+        rlen = len(rtxt)
+        if rlen and rtxt[-1] == '。':
+            rlen -= 1 # last dot
+        return rlen, pcnt
 
     def _chk_cnt(self, ln, dst_dlg, src_dlg, eol):
         max_cnt = 48
+        min_plen = 2
         cnt, pcnt = self._cnt_chars(dst_dlg)
         if cnt is None:
             self._error(ln, f'invalid space: {dst_dlg}')
@@ -179,7 +183,7 @@ class c_sdialog_comparer_check(c_sdialog_comparer):
                 self._error(ln, f'invalid space: {src_dlg}')
             assert spcnt > 0
             splen = (max_cnt - scnt) // spcnt
-            cnt += min(3, splen) * pcnt
+            cnt += min(min_plen, splen) * pcnt
         if cnt >= max_cnt:
             self._chk_cnt_tab.append((ln, dst_dlg, cnt))
 
