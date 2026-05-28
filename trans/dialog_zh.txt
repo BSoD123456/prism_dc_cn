@@ -82173,7 +82173,7 @@ z
 <text: Scene-61c65/1-Loop/2-Loop/17-Then/1-Loop/1-Loop/2-Then/1>
 [SEL:759]女[SEL:75a]子[SEL:75b]娘[SEL:75c]姑[SEL:75d]姐  [SEL:75e]侬[SEL:75f]阿[SEL:760]拉[SEL:761]阮[SEL:762]偶
 [SEL:763]伦[SEL:764]宝[SEL:765]爷[SEL:766]洒[SEL:767]后  [SEL:768]可[SEL:769]卬[SEL:76a]一[SEL:76b]谷[SEL:76c]崖
-[SEL:76d]俄
+[SEL:76d]俄[SEL:76e]夫[SEL:76f]头[SEL:770]婆
 
 [SEL:1f5a]前项
 
@@ -82912,7 +82912,7 @@ z
 
 -------------------
 <text: Scene-61c65/1-Loop/2-Loop/17-Then/1-Loop/2-Then/1-Loop/72-Then/1>
-？
+夫
 </text>
 <next: Scene-61c65/End>
 <next: Scene-61c65/1-Loop/1>
@@ -82921,7 +82921,7 @@ z
 
 -------------------
 <text: Scene-61c65/1-Loop/2-Loop/17-Then/1-Loop/2-Then/1-Loop/73-Then/1>
-？
+头
 </text>
 <next: Scene-61c65/End>
 <next: Scene-61c65/1-Loop/1>
@@ -82930,7 +82930,7 @@ z
 
 -------------------
 <text: Scene-61c65/1-Loop/2-Loop/17-Then/1-Loop/2-Then/1-Loop/74-Then/1>
-？
+婆
 </text>
 <next: Scene-61c65/End>
 <next: Scene-61c65/1-Loop/1>

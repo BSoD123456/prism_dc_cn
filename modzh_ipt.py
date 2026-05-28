@@ -87,8 +87,9 @@ if __name__ == '__main__':
         with open(r'trans\origname.txt', 'r', encoding = 'utf-8') as fd:
             rcs = read_chars(fd)
         rplc[36] = rcs.copy()
-        with open(r'wktab\dialog_done2.txt', 'r', encoding = 'utf-8') as sfd:
-            with open(r'trans\dialog_zh.txt', 'r', encoding = 'utf-8') as dfd:
+        with open(r'wktab_bak\dialog_done2.txt', 'r', encoding = 'utf-8') as sfd:
+            #with open(r'trans\dialog_zh.txt', 'r', encoding = 'utf-8') as dfd:
+            with open(r'wktab_bak\dialog_done2.txt', 'r', encoding = 'utf-8') as dfd:
                 with open(r'trans\dialog_zh_mod_ipt.txt', 'w', encoding = 'utf-8') as mfd:
                     st, tn = modzh_ipt(sfd, dfd, mfd, rplc)
         cs = []
