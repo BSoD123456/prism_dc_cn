@@ -97,7 +97,7 @@ class c_sdialog_comparer:
         if src_dlg == shd_dlg:
             if dst_dlg != shd_dlg:
                 self._error(ln, 'unmatched line')
-            return
+            return None
         src_seq, src_tmpl_seq = self._split_tmpl(src_dlg)
         dst_seq, dst_tmpl_seq = self._split_tmpl(dst_dlg)
         shd_seq, shd_tmpl_seq = self._split_tmpl(shd_dlg)
@@ -116,6 +116,7 @@ class c_sdialog_comparer:
             if smtxt and smtti is None:
                 self._error(ln, f'unmatched textref')
             self._treftab_bind_txt(ln, dst_txt, shd_grp)
+        return shd_seq
 
     def feed(self, srcfd, dstfd, shdfd):
         ln = 0
@@ -144,6 +145,83 @@ class c_sdialog_comparer:
     def result(self):
         return self.treftxt
 
+class c_sdialog_comparer_check(c_sdialog_comparer):
+
+    def __init__(self):
+        super().__init__()
+        self._chk_cnt_tab = []
+        self._chk_fnd_tab = {}
+
+    def _feed_line(self, ln, src_dlg, dst_dlg, shd_dlg):
+        shd_seq = super()._feed_line(ln, src_dlg, dst_dlg, shd_dlg)
+        if not shd_seq is None:
+            self._check_dialog(
+                ln, dst_dlg, src_dlg, shd_seq and shd_seq[-1] == '__EOL__')
+        return shd_seq
+
+    def _cnt_chars(self, dlg):
+        assert dlg and dlg[-1] == '\n'
+        rtxt, pcnt = re.subn(r'{[^{}]*}', '', dlg)
+        rtxt = re.sub(r'\[[^{}]*\]', '', rtxt)
+        rtxt = rtxt.replace('  ', '_')
+        if ' ' in rtxt:
+            return None, False
+        return len(rtxt) - 1, pcnt
+
+    def _chk_cnt(self, ln, dst_dlg, src_dlg, eol):
+        max_cnt = 48
+        cnt, pcnt = self._cnt_chars(dst_dlg)
+        if cnt is None:
+            self._error(ln, f'invalid space: {dst_dlg}')
+        if pcnt > 0:
+            scnt, spcnt = self._cnt_chars(src_dlg)
+            if scnt is None:
+                self._error(ln, f'invalid space: {src_dlg}')
+            assert spcnt > 0
+            splen = (max_cnt - scnt) // spcnt
+            cnt += min(3, splen) * pcnt
+        if cnt >= max_cnt:
+            self._chk_cnt_tab.append((ln, dst_dlg, cnt))
+
+    def _chk_cnt_rslt(self):
+        if not self._chk_cnt_tab:
+            return True
+        print('overcounted dialog:')
+        for ln, txt, cnt in self._chk_cnt_tab:
+            print(f'{txt}@{ln}: {cnt}')
+        return False
+
+    def _chk_fnd(self, ln, dst_dlg, src_dlg, eol, dpatt):
+        m = re.match(dpatt, dst_dlg)
+        if not m:
+            return
+        val = m.group(1)
+        if val is None:
+            return
+        rs = self._chk_fnd_tab
+        rs[val] = rs.get(val, 0) + 1
+
+    def _chk_fnd_rslt(self):
+        print('found dialog:')
+        for v, cnt in self._chk_fnd_tab.items():
+            print(f'{v}: {cnt}')
+        return True
+
+    def _check_dialog(self, ln, dst_dlg, src_dlg, eol):
+        self._chk_cnt(ln, dst_dlg, src_dlg, eol)
+        self._chk_fnd(ln, dst_dlg, src_dlg, eol, r'(\[CLR:yellow\][^\[\]{}]+\[CLR:white\])')
+
+    def _check_result(self):
+        r = True
+        r = (self._chk_cnt_rslt() and r)
+        r = (self._chk_fnd_rslt() and r)
+        return r
+
+    def result(self):
+        if not self._check_result():
+            return None
+        return super().result()
+
 def cmp_sdialog(srcfn, dstfn, shdfn):
     cmp = c_sdialog_comparer()
     with open(srcfn, 'r', encoding = 'utf-8') as srcfd:
@@ -153,7 +231,8 @@ def cmp_sdialog(srcfn, dstfn, shdfn):
     return cmp.result()
 
 def cmp_sdialog_lines(srclines, dstlines, shdlines):
-    cmp = c_sdialog_comparer()
+    #cmp = c_sdialog_comparer()
+    cmp = c_sdialog_comparer_check()
     cmp.feed_lines(srclines, dstlines, shdlines)
     return cmp.result()
 
